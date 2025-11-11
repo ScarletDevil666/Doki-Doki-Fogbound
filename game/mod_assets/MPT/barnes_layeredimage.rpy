@@ -16,6 +16,7 @@ layeredimage barnes: #All definitions are for her facing forward.
         #By changing what the "mood" attribute is, you can easily switch between premade sets of expressions that work well together, speeding up your workflow.
         #Additionally, you can add in any new ones as you like.
         attribute neut default null #neutral
+        attribute lsur null
         #attribute xxxx null #xxxx #Do you want to define a new mood?  Here, have a template!
     
     
@@ -33,8 +34,8 @@ layeredimage barnes: #All definitions are for her facing forward.
         #     "mod_assets/MPT/barnes/barnes_forward_mouth_ma.png"
         attribute cm default if_any(["neut"]):
             "mod_assets/MPT/barnes/Expressions/Mouth/1.png"
-        # attribute cm default if_any(["lsur","curi"]):
-        #     "mod_assets/MPT/barnes/barnes_forward_mouth_me.png"
+        attribute cm default if_any(["lsur"]):
+            "mod_assets/MPT/barnes/Expressions/Mouth/4.png"
         # attribute cm default if_any(["vsur","pout"]):
         #     "mod_assets/MPT/barnes/barnes_forward_mouth_mf.png"
         # attribute cm default if_any(["shoc"]):
@@ -98,8 +99,8 @@ layeredimage barnes: #All definitions are for her facing forward.
         #     "mod_assets/MPT/barnes/barnes_forward_eyes_e1d.png"
         # attribute oe default if_any(["cry"]):
         #     "mod_assets/MPT/barnes/barnes_forward_eyes_e1g.png"
-        # attribute oe default if_any(["vang","vsur","lsur"]):
-        #     "mod_assets/MPT/barnes/barnes_forward_eyes_e2a.png"
+        attribute oe default if_any(["lsur"]):
+            "mod_assets/MPT/barnes/Expressions/Eyes/2.png"
         # attribute oe default if_any(["nerv"]):
         #     "mod_assets/MPT/barnes/barnes_forward_eyes_e2b.png"
         # attribute oe default if_any(["pani","shoc"]):
@@ -135,8 +136,8 @@ layeredimage barnes: #All definitions are for her facing forward.
         #     "mod_assets/MPT/barnes/barnes_forward_eyebrows_b1c.png"#
         # attribute brow default if_any(["vang","angr"]):
         #     "mod_assets/MPT/barnes/barnes_forward_eyebrows_b1e.png"#
-        # attribute brow default if_any(["lsur"]):
-        #     "mod_assets/MPT/barnes/barnes_forward_eyebrows_b2b.png"#
+        attribute brow default if_any(["lsur"]):
+            "mod_assets/MPT/barnes/Expressions/Eyebrows/1.png"#
         # attribute brow default if_any(["vsur"]):
         #     "mod_assets/MPT/barnes/barnes_forward_eyebrows_b2a.png"#
         # attribute brow default if_any(["dist","pout"]):

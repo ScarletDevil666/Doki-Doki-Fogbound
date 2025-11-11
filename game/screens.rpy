@@ -1192,6 +1192,16 @@ screen ddlc_preferences():
                     if config.sample_sound:
                         textbutton _("Test") action Play("sound", config.sample_sound)
 
+            hbox:
+                label _("Ambient Volume")
+                
+                null width 5
+            
+                text str(round(preferences.get_volume("ambient") * 100)) style "value_text"
+
+            hbox:
+                bar value Preference("ambient volume")
+
             if config.has_voice:
                 hbox:
                     label _("Voice Volume")
