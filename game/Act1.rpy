@@ -356,7 +356,7 @@ label Act1:
     "The forest thickens."
     "For a few precious seconds, the world feels quieter."
 
-    show libitina base unsu at t21 with with dissolve
+    show libitina base unsu at t21 with dissolve
     l "Maybe... maybe we're safe..."
     show libitina at thide
     hide libitina
