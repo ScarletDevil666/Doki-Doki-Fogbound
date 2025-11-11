@@ -349,5 +349,102 @@ label Act1:
     pause 1.0
 
     "Branches scratch our faces instantly."
+    "I hear them behind us."
+    "The guards shouting orders, the clang of weapons, the snap of gunpowder."
+    "I think we've reached safety."
+    "For now."
+    "The forest thickens."
+    "For a few precious seconds, the world feels quieter."
+
+    show libitina base unsu at t21 with with dissolve
+    l "Maybe... maybe we're safe..."
+    show libitina at thide
+    hide libitina
+
+    play music "mod_assets/music/Zombie (Cover).ogg" fadein 2.0
+    pause 1.0
+    
+    "But instinct screams at me."
+    "Movement in the shadows, figured crouched behind thick trees, hidden, and waiting."
+    "Only a few seconds remain."
+
+    mo 'LIBITINA! RUN!'
+    
+    "She does not hesitate. Her feet pound the ground as she vanishes down a narrow path I cannot follow with her."
+    "My heart clenches, knowing what must come next."
+    "The spell, long kept secret, waits for this moment."
+    "This is it."
+    "No time to hesitate. No chance for second thoughts."
+    "The kingdom dies fully if I do not act."
+    "The only way to protect her, and the last hope of survival is this."
+
+    pause 1.0
+    play sound "mod_assets/THROAT SLITTING.ogg"
+    pause 1.0
+    
+    "A single, straight cut opens my throat. Blood spills, warmth fades, and the world tilts."
+    play sound "mod_assets/sfx/collapse.ogg"
+    scene black with fade
+    "Behind me, the enemy is silent."
+    "Then, realization kicks in."
+    pause 1.0
+    play sound "mod_assets/sfx/the king is dead! (sound effect).ogg"
+    en "Everyone's dead! The kingdom is ours!"
+    stop music fadeout 2.0
+
+    pause 3.0
+
+    # TODO: foggy village bg, sound effect for gasp.
+    # scene bg village_foggy with fade
+    # play sound "mod_assets/sfx/gasp.ogg"
+
+    pause 1.0
+    "I awaken slowly, in another soldier's vessel."
+    "Limbs that once were strong, now feel brittle and foreign, weighed down by the shell of someone else."
+    stop ambient fadeout 2.0
+    pause 1.0
+    "This."
+    "This is the cost."
+    "The body dies, but the mind endures."
+    "The shell is borrowed, broken, but the king remains."
+    "I have cheated death, but the world has not cheated me."
+    # The script says to hide Morvayn, but it never said to show him in the first place? Confusion.
+    
+    "I rise on unsteady legs."
+    "Every motion is a reminder this is not my form, not my strength."
+    "And yet, I am here."
+    "Dead soldiers around me."
+    "I can think, plan, breathe."
+    "I take in the empty, silent aura of the once full and spirited kingdom, letting the breeze cool over me."
+    "I take it in slowly, savoring each sense"
+    "My mind reaches for Libitina."
+    "I picture her small, brave, running ahead, untouched by the enemy."
+
+    mo "She is safe, for now."
+    mo "And that is all that matters."
+    mo "For her, I have endured the unbearable."
+    mo "For her, I cast the spell no king should ever wield."
+    pause 1.0
+    "They think the king is dead."
+    "They celebrate as if they have claimed everything."
+    "They do not know the truth. They do not know that the ruler remains."
+    "That I remain."
+    "That the game is not over."
+    "They are all by the forest."
+    "I must move fast."
+    "I take a step forward, then another."
+    "Each movement, each breath, each heartbeat is proof."
+    "Proof that the impossible has happened."
+
+    mo "The king is dead… But the ruler lives on…"
+    mo "Bound by the fog."
+    mo "I will find Libitina. She will not be left behind."
+    
+    stop music fadeout 2.0
+    scene black
+    with dissolve_scene_full
+
+
+
 
     return
