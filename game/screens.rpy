@@ -212,7 +212,7 @@ style window:
     yalign gui.textbox_yalign
     ysize gui.textbox_height
 
-    background Transform("gui/textbox.png", xalign=0.5, yalign=1.0)
+    background Transform("mod_assets/UI/1600-1700 Text Box.png", xalign=0.5, yalign=1.0)
 
 style window_monika is window:
     background Transform("gui/textbox_monika.png", xalign=0.5, yalign=1.0)
@@ -794,10 +794,10 @@ screen about():
                 yfit True
 
             vbox:
-                add Transform("mod_assets/DDLCModTemplateLogo.png", size=(200,200)) xalign .5
+                add Transform("mod_assets/UI/Fogbound.png", size=(200,200)) xalign .5
 
                 null height 5
-                
+
                 label "[config.name!t]" xalign .5
                 text _("Version [config.version!t]\n") xalign .5
 
