@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/Act1.rpy", line 5: play requires a channel
-    play 
-         ^
+File "game/ModDefine.rpy", line 9: invalid syntax
+    Fog(fog_color:(0.0, 0.0, 0.0))
+                  ^
 
 Ren'Py Version: Ren'Py 8.0.3.22090809
-Tue Nov 11 11:18:57 2025
+Thu Nov 13 17:01:34 2025

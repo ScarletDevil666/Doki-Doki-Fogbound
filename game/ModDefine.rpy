@@ -6,7 +6,6 @@ image bg Village = "mod_assets/bgs/Calm B4 The Storm Village.png"
 image bg Guards1 = "mod_assets/bgs/Armed Guards #1.png"
 image bg Guards2 = "mod_assets/bgs/Armed Guards #2.png"
 image bg 1600Forest = "mod_assets/bgs/1600 Forest.png"
-image fog = Fog() 
 define flash = Fade(.10, 0, .75, color="#fff")
 #characters
 define mo = Character("Morvayn", color="#a0d0ff")
