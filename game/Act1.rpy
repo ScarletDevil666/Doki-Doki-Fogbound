@@ -284,7 +284,7 @@ label Act1:
     scene bg Guards2 with dissolve
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
 
-    show libitina base worr at t31 with dissolve
+    show libitina base vsca om at t31 with dissolve
     l "Father, what are we going to do?"
 
     show libitina worr

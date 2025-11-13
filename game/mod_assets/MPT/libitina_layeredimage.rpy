@@ -25,6 +25,8 @@ layeredimage libitina base:
         attribute conc null # concentraiting
         attribute upse null # upset
         attribute worr null # worried
+        attribute lsca null # lightly scared
+        attribute vsca null # very scared
 
         attribute lsur null # lightly surprised
         attribute vsur null # very surprised
@@ -45,13 +47,15 @@ layeredimage libitina base:
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/a.png"
         attribute cm default if_any(['neut', 'unim', 'sad', 'angr']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/b.png"
-        attribute cm default if_any(['neut2', 'unsu', 'conc', 'upse', 'worr', 'awkw']):
+        attribute cm default if_any(['neut2', 'unsu', 'conc', 'upse', 'worr', 'awkw', 'lsca', 'vsca']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/c.png"
 
         attribute om if_any(['happ', 'vsur', 'flat', 'vple', 'vtea']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/d.png"
         attribute om if_any(['lsur', 'amus', 'plea', 'worr', 'awkw']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/e.png"
+        attribute om if_any(['lsca', 'vsca']):
+            "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/ml.png"
 
         attribute mouth_a:
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/a.png"
@@ -63,16 +67,18 @@ layeredimage libitina base:
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/d.png"
         attribute mouth_e:
             "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/e.png"
+        attribute mouth_f:
+            "mod_assets/MPT/gov.sdc.libitina_exp/Mouths/ml.png"
 
     group eyes:
-        attribute oe default if_any(['happ', 'neut', 'neut2', 'amus', 'vsur', 'vple', 'plea']):
+        attribute oe default if_any(['happ', 'neut', 'neut2', 'amus', 'vsur', 'vple', 'plea', 'vsca']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Eyes/a.png"
-        attribute oe default if_any(['flat', 'unim', 'unsu', 'lsur', 'angr', 'upse', 'worr', 'teas', 'vtea', 'awkw', 'sad', 'conc']):
+        attribute oe default if_any(['flat', 'unim', 'unsu', 'lsur', 'angr', 'upse', 'worr', 'teas', 'vtea', 'awkw', 'sad', 'conc', 'lsca']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Eyes/b.png"
 
         attribute ce if_any(['happ', 'amus', 'vsur', 'flat', 'lsur', 'teas', 'vtea', 'vple']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Eyes/c.png"
-        attribute ce if_any(['plea', 'unim', 'unsu', 'sad', 'awkw', 'worr']):
+        attribute ce if_any(['plea', 'unim', 'unsu', 'sad', 'awkw', 'worr', 'lsca', 'vsca']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Eyes/d.png"
 
         attribute eyes_a:
@@ -89,7 +95,7 @@ layeredimage libitina base:
             "mod_assets/MPT/gov.sdc.libitina_exp/Eyebrows/a.png"
         attribute brow default if_any(['teas', 'vtea', 'angr', 'upse']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Eyebrows/b.png"
-        attribute brow default if_any(['sad', 'awkw', 'worr']):
+        attribute brow default if_any(['sad', 'awkw', 'worr', 'lsca', 'vsca']):
             "mod_assets/MPT/gov.sdc.libitina_exp/Eyebrows/c.png"
 
         attribute eyebrows_a:
