@@ -54,5 +54,5 @@ image goro dawn = LayeredImageProxy("goro", Transform(matrixcolor=TintMatrix("#f
 image goro dusk = LayeredImageProxy("goro", Transform(matrixcolor=TintMatrix("#ffbec7")))
 image goro evening = LayeredImageProxy("goro", Transform(matrixcolor=TintMatrix("#c5cbf4")))
 image goro night = LayeredImageProxy("goro", Transform(matrixcolor=TintMatrix("#808598")))
-image goro fire = LayeredImageProxy("libitina base", Transform(matrixcolor=TintMatrix("#d66c15ff")))
+image goro fire = LayeredImageProxy("goro", Transform(matrixcolor=TintMatrix("#d66c15ff")))
 
