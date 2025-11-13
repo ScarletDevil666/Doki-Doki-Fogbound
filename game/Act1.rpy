@@ -20,7 +20,7 @@ label Act1:
     "An adviser, Goro. He always walks like he’s afraid of waking ghosts."
     "I scoff. Though if anyone here should fear the dead, it’s me."
 
-    show goro neut at t21
+    show goro neut fire at t21
     "Goro pauses at my side, head bowed in respect."
 
     g "Sire, forgive the intrusion. But I bring troubling news."
@@ -33,7 +33,7 @@ label Act1:
 
     g "I fear not, King Morvayn. Not while the kingdom still breathes."
 
-    mo "…I thought as much. Speak."
+    mo "...I thought as much. Speak."
 
     show goro conc
     g "It is the people."
@@ -83,7 +83,7 @@ label Act1:
     play ambient "mod_assets/ambience/int_day.ogg"
     pause
 
-    "It’s been about two minutes since I stopped in front of Libatina’s cracked door."
+    "It’s been about two minutes since I stopped in front of Libitina’s cracked door."
     "The wood is splintered at the hinges. I should have had it repaired weeks ago."
     "I just never found the time."
     "And with the way things are, I might as well not ever have the time."
@@ -106,7 +106,7 @@ label Act1:
     "I told myself not to speak of it, not to give it power by saying it out loud."
     "Maybe I just didn’t want to see fear reflected back at me."
     mo "Fuck."
-    "I didn’t even tell Libatina."
+    "I didn’t even tell Libitina."
     "She would ask questions, and she deserves answers I don’t have."
     "She would’ve asked ‘who caused this?’ Or ‘why is this happening?’"
     "And I have no goddamn clue!"
@@ -126,21 +126,21 @@ label Act1:
     scene bg LibitinaRoom with dissolve
 
     "I gently open the door."
-    "Libatina sits on the floor, legs crossed, and looking down."
+    "Libitina sits on the floor, legs crossed, and looking down."
     "The wind from the door blows to her, causing her to flinch slightly."
     "I step inside slowly, careful not to break the quiet of the room too much."
 
     #show morvayn neutral at center
-    mo "Libatina, there is something I must tell you."
+    mo "Libitina, there is something I must tell you."
 
-    show libitina base neut at t31
+    show libitina base neut fire at t31
     with dissolve
     "She turns, startled at the sound of my voice breaking the calm."
 
     show libitina vsur
     l "What is it, Father?"
     show libitina worr
-    l "You look pale…"
+    l "You look pale..."
 
     mo "I—"
     mo "There’s no easy way to say this..."
@@ -190,7 +190,7 @@ label Act1:
     scene bg Village with dissolve
     play music "mod_assets/music/King Morvayn.ogg"
     play ambient "mod_assets/ambience/ext_day.ogg"
-    show libitina base neut at t31
+    show libitina base neut dusk at t31
 
     "She steps forward, and together we walk toward the door."
     "The breeze blows lightly on the edges of her dress."
@@ -200,7 +200,7 @@ label Act1:
     scene black with fade
     pause 0.2
     scene bg Village with fade
-    show libitina base neut at t31
+    show libitina base neut dusk at t31
     "A couple of hours pass."
     "The two of us are taking in the cool breeze."
     "The kingdom breathes around us, unaware of the storm bound to happen."
@@ -321,7 +321,7 @@ label Act1:
     "Libitina clutches my arm, eyes wide, breaths shallow."
     "Her pace matches mine. I keep a hand on her shoulder, guiding and protecting."
 
-    l "Father… I… I can’t—"
+    l "Father... I... I can’t—"
 
     mo "Focus on me, Libitina. Stay close. Do not look back."
 
@@ -337,7 +337,7 @@ label Act1:
     "We spotted a nearby forest. Its entrance lies open and unguarded—a haven for cover."
 
     show libitina base worr at t31 with dissolve
-    l "Father… is it over? Are we—"
+    l "Father... is it over? Are we—"
 
     mo "Not yet. Keep moving. Don’t slow."
 
@@ -394,8 +394,10 @@ label Act1:
 
     pause 3.0
 
-    # TODO: foggy village bg, sound effect for gasp.
-    # scene bg village_foggy with fade
+    # TODO:  sound effect for gasp.
+    scene bg Village
+    show fog
+    with dissolve_scene_full
     # play sound "mod_assets/sfx/gasp.ogg"
 
     pause 1.0
@@ -436,7 +438,7 @@ label Act1:
     "Each movement, each breath, each heartbeat is proof."
     "Proof that the impossible has happened."
 
-    mo "The king is dead… But the ruler lives on…"
+    mo "The king is dead... But the ruler lives on..."
     mo "Bound by the fog."
     mo "I will find Libitina. She will not be left behind."
     
@@ -451,14 +453,14 @@ label Act1:
     "Years carried in exile, walking in shadows, wearing a face that’s not my own."
     "Yet through all of it, Libitina has remained at my side."
     pause 1.0
-    "We have crossed kingdoms, seas, mountains… all searching."
+    "We have crossed kingdoms, seas, mountains... all searching."
     "Always searching."
 
     play sound "mod_assets/sfx/crackling fire.ogg"
     "We rest by the fire, the forest around us quiet."
 
     show libitina base neut at t11 with dissolve
-    l "Father… how long will this go on?"
+    l "Father... how long will this go on?"
     pause 1.0
     mo "What do you mean, Libitina?"
     show libitina sad
@@ -484,7 +486,7 @@ label Act1:
     l "We endure. But what life is this?"
     l "Running from one shadow to the next?"
     "Her eyes meet mine in the firelight."
-    mo "Home is not found, Libatina."
+    mo "Home is not found, Libitina."
     mo "It is made. And it cannot be made yet."
     mo "Not until the prophecy is fulfilled."
     show libitina neut
@@ -493,7 +495,7 @@ label Act1:
     mo "Then we keep walking."
     mo "Because if we stop, all of this-"
     pause 0.75
-    mo "All of us… ends."
+    mo "All of us... ends."
     show libitina neut mouth_c eyes_d
     "She exhales, looking into the flames."
     "Not content, but not broken either."
@@ -523,7 +525,7 @@ label Act1:
     "Wide, deep, and black with shadow."
     "The space here is broken, as if struck by something ancient, something meant to be forgotten."
     show libitina base unsu at t11
-    l "What is this place…?"
+    l "What is this place...?"
     mo "I-I do not know. I have never seen land shaped like this."
     show libitina at thide
     hide libitina
@@ -550,7 +552,7 @@ label Act1:
     play ambient "mod_assets/sfx/int_night.ogg"
     scene bg cave_interior with wipeleft_scene
     "The stone narrows around us, pressing close, until at last the passage opens into a chamber."
-    "Libatina and I walk by each side looking for some type of connection, or shelter inside the space."
+    "Libitina and I walk by each side looking for some type of connection, or shelter inside the space."
     "But instead I'm met with something else."
     scene black with fade
     "Little lines of text are scattered around the cave, each one less reconcilable than the other."
@@ -605,7 +607,7 @@ label Act1:
     mo "He knew the kingdom would fall."
     mo "He knew we would stand here, at the edge of its grave."
     mo "These words.."
-    mo "They are meant for us, Libatina."
+    mo "They are meant for us, Libitina."
     pause 1.0
     mo "We must find out what this means."
     mo "If it takes us days, weeks, years.."
@@ -614,5 +616,119 @@ label Act1:
     stop music fadeout 2.0
     scene black
     with dissolve_scene_full
+
+    # Title Card: Three Years Later
+    scene bg 1700_Path
+    with dissolve_scene_full
+    play music "mod_assets\music\Zombie (Cover).ogg" fadein 2.0
+    "Three years passed within the stone belly of the crater."
+    "Three years of dust and firelight, of words carved into parchment until my hands bled."
+    "With many quests as-well along the way."
+    "Three years of Libitina’s quiet voice, keeping me anchored when shadows pressed too close."
+    "I love her."
+    "We’ve gone through hell and back together."
+    pause 1.0
+    "At last, the language surrendered itself to me."
+    "The meaning was not simple... but it was clear."
+    "It’s time I tell Libitina."
+    "It’s time we go."
+    "I step into the cave"
+    scene bg cave_text with wipeleft_scene
+    mo "Libitina, It’s time." 
+    show libitina base unsu night at t11
+    l "Oh my?"
+    l "Father this is.."
+    l "What does it say?"
+    mo "It speaks of two paths."
+    l "What do they say?"
+    mo "The first is a way through."
+    mo "A portal."
+    mo "A passage to another world."
+    mo "A place where our people’s power lies waiting."
+    pause 1.0
+    mo "The second is the spell I once used, long ago."
+    mo "But perfected."
+    mo "Refined, you could say."
+    "It is not a simple transfer now, not the vessel I once forged for myself."
+    "This is power without limit."
+    mo "It speaks of a mass awakening."
+    mo "A way to place thought, memory, soul into bodies already stilled by death."
+    mo "An army, loyal and unbroken. Carved not of flesh, but of will."
+    show libitina worr
+    l "To wake the dead?"
+    "Her voice trembles, not in fear of me, but of what these words demand. And yet she does not turn away."
+    mo "Yes. To wake them."
+    mo "To bring them back to us eventually."
+    mo "These texts tell me the truth."
+    mo "The portal will carry us to a world not unlike our own, yet steeped in what was lost."
+    mo "There, we must find vessels."
+    mo "Bodies left behind by death, waiting to be claimed."
+    l "Vessels...?"
+    mo"Yes. People."
+    mo"Each one will hold more strength than the last."
+    mo"We must claim them, master them, until at last we find the strongest vessel of all."
+    mo"Even if it means we have to kill."
+    pause 1.0
+    mo"Only then can my power be restored."
+    mo"Only then can we return to Blackbriar... and raise our kingdom from its grave."
+    mo"Bring the people back."
+    mo"And take what’s ours.."
+    pause 1.0
+    mo "Libitina, I need you to open the portal for me."
+    show libitina awkw
+    l "...Me?"
+    mo "Yes. The blood that binds us is the key."
+    mo "Alone, I cannot force the passage open."
+    mo "But with your strength, our line united, the way will yield."
+    l "I-I don’t know if I can."
+    mo "You can. You must."
+    mo "These words were left for us, not for others."
+    mo "The path is ours to walk."
+    pause 1.0
+    mo "Without you, Libitina, the kingdom dies with me."
+    show libitina conc
+    l "...Tell me what to do."
+    "I move over to the wall, fingers tracing the deepest lines of the script."
+    "My voice takes the rhythm of the old tongue... words my grandfather once whispered by firelight, long ago."
+    "The cave trembles."
+    # TODO: low hum sfx
+    # play sound "mod_assets/sfx/low hum.ogg"
+    "A low hum grows in the stone, in the air, in their very blood."
+    "The symbols ignite, faint at first, then brighter, as though the chamber itself remembers its purpose."
+    mo "Place your hand here, Libitina. Feel the words. Do not fear them."
+    "She steps closer, hesitation lingering in her breath."
+    "Slowly, she presses her palm to the stone beside mine."
+    scene bg cave_text
+    with flash
+    "Suddenly the wall splits."
+    "Light spills forth, pale and shifting, a wound in the air where stone once stood."
+    show libitina base lsur night at t11
+    l "...Father, it’s real."
+    mo "More real than anything we have known."
+    pause 1.0
+    mo "This is our passage."
+    mo "Our reckoning."
+    mo "Beyond this rift, the vessels await."
+    scene white with Dissolve(6.0)
+    "The light of the portal washes over us, painting the chamber in ghostly hues."
+    "The cave groans as if resisting, yet the path holds open, beckoning."
+    "I look to my beloved daughter, for the last time."
+    mo "Once we step through, there is no return."
+    mo "Do you understand?"
+    mo "No matter what happens."
+    mo "We survive."
+    mo "Do whatever it takes to restore Blackbriar."
+    show libitina base conc night at t11
+    l "I understand."
+    l "If it means the kingdom lives again... I will follow you."
+    mo "...Then let us begin."
+    "Together, we step into the rift."
+    "The cavern vanishes, swallowed in white."
+    "And with it, the last memory of Blackbriar falls away.."
+    scene black
+    with dissolve_scene_full
+    stop music fadeout 2.0
+    stop sfx fadeout 2.0
+
 
     return
