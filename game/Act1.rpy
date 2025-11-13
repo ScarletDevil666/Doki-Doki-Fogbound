@@ -15,7 +15,7 @@ label Act1:
     mo "Ruling over thousands can wear even a king down in time."
 
     #play sound "footsteps_soft.ogg"
-    "(I hear footsteps behind me, approaching softly.)"
+    "I hear footsteps behind me, approaching softly."
     "I don’t need to turn. The rhythm of those steps is familiar."
     "An adviser, Goro. He always walks like he’s afraid of waking ghosts."
     "I scoff. Though if anyone here should fear the dead, it’s me."
@@ -379,7 +379,7 @@ label Act1:
     "The only way to protect her, and the last hope of survival is this."
 
     pause 1.0
-    play sound "mod_assets/THROAT SLITTING.ogg"
+    play sound "mod_assets/sfx/THROAT SLITTING.ogg"
     pause 1.0
     
     "A single, straight cut opens my throat. Blood spills, warmth fades, and the world tilts."
@@ -416,7 +416,7 @@ label Act1:
     "Dead soldiers around me."
     "I can think, plan, breathe."
     "I take in the empty, silent aura of the once full and spirited kingdom, letting the breeze cool over me."
-    "I take it in slowly, savoring each sense"
+    "I take it in slowly, savoring each sense."
     "My mind reaches for Libitina."
     "I picture her small, brave, running ahead, untouched by the enemy."
 
@@ -443,8 +443,176 @@ label Act1:
     stop music fadeout 2.0
     scene black
     with dissolve_scene_full
+    pause 1.0
+    scene bg 1700_Forest
+    with dissolve_scene_full
+    #play ambient "mod_assets/sfx/wind"
+    "Nearly a hundred years have passed since the fall of Blackbriar."
+    "Years carried in exile, walking in shadows, wearing a face that’s not my own."
+    "Yet through all of it, Libitina has remained at my side."
+    pause 1.0
+    "We have crossed kingdoms, seas, mountains… all searching."
+    "Always searching."
 
+    play sound "mod_assets/sfx/crackling fire.ogg"
+    "We rest by the fire, the forest around us quiet."
 
+    show libitina base neut at t11 with dissolve
+    l "Father… how long will this go on?"
+    pause 1.0
+    mo "What do you mean, Libitina?"
+    show libitina sad
 
+    l "We leave one place, find another."
+    l "And every time, they drive us out."
+    l "It’s been nearly a century."
+    show libitina unsu
+    l "War, suspicion, curses."
+    l "Running.."
+    l "Always something."
+    l "Always someone watching."
+    pause 1.0
+    l "When will we have a home again?"
+    "Her voice is not the frightened whisper of the girl she once was."
+    "It carries weight now."
+    "Patience, tempered by years I cannot deny her."
+    mo "Heh.."
+    mo "I have asked myself the same question."
+    mo "More times than you know."
+    show libitina unim
+    l "We survive, yes."
+    l "We endure. But what life is this?"
+    l "Running from one shadow to the next?"
+    "Her eyes meet mine in the firelight."
+    mo "Home is not found, Libatina."
+    mo "It is made. And it cannot be made yet."
+    mo "Not until the prophecy is fulfilled."
+    show libitina neut
+    l "What the hell kind of prophecy are we looking for?"
+    l "And if we never find it?"
+    mo "Then we keep walking."
+    mo "Because if we stop, all of this-"
+    pause 0.75
+    mo "All of us… ends."
+    show libitina neut mouth_c eyes_d
+    "She exhales, looking into the flames."
+    "Not content, but not broken either."
+    "Her strength humbles me"
+    "In her voice I hear the echo of her mother.."
+    "And in her silence, the weight of every year I’ve stolen from her."
+    "Dammit.."
+    show libitina base conc
+    l "Then I will walk with you, Father."
+    play sound "mod_assets/sfx/Dying Fire.ogg"
+    "The fire fades away, the smell lingering around us."
+    show libitina base neut
+    l "The fire’s gone, Father."
+    l "Do we keep moving?"
+    mo "Yes. We cannot stay where the light dies."
+    mo "We move until we find shelter."
+    scene bg 1700_path
+    with dissolve_scene_full
+    "We’ve been walking for a while through an unfamiliar path."
+    "The path is uneven, tangled with roots and shadow."
+    "Each step feels heavier than the last, but we press on."
+    "Hours blur, until the forest gives way to something vast."
+    "Before us, the trees fall away as we move."
+    "We approach a-"
+    scene black
+    "A-A crater."
+    "Wide, deep, and black with shadow."
+    "The space here is broken, as if struck by something ancient, something meant to be forgotten."
+    show libitina base unsu at t11
+    l "What is this place…?"
+    mo "I-I do not know. I have never seen land shaped like this."
+    show libitina at thide
+    hide libitina
+    "We step carefully to the edge."
+    "Loose stones tumble downward, swallowed by the dark. Then, in the stillness, I see it."
+    "A crack?"
+    "No, an opening."
+    "A cave.."
+    "At first it seems natural, but as I look closer.."
+    "The shape is too deliberate, the angles way too clean."
+    "This is no accident of stone."
+    show libitina base worr at t11
+    l "Father... there’s something inside."
+    "She’s right."
+    "A passage, cut by hands long before ours."
+    "A cave, hidden beneath the scar of the crater."
+    "My heart beats faster. Not with certainty."
+    "But with the weight of discovery."
+    "Whatever this place is, it was meant to be found, or meant to be buried."
+    mo "Come with me Lib."
+    mo "We will see what waits in the dark."
+    stop ambient fadeout 2.0
+    "Together, we descend into the depths."
+    play ambient "mod_assets/sfx/int_night.ogg"
+    scene bg cave_interior with wipeleft_scene
+    "The stone narrows around us, pressing close, until at last the passage opens into a chamber."
+    "Libatina and I walk by each side looking for some type of connection, or shelter inside the space."
+    "But instead I'm met with something else."
+    scene black with fade
+    "Little lines of text are scattered around the cave, each one less reconcilable than the other."
+    "The walls.."
+    "They are not natural."
+    "Carved by hand, etched with symbols that shimmer faintly against the dim light."
+    "A language unknown, curling across the stone like roots of meaning I cannot yet grasp."
+    "But, a couple of lines singled out, stand out to me."
+    pause 0.5
+    scene bg cave_text with dissolve
+    mo "...Someone was here before us."
+    show libitina base unsu at t11
+    l "Father, can you read it?"
+    "I reach out, fingers brushing against the ancient text."
+    pause
+    show libitina at thide
+    hide libitina
+    "I cannot read it yet."
+    "But it feels familiar."
+    "As though some echo of the words lives in my blood."
+    pause 1.0
+    "Then I hear it.."
+    "Not from the walls, but from memory.."
+    "A voice, deep and steady, carried from my childhood."
+    "My grandfather’s voice."
+    stop ambient fadeout 2.0
+    play music "mod_assets/music/King Morvayn.ogg" fadein 3.0
+    mo "...I know this text."
+    show libitina base unsu at t11
+    l "You do? But how?"
+    mo "I never thought I would hear it again."
+    mo "My grandfather spoke these words only once, long ago, by firelight on a winter’s night."
+    mo "He said they were old, older than kings, and that I should remember them, though I never understood why."
+    mo "And here they are, carved into stone beneath Blackbriar.."
+    mo "The same warning he gave, inscribed by those who came before us."
+    mo "'If the kingdom falls, if fire takes the throne, seek the scar where earth was broken.'"
+    mo "'Beneath its wound, the words endure.'"
+    mo "'Take them into your blood, carry them into the dark.'"
+    mo "'And the line will not be severed.'"
+    show libitina base worr
+    l "He told you this?"
+    pause 1.0
+    l "He knew?"
+    "My chest tightens."
+    "My grandfather had spoken of ruin before it came.."
+    show libitina at thide
+    hide libitina
+    "He had left behind a path for us in the shadow of defeat."
+    "I thought of them only as stories."
+    "But now.."
+    "I now see them for what they really were."
+    mo "He knew the kingdom would fall."
+    mo "He knew we would stand here, at the edge of its grave."
+    mo "These words.."
+    mo "They are meant for us, Libatina."
+    pause 1.0
+    mo "We must find out what this means."
+    mo "If it takes us days, weeks, years.."
+    mo "So be it."
+    mo "We will find out."
+    stop music fadeout 2.0
+    scene black
+    with dissolve_scene_full
 
     return
