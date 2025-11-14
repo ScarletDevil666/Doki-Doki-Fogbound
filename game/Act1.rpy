@@ -133,7 +133,7 @@ label Act1:
     #show morvayn neutral at center
     mo "Libitina, there is something I must tell you."
 
-    show libitina base neut fire at t31
+    show libitina base neut fire regalia at t31
     with dissolve
     "She turns, startled at the sound of my voice breaking the calm."
 
@@ -190,7 +190,7 @@ label Act1:
     scene bg Village with dissolve
     play music "mod_assets/music/King Morvayn.ogg"
     play ambient "mod_assets/ambience/ext_day.ogg"
-    show libitina base neut dusk at t31
+    show libitina base neut regalia at t31
 
     "She steps forward, and together we walk toward the door."
     "The breeze blows lightly on the edges of her dress."
@@ -200,7 +200,7 @@ label Act1:
     scene black with fade
     pause 0.2
     scene bg Village with fade
-    show libitina base neut dusk at t31
+    show libitina base regalia neut at t31
     "A couple of hours pass."
     "The two of us are taking in the cool breeze."
     "The kingdom breathes around us, unaware of the storm bound to happen."
@@ -225,7 +225,7 @@ label Act1:
     mo "Damn it, how could I have been so careless?"
     mo "Our enemies chose their moment. And now, they come."
 
-    show libitina base worr at t31 with dissolve
+    show libitina base regalia worr at t31 with dissolve
     l "T-They caused this?"
 
     show libitina worr
@@ -247,7 +247,7 @@ label Act1:
     mo "They do not wait for us to recover."
     mo "Why should they?"
 
-    show libitina base worr at t31
+    show libitina base regalia worr at t31
     l "Father, can’t you stop them?"
 
     show libitina sad
@@ -284,10 +284,9 @@ label Act1:
     scene bg Guards2 with dissolve
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
 
-    show libitina base vsca om at t31 with dissolve
+    show libitina base regalia vsca om at t31 with dissolve
     l "Father, what are we going to do?"
 
-    show libitina worr
     mo "Our only goal is to survive."
     mo "Once that’s done, we run, and we take as many with us as possible."
 
@@ -309,6 +308,7 @@ label Act1:
     "It is not enough. My body strains, my mind stretches, and still the army advances, relentlessly."
     "A small group attempts to corner us—a handful of soldiers, a mage in the back keeping watch."
 
+    #TODO Running sound
     #play sound "running_faint.ogg"
     "There is no time. I catch Libitina’s hand, squeezing it once, and begin to flee."
     "We move fast, but not recklessly."
@@ -336,7 +336,7 @@ label Act1:
 
     "We spotted a nearby forest. Its entrance lies open and unguarded—a haven for cover."
 
-    show libitina base worr at t31 with dissolve
+    show libitina base regalia worr at t31 with dissolve
     l "Father... is it over? Are we—"
 
     mo "Not yet. Keep moving. Don’t slow."
@@ -356,7 +356,7 @@ label Act1:
     "The forest thickens."
     "For a few precious seconds, the world feels quieter."
 
-    show libitina base unsu at t21 with dissolve
+    show libitina base regalia unsu at t21 with dissolve
     l "Maybe... maybe we're safe..."
     show libitina at thide
     hide libitina
@@ -446,8 +446,9 @@ label Act1:
     scene black
     with dissolve_scene_full
     pause 1.0
-    scene bg 1700_Forest
+    scene bg 1700Forest
     with dissolve_scene_full
+    # TODO: Wind ambience
     #play ambient "mod_assets/sfx/wind"
     "Nearly a hundred years have passed since the fall of Blackbriar."
     "Years carried in exile, walking in shadows, wearing a face that’s not my own."
@@ -459,7 +460,7 @@ label Act1:
     play sound "mod_assets/sfx/crackling fire.ogg"
     "We rest by the fire, the forest around us quiet."
 
-    show libitina base neut at t11 with dissolve
+    show libitina base regalia neut fire at t11 with dissolve
     l "Father... how long will this go on?"
     pause 1.0
     mo "What do you mean, Libitina?"
@@ -474,6 +475,7 @@ label Act1:
     l "Always something."
     l "Always someone watching."
     pause 1.0
+    show libitina eyes_a
     l "When will we have a home again?"
     "Her voice is not the frightened whisper of the girl she once was."
     "It carries weight now."
@@ -503,16 +505,16 @@ label Act1:
     "In her voice I hear the echo of her mother.."
     "And in her silence, the weight of every year I’ve stolen from her."
     "Dammit.."
-    show libitina base conc
+    show libitina base regalia conc fire
     l "Then I will walk with you, Father."
     play sound "mod_assets/sfx/Dying Fire.ogg"
     "The fire fades away, the smell lingering around us."
-    show libitina base neut
+    show libitina base regalia neut night with dissolve
     l "The fire’s gone, Father."
     l "Do we keep moving?"
     mo "Yes. We cannot stay where the light dies."
     mo "We move until we find shelter."
-    scene bg 1700_path
+    scene bg 1700Path
     with dissolve_scene_full
     "We’ve been walking for a while through an unfamiliar path."
     "The path is uneven, tangled with roots and shadow."
@@ -524,7 +526,7 @@ label Act1:
     "A-A crater."
     "Wide, deep, and black with shadow."
     "The space here is broken, as if struck by something ancient, something meant to be forgotten."
-    show libitina base unsu at t11
+    show libitina base regalia unsu night at t11
     l "What is this place...?"
     mo "I-I do not know. I have never seen land shaped like this."
     show libitina at thide
@@ -537,7 +539,7 @@ label Act1:
     "At first it seems natural, but as I look closer.."
     "The shape is too deliberate, the angles way too clean."
     "This is no accident of stone."
-    show libitina base worr at t11
+    show libitina base regalia worr at t11
     l "Father... there’s something inside."
     "She’s right."
     "A passage, cut by hands long before ours."
@@ -550,7 +552,7 @@ label Act1:
     stop ambient fadeout 2.0
     "Together, we descend into the depths."
     play ambient "mod_assets/sfx/int_night.ogg"
-    scene bg cave_interior with wipeleft_scene
+    scene bg CaveInterior with wipeleft_scene
     "The stone narrows around us, pressing close, until at last the passage opens into a chamber."
     "Libitina and I walk by each side looking for some type of connection, or shelter inside the space."
     "But instead I'm met with something else."
@@ -562,9 +564,9 @@ label Act1:
     "A language unknown, curling across the stone like roots of meaning I cannot yet grasp."
     "But, a couple of lines singled out, stand out to me."
     pause 0.5
-    scene bg cave_text with dissolve
+    scene bg CaveText with dissolve
     mo "...Someone was here before us."
-    show libitina base unsu at t11
+    show libitina base regalia unsu night at t11
     l "Father, can you read it?"
     "I reach out, fingers brushing against the ancient text."
     pause
@@ -581,7 +583,7 @@ label Act1:
     stop ambient fadeout 2.0
     play music "mod_assets/music/King Morvayn.ogg" fadein 3.0
     mo "...I know this text."
-    show libitina base unsu at t11
+    show libitina base regalia unsu night at t11
     l "You do? But how?"
     mo "I never thought I would hear it again."
     mo "My grandfather spoke these words only once, long ago, by firelight on a winter’s night."
@@ -592,7 +594,7 @@ label Act1:
     mo "'Beneath its wound, the words endure.'"
     mo "'Take them into your blood, carry them into the dark.'"
     mo "'And the line will not be severed.'"
-    show libitina base worr
+    show libitina worr
     l "He told you this?"
     pause 1.0
     l "He knew?"
@@ -618,7 +620,7 @@ label Act1:
     with dissolve_scene_full
 
     # Title Card: Three Years Later
-    scene bg 1700_Path
+    scene bg 1700Path
     with dissolve_scene_full
     play music "mod_assets\music\Zombie (Cover).ogg" fadein 2.0
     "Three years passed within the stone belly of the crater."
@@ -633,9 +635,9 @@ label Act1:
     "It’s time I tell Libitina."
     "It’s time we go."
     "I step into the cave"
-    scene bg cave_text with wipeleft_scene
+    scene bg CaveText with wipeleft_scene
     mo "Libitina, It’s time." 
-    show libitina base unsu night at t11
+    show libitina base regalia unsu night at t11
     l "Oh my?"
     l "Father this is.."
     l "What does it say?"
@@ -698,11 +700,11 @@ label Act1:
     mo "Place your hand here, Libitina. Feel the words. Do not fear them."
     "She steps closer, hesitation lingering in her breath."
     "Slowly, she presses her palm to the stone beside mine."
-    scene bg cave_text
+    scene bg CaveText
     with flash
     "Suddenly the wall splits."
     "Light spills forth, pale and shifting, a wound in the air where stone once stood."
-    show libitina base lsur night at t11
+    show libitina base regalia lsur night at t11
     l "...Father, it’s real."
     mo "More real than anything we have known."
     pause 1.0
@@ -718,7 +720,7 @@ label Act1:
     mo "No matter what happens."
     mo "We survive."
     mo "Do whatever it takes to restore Blackbriar."
-    show libitina base conc night at t11
+    show libitina base regalia conc night at t11
     l "I understand."
     l "If it means the kingdom lives again... I will follow you."
     mo "...Then let us begin."
