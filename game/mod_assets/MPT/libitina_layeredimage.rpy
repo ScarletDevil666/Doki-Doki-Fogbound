@@ -6,7 +6,7 @@ layeredimage libitina base:
         attribute uniform default:
             "mod_assets/MPT/gov.sdc.libitina_exp/Poses/1.png"
         attribute regalia:
-            "mod_assets/MPT/gov.sdc.libitina_gh/Poses/1k.png"
+            "mod_assets/MPT/gov.sdc.libitina_gh/Poses/2k.png"
 
     group mood: 
         attribute happ null # happy
@@ -114,7 +114,7 @@ layeredimage libitina leaning:
         attribute yandere:
             "mod_assets/MPT/gov.sdc.libitina_exp/Poses/3.png"
         attribute regalia:
-            "mod_assets/MPT/gov.sdc.libitina_gh/Poses/2k.png"
+            "mod_assets/MPT/gov.sdc.libitina_gh/Poses/1k.png"
         attribute regalia_yandere:
             "mod_assets/MPT/gov.sdc.libitina_gh/Poses/3k.png"
 

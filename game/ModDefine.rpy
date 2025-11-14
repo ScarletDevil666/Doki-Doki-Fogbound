@@ -8,7 +8,7 @@ image bg Guards2 = "mod_assets/bgs/Armed Guards #2.png"
 image bg 1600Forest = "mod_assets/bgs/1600 Forest.png"
 define flash = Fade(.10, 0, .75, color="#fff")
 #characters
-define mo = Character("Morvayn", color="#a0d0ff")
-define l = Character("Libatina", color="#c080ff")
-define g = Character("Goro", color="#d0a060")
-define en = Character("Enemies", color="#ad4949")
+define mo = Character("Morvayn")
+define l = Character("Libatina")
+define g = Character("Goro")
+define en = Character("Enemies")
