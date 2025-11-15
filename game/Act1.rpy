@@ -200,7 +200,7 @@ label Act1:
     scene black with fade
     pause 0.2
     scene bg Village with fade
-    show libitina base regalia neut dusk at t31
+    show libitina base regalia neut evening at t31
     "A couple of hours pass."
     "The two of us are taking in the cool breeze."
     "The kingdom breathes around us, unaware of the storm bound to happen."
