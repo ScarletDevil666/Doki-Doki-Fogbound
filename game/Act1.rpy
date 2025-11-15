@@ -243,6 +243,8 @@ label Act1:
     mo "Come on, come on..."
     "It is thin, almost nonexistent. A few flickers, weak sparks that sputter and die."
 
+    scene bg Village1 with dissolve_scene_full
+
     mo "So much power lost. And yet, they come."
     mo "They do not wait for us to recover."
     mo "Why should they?"
@@ -281,7 +283,11 @@ label Act1:
     "They will flank us if we stay."
     "I push past the railing, retreating into the shadows of the castle."
 
-    scene bg Guards2 with dissolve
+    "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
+    "I move silently, carefully, guiding Libatina to a safe corner."
+
+    scene bg Away_Path with wipeleft_scene
+
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
 
     show libitina base regalia vsca om at t31 with dissolve
@@ -289,6 +295,8 @@ label Act1:
 
     mo "Our only goal is to survive."
     mo "Once that’s done, we run, and we take as many with us as possible."
+
+    scene bg Guards1 with wipeleft_scene
 
     "Even as I say it, I know survival will demand a sacrifice beyond her understanding."
     "I feel the pulse of the spell inside me, the one I created long ago."
@@ -308,8 +316,7 @@ label Act1:
     "It is not enough. My body strains, my mind stretches, and still the army advances, relentlessly."
     "A small group attempts to corner us—a handful of soldiers, a mage in the back keeping watch."
 
-    #TODO Running sound
-    #play sound "running_faint.ogg"
+    play sound "faint running.ogg"
     "There is no time. I catch Libitina’s hand, squeezing it once, and begin to flee."
     "We move fast, but not recklessly."
     "Every step echoes against the ground, but it’s our only chance."
@@ -394,11 +401,10 @@ label Act1:
 
     pause 3.0
 
-    # TODO:  sound effect for gasp.
-    scene bg Village
+    scene bg Fire_Village
     show fog
     with dissolve_scene_full
-    # play sound "mod_assets/sfx/gasp.ogg"
+    play sound "mod_assets/sfx/gasp.ogg"
 
     pause 1.0
     "I awaken slowly, in another soldier's vessel."
@@ -448,8 +454,7 @@ label Act1:
     pause 1.0
     scene bg 1700Forest
     with dissolve_scene_full
-    # TODO: Wind ambience
-    #play ambient "mod_assets/sfx/wind"
+    play ambient "mod_assets/ambience/wind.ogg"
     "Nearly a hundred years have passed since the fall of Blackbriar."
     "Years carried in exile, walking in shadows, wearing a face that’s not my own."
     "Yet through all of it, Libitina has remained at my side."
@@ -693,8 +698,7 @@ label Act1:
     "I move over to the wall, fingers tracing the deepest lines of the script."
     "My voice takes the rhythm of the old tongue... words my grandfather once whispered by firelight, long ago."
     "The cave trembles."
-    # TODO: low hum sfx
-    # play sound "mod_assets/sfx/low hum.ogg"
+    play sound "mod_assets/sfx/Low Hum.ogg"
     "A low hum grows in the stone, in the air, in their very blood."
     "The symbols ignite, faint at first, then brighter, as though the chamber itself remembers its purpose."
     mo "Place your hand here, Libitina. Feel the words. Do not fear them."
