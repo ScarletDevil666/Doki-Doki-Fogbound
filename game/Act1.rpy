@@ -187,7 +187,9 @@ label Act1:
     hide morvayn
     stop sound fadeout 2.0
     scene black with dissolve
-    scene bg Village with dissolve
+    scene bg Village 
+    show fog
+    with dissolve
     play music "mod_assets/music/King Morvayn.ogg"
     play ambient "mod_assets/ambience/ext_day.ogg"
     show libitina base neut regalia evening at t31
@@ -199,7 +201,9 @@ label Act1:
 
     scene black with fade
     pause 0.2
-    scene bg Village with fade
+    scene bg Village
+    show fog 
+    with fade
     show libitina base regalia neut evening at t31
     "A couple of hours pass."
     "The two of us are taking in the cool breeze."
@@ -216,7 +220,9 @@ label Act1:
     stop music fadeout 2.0
     play ambient "mod_assets/ambience/war sounds.ogg"
 
-    scene bg Guards1 with fade
+    scene bg Guards1 
+    show fog
+    with fade
     "But slowly, as I focus, the shapes become clear."
     "Soldiers, mages, battlemages—an army moving with purpose, unrelenting."
     "A kingdom that clearly isn’t our own."
@@ -358,8 +364,10 @@ label Act1:
     stop music fadeout 3.0
     play ambient "mod_assets/ambience/ext_day.ogg"
 
-    scene bg 1600Forest with fade
-    pause 1.0
+    scene bg 1600Forest
+    show fog
+    with fade
+    pause 1.5
 
     "Branches scratch our faces instantly."
     "I hear them behind us."
@@ -375,7 +383,7 @@ label Act1:
     hide libitina
 
     play music "mod_assets/music/Zombie (Cover).ogg" fadein 2.0
-    pause 1.0
+    pause 1.5
     
     "But instinct screams at me."
     "Movement in the shadows, figured crouched behind thick trees, hidden, and waiting."
@@ -391,16 +399,16 @@ label Act1:
     "The kingdom dies fully if I do not act."
     "The only way to protect her, and the last hope of survival is this."
 
-    pause 1.0
+    pause 1.5
     play sound "mod_assets/sfx/THROAT SLITTING.ogg"
-    pause 1.0
+    pause 1.5
     
     "A single, straight cut opens my throat. Blood spills, warmth fades, and the world tilts."
     play sound "mod_assets/sfx/collapse.ogg"
     scene black with fade
     "Behind me, the enemy is silent."
     "Then, realization kicks in."
-    pause 1.0
+    pause 1.5
     play sound "mod_assets/sfx/the king is dead! (sound effect).ogg"
     en "Everyone's dead! The kingdom is ours!"
     stop music fadeout 2.0
@@ -414,11 +422,11 @@ label Act1:
     play sound "mod_assets/sfx/gasp.ogg"
     play ambient "mod_assets/ambience/rain_ext.ogg"
 
-    pause 1.0
+    pause 1.5
     "I awaken slowly, in another soldier's vessel."
     "Limbs that once were strong, now feel brittle and foreign, weighed down by the shell of someone else."
     stop ambient fadeout 2.0
-    pause 1.0
+    pause 1.5
     "This."
     "This is the cost."
     "The body dies, but the mind endures."
@@ -440,7 +448,7 @@ label Act1:
     mo "And that is all that matters."
     mo "For her, I have endured the unbearable."
     mo "For her, I cast the spell no king should ever wield."
-    pause 1.0
+    pause 1.5
     "They think the king is dead."
     "They celebrate as if they have claimed everything."
     "They do not know the truth. They do not know that the ruler remains."
@@ -459,7 +467,7 @@ label Act1:
     stop music fadeout 2.0
     scene black
     with dissolve_scene_full
-    pause 1.0
+    pause 1.5
     scene bg 1700Forest
     show fog
     with dissolve_scene_full
@@ -467,7 +475,7 @@ label Act1:
     "Nearly a hundred years have passed since the fall of Blackbriar."
     "Years carried in exile, walking in shadows, wearing a face that’s not my own."
     "Yet through all of it, Libitina has remained at my side."
-    pause 1.0
+    pause 1.5
     "We have crossed kingdoms, seas, mountains... all searching."
     "Always searching."
 
@@ -476,7 +484,7 @@ label Act1:
 
     show libitina base regalia neut fire at t11 with dissolve
     l "Father... how long will this go on?"
-    pause 1.0
+    pause 1.5
     mo "What do you mean, Libitina?"
     show libitina sad
 
@@ -488,7 +496,7 @@ label Act1:
     l "Running.."
     l "Always something."
     l "Always someone watching."
-    pause 1.0
+    pause 1.5
     show libitina eyes_a
     l "When will we have a home again?"
     "Her voice is not the frightened whisper of the girl she once was."
@@ -590,7 +598,7 @@ label Act1:
     "I cannot read it yet."
     "But it feels familiar."
     "As though some echo of the words lives in my blood."
-    pause 1.0
+    pause 1.5
     "Then I hear it.."
     "Not from the walls, but from memory.."
     "A voice, deep and steady, carried from my childhood."
@@ -611,7 +619,7 @@ label Act1:
     mo "'And the line will not be severed.'"
     show libitina worr
     l "He told you this?"
-    pause 1.0
+    pause 1.5
     l "He knew?"
     "My chest tightens."
     "My grandfather had spoken of ruin before it came.."
@@ -625,7 +633,7 @@ label Act1:
     mo "He knew we would stand here, at the edge of its grave."
     mo "These words.."
     mo "They are meant for us, Libitina."
-    pause 1.0
+    pause 1.5
     mo "We must find out what this means."
     mo "If it takes us days, weeks, years.."
     mo "So be it."
@@ -645,7 +653,7 @@ label Act1:
     "Three years of Libitina’s quiet voice, keeping me anchored when shadows pressed too close."
     "I love her."
     "We’ve gone through hell and back together."
-    pause 1.0
+    pause 1.5
     "At last, the language surrendered itself to me."
     "The meaning was not simple... but it was clear."
     "It’s time I tell Libitina."
@@ -663,7 +671,7 @@ label Act1:
     mo "A portal."
     mo "A passage to another world."
     mo "A place where our people’s power lies waiting."
-    pause 1.0
+    pause 1.5
     mo "The second is the spell I once used, long ago."
     mo "But perfected."
     mo "Refined, you could say."
@@ -686,12 +694,12 @@ label Act1:
     mo"Each one will hold more strength than the last."
     mo"We must claim them, master them, until at last we find the strongest vessel of all."
     mo"Even if it means we have to kill."
-    pause 1.0
+    pause 1.5
     mo"Only then can my power be restored."
     mo"Only then can we return to Blackbriar... and raise our kingdom from its grave."
     mo"Bring the people back."
     mo"And take what’s ours.."
-    pause 1.0
+    pause 1.5
     mo "Libitina, I need you to open the portal for me."
     show libitina awkw
     l "...Me?"
@@ -702,7 +710,7 @@ label Act1:
     mo "You can. You must."
     mo "These words were left for us, not for others."
     mo "The path is ours to walk."
-    pause 1.0
+    pause 1.5
     mo "Without you, Libitina, the kingdom dies with me."
     show libitina conc
     l "...Tell me what to do."
@@ -722,7 +730,7 @@ label Act1:
     show libitina base regalia lsur night at t11
     l "...Father, it’s real."
     mo "More real than anything we have known."
-    pause 1.0
+    pause 1.5
     mo "This is our passage."
     mo "Our reckoning."
     mo "Beyond this rift, the vessels await."
@@ -735,7 +743,6 @@ label Act1:
     mo "No matter what happens."
     mo "We survive."
     mo "Do whatever it takes to restore Blackbriar."
-    show libitina base regalia conc night at t11
     l "I understand."
     l "If it means the kingdom lives again... I will follow you."
     mo "...Then let us begin."
