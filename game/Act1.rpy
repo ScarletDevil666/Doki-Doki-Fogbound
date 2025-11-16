@@ -190,7 +190,7 @@ label Act1:
     scene bg Village with dissolve
     play music "mod_assets/music/King Morvayn.ogg"
     play ambient "mod_assets/ambience/ext_day.ogg"
-    show libitina base neut regalia at t31
+    show libitina base neut regalia evening at t31
 
     "She steps forward, and together we walk toward the door."
     "The breeze blows lightly on the edges of her dress."
@@ -200,7 +200,7 @@ label Act1:
     scene black with fade
     pause 0.2
     scene bg Village with fade
-    show libitina base regalia neut dusk at t31
+    show libitina base regalia neut evening at t31
     "A couple of hours pass."
     "The two of us are taking in the cool breeze."
     "The kingdom breathes around us, unaware of the storm bound to happen."
@@ -225,7 +225,7 @@ label Act1:
     mo "Damn it, how could I have been so careless?"
     mo "Our enemies chose their moment. And now, they come."
 
-    show libitina base regalia worr at t31 with dissolve
+    show libitina base regalia worr evening at t31 with dissolve
     l "T-They caused this?"
 
     show libitina worr
@@ -243,13 +243,15 @@ label Act1:
     mo "Come on, come on..."
     "It is thin, almost nonexistent. A few flickers, weak sparks that sputter and die."
 
-    scene bg Village1 with dissolve_scene_full
+    scene bg Village1
+    show fog 
+    with dissolve_scene_full
 
     mo "So much power lost. And yet, they come."
     mo "They do not wait for us to recover."
     mo "Why should they?"
 
-    show libitina base regalia worr at t31
+    show libitina base regalia worr evening at t31
     l "Father, can’t you stop them?"
 
     show libitina sad
@@ -286,17 +288,21 @@ label Act1:
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
     "I move silently, carefully, guiding Libatina to a safe corner."
 
-    scene bg Away_Path with wipeleft_scene
+    scene bg Away_Path
+    show fog 
+    with wipeleft_scene
 
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
 
-    show libitina base regalia vsca om at t31 with dissolve
+    show libitina base regalia vsca om evening at t31 with dissolve
     l "Father, what are we going to do?"
 
     mo "Our only goal is to survive."
     mo "Once that’s done, we run, and we take as many with us as possible."
 
-    scene bg Guards1 with wipeleft_scene
+    scene bg Guards1
+    show fog 
+    with wipeleft_scene
 
     "Even as I say it, I know survival will demand a sacrifice beyond her understanding."
     "I feel the pulse of the spell inside me, the one I created long ago."
@@ -343,7 +349,7 @@ label Act1:
 
     "We spotted a nearby forest. Its entrance lies open and unguarded—a haven for cover."
 
-    show libitina base regalia worr at t31 with dissolve
+    show libitina base regalia worr evening at t31 with dissolve
     l "Father... is it over? Are we—"
 
     mo "Not yet. Keep moving. Don’t slow."
@@ -363,7 +369,7 @@ label Act1:
     "The forest thickens."
     "For a few precious seconds, the world feels quieter."
 
-    show libitina base regalia unsu at t21 with dissolve
+    show libitina base regalia unsu evening at t21 with dissolve
     l "Maybe... maybe we're safe..."
     show libitina at thide
     hide libitina
@@ -403,8 +409,10 @@ label Act1:
 
     scene bg Fire_Village
     show fog
+    show eff_rain_l
     with dissolve_scene_full
     play sound "mod_assets/sfx/gasp.ogg"
+    play ambient "mod_assets/ambience/rain_ext.ogg"
 
     pause 1.0
     "I awaken slowly, in another soldier's vessel."
@@ -453,6 +461,7 @@ label Act1:
     with dissolve_scene_full
     pause 1.0
     scene bg 1700Forest
+    show fog
     with dissolve_scene_full
     play ambient "mod_assets/ambience/wind.ogg"
     "Nearly a hundred years have passed since the fall of Blackbriar."
@@ -514,12 +523,13 @@ label Act1:
     l "Then I will walk with you, Father."
     play sound "mod_assets/sfx/Dying Fire.ogg"
     "The fire fades away, the smell lingering around us."
-    show libitina base regalia neut night with dissolve
+    show libitina base regalia neut evening with dissolve
     l "The fire’s gone, Father."
     l "Do we keep moving?"
     mo "Yes. We cannot stay where the light dies."
     mo "We move until we find shelter."
     scene bg 1700Path
+    show fog
     with dissolve_scene_full
     "We’ve been walking for a while through an unfamiliar path."
     "The path is uneven, tangled with roots and shadow."
@@ -544,7 +554,7 @@ label Act1:
     "At first it seems natural, but as I look closer.."
     "The shape is too deliberate, the angles way too clean."
     "This is no accident of stone."
-    show libitina base regalia worr at t11
+    show libitina base regalia worr night at t11
     l "Father... there’s something inside."
     "She’s right."
     "A passage, cut by hands long before ours."
@@ -626,6 +636,7 @@ label Act1:
 
     # Title Card: Three Years Later
     scene bg 1700Path
+    show fog
     with dissolve_scene_full
     play music "mod_assets\music\Zombie (Cover).ogg" fadein 2.0
     "Three years passed within the stone belly of the crater."
