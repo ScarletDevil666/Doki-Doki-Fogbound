@@ -32,4 +32,4 @@ DDLCRPAsMissing: 'images.rpa' was not found in the game folder. Check your DDLC 
 Windows-10-10.0.26100 AMD64
 Ren'Py 8.0.3.22090809
 DDLC Mod Template – Python 3 Edition 4.2.4–Py3
-Thu Nov 13 22:06:54 2025
+Fri Nov 14 19:58:51 2025
