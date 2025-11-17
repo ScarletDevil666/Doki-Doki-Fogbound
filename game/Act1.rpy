@@ -3,75 +3,95 @@ init python:
 label Act1:
     scene bg morvaynsroom
     with dissolve
-    play music "mod_assets/music/King Morvayn.ogg"
     with flash
     pause 0.1
     play sound "mod_assets/sfx/Dying Fire.ogg"
-
-    "Silence lingers, broken only by the faint crackle of a dying fire."
-
-    #show morvayn neut at t11
-    mo "I’ve never been fond of silence, but even I can appreciate a moment’s peace alone."
-    mo "Ruling over thousands can wear even a king down in time."
-
-    #play sound "footsteps_soft.ogg"
-    "I hear footsteps behind me, approaching softly."
-    "I don’t need to turn. The rhythm of those steps is familiar."
-    "An adviser, Goro. He always walks like he’s afraid of waking ghosts."
-    "I scoff. Though if anyone here should fear the dead, it’s me."
-
-    show goro neut fire at t21
-    "Goro pauses at my side, head bowed in respect."
-
-    g "Sire, forgive the intrusion. But I bring troubling news."
-
-    mo "Another matter requiring my judgment?"
-
-    "A faint breath escapes me, tinged with a weary laugh."
-
-    mo "Tell me, Goro... Does a ruler ever truly rest?"
-
-    g "I fear not, King Morvayn. Not while the kingdom still breathes."
-
-    mo "...I thought as much. Speak."
-
-    show goro conc
-    g "It is the people."
-    g "One by one, they are losing their magic."
-    g "Spells are failing. Rituals collapsed."
-    g "Folks conjured sparks yesterday—today, nothing."
-
-    "His hands shake as he speaks, though he bows to hide it. His fear is obvious."
-    "Although my chest tightens, I do not allow it to show."
-    "A leader cannot. Not now."
-
-    mo "You’re certain? None remain untouched?"
-
-    show goro neut
-    g "A few sparks remain, but weak. Fading quickly. It spreads like a sickness, sire."
-
-    "I avert my eyes."
-    "A powerless kingdom... Warlocks and witches with nothing but their frail bodies."
-    "We must not have this."
-    "Fear wants to take root in me, but calm is a weapon too."
-    "Even if it feels like a lie, it must be spoken."
-
-    mo "Goro, I need you to gather the healers."
-    mo "Summon every mage who can still conjure so much as a flame."
-    mo "Search the archives. I want answers, and I want them quickly."
-
-    show goro e2
+    "Silence lingers, broken only by the faint crackle of a dying fire" 
+    "I’ve never been fond of silence, but moments alone have their weight" 
+    "Ruling over thousands wears even the strongest down" 
+    "Mm, maybe I should play a record."  
+    # TODO: import sounds from drive
+    play ambient "mod_assets/ambience/vinyl.ogg"
+    play music "mod_assets/music/heart shaped box (vinyl).ogg" fadein 2.0
+    play sound "mod_assets/sfx/male sigh.ogg"
+    "Better."
+    play sound "mod_assets/sfx/footsteps.ogg"
+    pause 1.5
+    "Before I can fully relax, my quiet is cut off by the faint sound of footsteps." 
+    "Even without looking, I can tell their rhythm." 
+    mo "Heh..." 
+    "Goro. My adviser. Always watching, always waiting." 
+    "He walks like he fears waking ghosts" 
+    play sound "mod_assets/sfx/scoff.ogg"
+    "I scoff."
+    "If anyone should fear the dead, it is me" 
+    "Goro pauses at my side, head bowed"
+    show goro neutral fire at l21  
+    g "Sire, forgive the intrusion. I bring troubling news" 
+    mo "Another matter demanding my judgment?" 
+    g "It is troubling, sire. The people are losing their magic one by one." 
+    pause 0.75
+    "H-Huh?" 
+    mo "L-Losing Magic?" 
+    mo "Ah. So the kingdom aches and you think it is my fault." 
+    mo "I suppose that is what happens when you leave an old king alone with his thoughts too long." 
+    g "I did not say it was your fault, sire. I only—{nw}" 
+    mo "I jest, Goro. You know I trust your counsel." 
+    mo "Speak"
+    mo "I’m sure it’s not as terrible as you are making it out to be..." 
+    g "Morvayn, spells are failing." 
+    g "Rituals are collapsing." 
+    g "Sparks that danced yesterday are gone today." 
+    g "Even the healers cannot maintain a flicker" 
+    mo "A-Ah."  
+    mo "I see." 
+    mo "Do you remember the festival of the Last Flame?" 
+    mo "The year we almost lost half the apprentices to overconfidence?" 
+    mo "You were there. I nearly had to rescue them from the river." 
+    g "Haah, I remember. You swore we would never see such carelessness again."
+    g "And yet, here we are.." 
+    mo "Carelessness is contagious, apparently." 
+    pause 1.5
+    mo "Or perhaps it is the curse we did not see coming." 
+    mo "Do you have any idea what caused this?" 
+    g "I… I have no clue, sire." 
+    g "I hoped you might have a lead, something I’ve missed?" 
+    mo "Aren’t you supposed to be the adviser, boy?" 
+    mo "Surely you must have noticed something?" 
+    g "I wish I could say I have, sire." 
+    g "Everything seems to slip through my grasp." 
+    g "I, myself, have only just discovered it." 
+    pause 1.5
+    mo "Tell me, Goro, do you ever rest even for a moment?" 
+    g "Rarely, sire. Not while the kingdom still breathes. You taught me that."  
+    mo "...Yes, I suppose I did." 
+    mo "Even so, this question must be asked." 
+    mo "Now tell me plainly, are there any who can still cast spells?" 
+    mo "Even if it shows only the slightest trace?" 
+    g "A few weak sparks linger. Fading fast. Like a sickness, sire." 
+    mo "A powerless kingdom. And yet, here we are." 
+    mo "You and I, still breathing." 
+    pause 0.75
+    mo "Fear wants to rise, Goro, but we cannot let it. Calm is a weapon even if I'd like to lie to myself." 
+    g "Yes, sire. Calm is the weapon that keeps us alive. Even now, I see it in your eyes." 
+    mo "Then, how about we move forward?" 
+    mo "You will gather the healers. Every mage who can still conjure a flame."
+    mo "Search the archives."
+    mo "I need answers very soon.."  
+    mo "And Goro.." 
+    mo "Do not scold me if I am slow. You know I prefer action over hesitation." 
     g "Yes, sire. At once."
-
-    mo "Once that’s done, I’ll take a gander at it myself."
-    mo "Carry on now."
-
-    "He bows deeply and retreats, leaving me alone once more, on the sofa."
+    g "And I will hold my tongue mostly." 
+    mo "I will see it for myself. Carry on, old friend." 
+    show goro at lhide
     hide goro
-    "I pull myself upright."
-    "A ruler cannot falter. Not in front of them. Not even in front of myself."
-    "This must be fixed."
-    "I know I can do it."
+    "He bows and retreats."
+    play sound "mod_assets/sfx/male sigh.ogg"
+    pause 1.0
+    "I sigh quietly, alone once more." 
+    "A ruler cannot falter, not for them, not even for himself."
+    "This must be fixed. I will fix it." 
+
     scene black
     with dissolve
     stop music fadeout 2.0
