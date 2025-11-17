@@ -48,7 +48,7 @@ image libitina base dawn = LayeredImageProxy("libitina base", Transform(matrixco
 image libitina base dusk = LayeredImageProxy("libitina base", Transform(matrixcolor=TintMatrix("#ffbec7")))
 image libitina base evening = LayeredImageProxy("libitina base", Transform(matrixcolor=TintMatrix("#c5cbf4")))
 image libitina base night = LayeredImageProxy("libitina base", Transform(matrixcolor=TintMatrix("#808598")))
-image libitina base green = LayeredImageProxy("libitina base", Transform(matrixcolor=TintMatrix("#03a140ff"))) #03a140ff
+image libitina base green = LayeredImageProxy("libitina base", Transform(matrixcolor=TintMatrix("#67793eff")))
 image libitina base fire = LayeredImageProxy("libitina base", Transform(matrixcolor=TintMatrix("#d66c15ff")))
 
 image goro dawn = LayeredImageProxy("goro", Transform(matrixcolor=TintMatrix("#ffbec7")))
