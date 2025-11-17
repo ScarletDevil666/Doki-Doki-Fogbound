@@ -13,7 +13,7 @@ image bg 1700Path = "mod_assets/bgs/1700 Path.png"
 image bg CaveInterior = "mod_assets/bgs/Cave Interior.png"
 image bg CaveText = "mod_assets/bgs/Cave Text.png"
 image bg Away_Path = "mod_assets/bgs/away path.png"
-define flash = Fade(.10, 0, .75, color="#fff")
+define flash = Fade(.25, 0, .75, color="#fff")
 #characters
 define mo = Character("Morvayn")
 define l = Character("Libatina")

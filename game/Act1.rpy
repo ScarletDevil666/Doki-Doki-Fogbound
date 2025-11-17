@@ -11,22 +11,22 @@ label Act1:
     "Ruling over thousands wears even the strongest down" 
     "Mm, maybe I should play a record."  
     # TODO: import sounds from drive
-    play ambient "mod_assets/ambience/vinyl.ogg"
-    play music "mod_assets/music/heart shaped box (vinyl).ogg" fadein 2.0
-    play sound "mod_assets/sfx/male sigh.ogg"
+    play sound "mod_assets/sfx/Vinyl (1600).ogg"
+    play music "mod_assets/music/Heart Shaped Box (Vinyl 1600-Prologue-Cover).ogg" fadein 2.0
+    queue sound "mod_assets/sfx/male sigh.ogg"
     "Better."
-    play sound "mod_assets/sfx/footsteps.ogg"
+    play sound "mod_assets/sfx/Faint Footsteps (Int).ogg"
     pause 1.5
     "Before I can fully relax, my quiet is cut off by the faint sound of footsteps." 
     "Even without looking, I can tell their rhythm." 
     mo "Heh..." 
     "Goro. My adviser. Always watching, always waiting." 
     "He walks like he fears waking ghosts" 
-    play sound "mod_assets/sfx/scoff.ogg"
+    #play sound "mod_assets/sfx/scoff.ogg"
     "I scoff."
     "If anyone should fear the dead, it is me" 
     "Goro pauses at my side, head bowed"
-    show goro neutral fire at l21  
+    show goro neut fire at l21  
     g "Sire, forgive the intrusion. I bring troubling news" 
     mo "Another matter demanding my judgment?" 
     g "It is troubling, sire. The people are losing their magic one by one." 
@@ -222,7 +222,7 @@ label Act1:
     scene black with fade
     pause 0.2
     scene bg Village
-    show fog 
+    show fog
     with fade
     show libitina base regalia neut evening at t31
     "A couple of hours pass."
@@ -348,7 +348,7 @@ label Act1:
     "It is not enough. My body strains, my mind stretches, and still the army advances, relentlessly."
     "A small group attempts to corner us—a handful of soldiers, a mage in the back keeping watch."
 
-    play sound "faint running.ogg"
+    play sound "mod_assets/sfx/faint running.ogg"
     "There is no time. I catch Libitina’s hand, squeezing it once, and begin to flee."
     "We move fast, but not recklessly."
     "Every step echoes against the ground, but it’s our only chance."
@@ -356,7 +356,7 @@ label Act1:
     "Behind us, the enemy advances, their shouts sharp, punctuated by the clatter of armored boots and the hiss of gunsmoke as battlemages test the air."
     "Arrows streak past, digging into the stone railing or embedding in the ground near our feet."
 
-    show libitina sad at t31
+    show libitina base regalia sad evening at t31
     "Libitina clutches my arm, eyes wide, breaths shallow."
     "Her pace matches mine. I keep a hand on her shoulder, guiding and protecting."
 
@@ -594,7 +594,7 @@ label Act1:
     mo "We will see what waits in the dark."
     stop ambient fadeout 2.0
     "Together, we descend into the depths."
-    play ambient "mod_assets/sfx/int_night.ogg"
+    play ambient "mod_assets/ambience/int_night.ogg"
     scene bg CaveInterior with wipeleft_scene
     "The stone narrows around us, pressing close, until at last the passage opens into a chamber."
     "Libitina and I walk by each side looking for some type of connection, or shelter inside the space."
@@ -609,7 +609,7 @@ label Act1:
     pause 0.5
     scene bg CaveText with dissolve
     mo "...Someone was here before us."
-    show libitina base regalia unsu night at t11
+    show libitina base regalia unsu green at t11
     l "Father, can you read it?"
     "I reach out, fingers brushing against the ancient text."
     pause
