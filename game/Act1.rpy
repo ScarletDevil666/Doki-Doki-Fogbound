@@ -3,75 +3,95 @@ init python:
 label Act1:
     scene bg morvaynsroom
     with dissolve
-    play music "mod_assets/music/King Morvayn.ogg"
     with flash
     pause 0.1
     play sound "mod_assets/sfx/Dying Fire.ogg"
-
-    "Silence lingers, broken only by the faint crackle of a dying fire."
-
-    #show morvayn neut at t11
-    mo "I’ve never been fond of silence, but even I can appreciate a moment’s peace alone."
-    mo "Ruling over thousands can wear even a king down in time."
-
-    #play sound "footsteps_soft.ogg"
-    "I hear footsteps behind me, approaching softly."
-    "I don’t need to turn. The rhythm of those steps is familiar."
-    "An adviser, Goro. He always walks like he’s afraid of waking ghosts."
-    "I scoff. Though if anyone here should fear the dead, it’s me."
-
-    show goro neut fire at t21
-    "Goro pauses at my side, head bowed in respect."
-
-    g "Sire, forgive the intrusion. But I bring troubling news."
-
-    mo "Another matter requiring my judgment?"
-
-    "A faint breath escapes me, tinged with a weary laugh."
-
-    mo "Tell me, Goro... Does a ruler ever truly rest?"
-
-    g "I fear not, King Morvayn. Not while the kingdom still breathes."
-
-    mo "...I thought as much. Speak."
-
-    show goro conc
-    g "It is the people."
-    g "One by one, they are losing their magic."
-    g "Spells are failing. Rituals collapsed."
-    g "Folks conjured sparks yesterday—today, nothing."
-
-    "His hands shake as he speaks, though he bows to hide it. His fear is obvious."
-    "Although my chest tightens, I do not allow it to show."
-    "A leader cannot. Not now."
-
-    mo "You’re certain? None remain untouched?"
-
-    show goro neut
-    g "A few sparks remain, but weak. Fading quickly. It spreads like a sickness, sire."
-
-    "I avert my eyes."
-    "A powerless kingdom... Warlocks and witches with nothing but their frail bodies."
-    "We must not have this."
-    "Fear wants to take root in me, but calm is a weapon too."
-    "Even if it feels like a lie, it must be spoken."
-
-    mo "Goro, I need you to gather the healers."
-    mo "Summon every mage who can still conjure so much as a flame."
-    mo "Search the archives. I want answers, and I want them quickly."
-
-    show goro e2
+    "Silence lingers, broken only by the faint crackle of a dying fire" 
+    "I’ve never been fond of silence, but moments alone have their weight" 
+    "Ruling over thousands wears even the strongest down" 
+    "Mm, maybe I should play a record."  
+    # TODO: import sounds from drive
+    play ambient "mod_assets/ambience/vinyl.ogg"
+    play music "mod_assets/music/heart shaped box (vinyl).ogg" fadein 2.0
+    play sound "mod_assets/sfx/male sigh.ogg"
+    "Better."
+    play sound "mod_assets/sfx/footsteps.ogg"
+    pause 1.5
+    "Before I can fully relax, my quiet is cut off by the faint sound of footsteps." 
+    "Even without looking, I can tell their rhythm." 
+    mo "Heh..." 
+    "Goro. My adviser. Always watching, always waiting." 
+    "He walks like he fears waking ghosts" 
+    play sound "mod_assets/sfx/scoff.ogg"
+    "I scoff."
+    "If anyone should fear the dead, it is me" 
+    "Goro pauses at my side, head bowed"
+    show goro neutral fire at l21  
+    g "Sire, forgive the intrusion. I bring troubling news" 
+    mo "Another matter demanding my judgment?" 
+    g "It is troubling, sire. The people are losing their magic one by one." 
+    pause 0.75
+    "H-Huh?" 
+    mo "L-Losing Magic?" 
+    mo "Ah. So the kingdom aches and you think it is my fault." 
+    mo "I suppose that is what happens when you leave an old king alone with his thoughts too long." 
+    g "I did not say it was your fault, sire. I only—{nw}" 
+    mo "I jest, Goro. You know I trust your counsel." 
+    mo "Speak"
+    mo "I’m sure it’s not as terrible as you are making it out to be..." 
+    g "Morvayn, spells are failing." 
+    g "Rituals are collapsing." 
+    g "Sparks that danced yesterday are gone today." 
+    g "Even the healers cannot maintain a flicker" 
+    mo "A-Ah."  
+    mo "I see." 
+    mo "Do you remember the festival of the Last Flame?" 
+    mo "The year we almost lost half the apprentices to overconfidence?" 
+    mo "You were there. I nearly had to rescue them from the river." 
+    g "Haah, I remember. You swore we would never see such carelessness again."
+    g "And yet, here we are.." 
+    mo "Carelessness is contagious, apparently." 
+    pause 1.5
+    mo "Or perhaps it is the curse we did not see coming." 
+    mo "Do you have any idea what caused this?" 
+    g "I… I have no clue, sire." 
+    g "I hoped you might have a lead, something I’ve missed?" 
+    mo "Aren’t you supposed to be the adviser, boy?" 
+    mo "Surely you must have noticed something?" 
+    g "I wish I could say I have, sire." 
+    g "Everything seems to slip through my grasp." 
+    g "I, myself, have only just discovered it." 
+    pause 1.5
+    mo "Tell me, Goro, do you ever rest even for a moment?" 
+    g "Rarely, sire. Not while the kingdom still breathes. You taught me that."  
+    mo "...Yes, I suppose I did." 
+    mo "Even so, this question must be asked." 
+    mo "Now tell me plainly, are there any who can still cast spells?" 
+    mo "Even if it shows only the slightest trace?" 
+    g "A few weak sparks linger. Fading fast. Like a sickness, sire." 
+    mo "A powerless kingdom. And yet, here we are." 
+    mo "You and I, still breathing." 
+    pause 0.75
+    mo "Fear wants to rise, Goro, but we cannot let it. Calm is a weapon even if I'd like to lie to myself." 
+    g "Yes, sire. Calm is the weapon that keeps us alive. Even now, I see it in your eyes." 
+    mo "Then, how about we move forward?" 
+    mo "You will gather the healers. Every mage who can still conjure a flame."
+    mo "Search the archives."
+    mo "I need answers very soon.."  
+    mo "And Goro.." 
+    mo "Do not scold me if I am slow. You know I prefer action over hesitation." 
     g "Yes, sire. At once."
-
-    mo "Once that’s done, I’ll take a gander at it myself."
-    mo "Carry on now."
-
-    "He bows deeply and retreats, leaving me alone once more, on the sofa."
+    g "And I will hold my tongue mostly." 
+    mo "I will see it for myself. Carry on, old friend." 
+    show goro at lhide
     hide goro
-    "I pull myself upright."
-    "A ruler cannot falter. Not in front of them. Not even in front of myself."
-    "This must be fixed."
-    "I know I can do it."
+    "He bows and retreats."
+    play sound "mod_assets/sfx/male sigh.ogg"
+    pause 1.0
+    "I sigh quietly, alone once more." 
+    "A ruler cannot falter, not for them, not even for himself."
+    "This must be fixed. I will fix it." 
+
     scene black
     with dissolve
     stop music fadeout 2.0
@@ -187,10 +207,12 @@ label Act1:
     hide morvayn
     stop sound fadeout 2.0
     scene black with dissolve
-    scene bg Village with dissolve
+    scene bg Village 
+    show fog
+    with dissolve
     play music "mod_assets/music/King Morvayn.ogg"
     play ambient "mod_assets/ambience/ext_day.ogg"
-    show libitina base neut regalia at t31
+    show libitina base neut regalia evening at t31
 
     "She steps forward, and together we walk toward the door."
     "The breeze blows lightly on the edges of her dress."
@@ -199,7 +221,9 @@ label Act1:
 
     scene black with fade
     pause 0.2
-    scene bg Village with fade
+    scene bg Village
+    show fog 
+    with fade
     show libitina base regalia neut evening at t31
     "A couple of hours pass."
     "The two of us are taking in the cool breeze."
@@ -216,7 +240,9 @@ label Act1:
     stop music fadeout 2.0
     play ambient "mod_assets/ambience/war sounds.ogg"
 
-    scene bg Guards1 with fade
+    scene bg Guards1 
+    show fog
+    with fade
     "But slowly, as I focus, the shapes become clear."
     "Soldiers, mages, battlemages—an army moving with purpose, unrelenting."
     "A kingdom that clearly isn’t our own."
@@ -225,7 +251,7 @@ label Act1:
     mo "Damn it, how could I have been so careless?"
     mo "Our enemies chose their moment. And now, they come."
 
-    show libitina base regalia worr at t31 with dissolve
+    show libitina base regalia worr evening at t31 with dissolve
     l "T-They caused this?"
 
     show libitina worr
@@ -243,13 +269,15 @@ label Act1:
     mo "Come on, come on..."
     "It is thin, almost nonexistent. A few flickers, weak sparks that sputter and die."
 
-    scene bg Village1 with dissolve_scene_full
+    scene bg Village1
+    show fog 
+    with dissolve_scene_full
 
     mo "So much power lost. And yet, they come."
     mo "They do not wait for us to recover."
     mo "Why should they?"
 
-    show libitina base regalia worr at t31
+    show libitina base regalia worr evening at t31
     l "Father, can’t you stop them?"
 
     show libitina sad
@@ -286,17 +314,21 @@ label Act1:
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
     "I move silently, carefully, guiding Libatina to a safe corner."
 
-    scene bg Away_Path with wipeleft_scene
+    scene bg Away_Path
+    show fog 
+    with wipeleft_scene
 
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
 
-    show libitina base regalia vsca om at t31 with dissolve
+    show libitina base regalia vsca om evening at t31 with dissolve
     l "Father, what are we going to do?"
 
     mo "Our only goal is to survive."
     mo "Once that’s done, we run, and we take as many with us as possible."
 
-    scene bg Guards1 with wipeleft_scene
+    scene bg Guards1
+    show fog 
+    with wipeleft_scene
 
     "Even as I say it, I know survival will demand a sacrifice beyond her understanding."
     "I feel the pulse of the spell inside me, the one I created long ago."
@@ -343,7 +375,7 @@ label Act1:
 
     "We spotted a nearby forest. Its entrance lies open and unguarded—a haven for cover."
 
-    show libitina base regalia worr at t31 with dissolve
+    show libitina base regalia worr evening at t31 with dissolve
     l "Father... is it over? Are we—"
 
     mo "Not yet. Keep moving. Don’t slow."
@@ -352,8 +384,10 @@ label Act1:
     stop music fadeout 3.0
     play ambient "mod_assets/ambience/ext_day.ogg"
 
-    scene bg 1600Forest with fade
-    pause 1.0
+    scene bg 1600Forest
+    show fog
+    with fade
+    pause 1.5
 
     "Branches scratch our faces instantly."
     "I hear them behind us."
@@ -363,13 +397,13 @@ label Act1:
     "The forest thickens."
     "For a few precious seconds, the world feels quieter."
 
-    show libitina base regalia unsu at t21 with dissolve
+    show libitina base regalia unsu evening at t21 with dissolve
     l "Maybe... maybe we're safe..."
     show libitina at thide
     hide libitina
 
     play music "mod_assets/music/Zombie (Cover).ogg" fadein 2.0
-    pause 1.0
+    pause 1.5
     
     "But instinct screams at me."
     "Movement in the shadows, figured crouched behind thick trees, hidden, and waiting."
@@ -385,16 +419,16 @@ label Act1:
     "The kingdom dies fully if I do not act."
     "The only way to protect her, and the last hope of survival is this."
 
-    pause 1.0
+    pause 1.5
     play sound "mod_assets/sfx/THROAT SLITTING.ogg"
-    pause 1.0
+    pause 1.5
     
     "A single, straight cut opens my throat. Blood spills, warmth fades, and the world tilts."
     play sound "mod_assets/sfx/collapse.ogg"
     scene black with fade
     "Behind me, the enemy is silent."
     "Then, realization kicks in."
-    pause 1.0
+    pause 1.5
     play sound "mod_assets/sfx/the king is dead! (sound effect).ogg"
     en "Everyone's dead! The kingdom is ours!"
     stop music fadeout 2.0
@@ -403,14 +437,16 @@ label Act1:
 
     scene bg Fire_Village
     show fog
+    show eff_rain_l
     with dissolve_scene_full
     play sound "mod_assets/sfx/gasp.ogg"
+    play ambient "mod_assets/ambience/rain_ext.ogg"
 
-    pause 1.0
+    pause 1.5
     "I awaken slowly, in another soldier's vessel."
     "Limbs that once were strong, now feel brittle and foreign, weighed down by the shell of someone else."
     stop ambient fadeout 2.0
-    pause 1.0
+    pause 1.5
     "This."
     "This is the cost."
     "The body dies, but the mind endures."
@@ -432,7 +468,7 @@ label Act1:
     mo "And that is all that matters."
     mo "For her, I have endured the unbearable."
     mo "For her, I cast the spell no king should ever wield."
-    pause 1.0
+    pause 1.5
     "They think the king is dead."
     "They celebrate as if they have claimed everything."
     "They do not know the truth. They do not know that the ruler remains."
@@ -451,14 +487,15 @@ label Act1:
     stop music fadeout 2.0
     scene black
     with dissolve_scene_full
-    pause 1.0
+    pause 1.5
     scene bg 1700Forest
+    show fog
     with dissolve_scene_full
     play ambient "mod_assets/ambience/wind.ogg"
     "Nearly a hundred years have passed since the fall of Blackbriar."
     "Years carried in exile, walking in shadows, wearing a face that’s not my own."
     "Yet through all of it, Libitina has remained at my side."
-    pause 1.0
+    pause 1.5
     "We have crossed kingdoms, seas, mountains... all searching."
     "Always searching."
 
@@ -467,7 +504,7 @@ label Act1:
 
     show libitina base regalia neut fire at t11 with dissolve
     l "Father... how long will this go on?"
-    pause 1.0
+    pause 1.5
     mo "What do you mean, Libitina?"
     show libitina sad
 
@@ -479,7 +516,7 @@ label Act1:
     l "Running.."
     l "Always something."
     l "Always someone watching."
-    pause 1.0
+    pause 1.5
     show libitina eyes_a
     l "When will we have a home again?"
     "Her voice is not the frightened whisper of the girl she once was."
@@ -514,12 +551,13 @@ label Act1:
     l "Then I will walk with you, Father."
     play sound "mod_assets/sfx/Dying Fire.ogg"
     "The fire fades away, the smell lingering around us."
-    show libitina base regalia neut night with dissolve
+    show libitina base regalia neut evening with dissolve
     l "The fire’s gone, Father."
     l "Do we keep moving?"
     mo "Yes. We cannot stay where the light dies."
     mo "We move until we find shelter."
     scene bg 1700Path
+    show fog
     with dissolve_scene_full
     "We’ve been walking for a while through an unfamiliar path."
     "The path is uneven, tangled with roots and shadow."
@@ -544,7 +582,7 @@ label Act1:
     "At first it seems natural, but as I look closer.."
     "The shape is too deliberate, the angles way too clean."
     "This is no accident of stone."
-    show libitina base regalia worr at t11
+    show libitina base regalia worr night at t11
     l "Father... there’s something inside."
     "She’s right."
     "A passage, cut by hands long before ours."
@@ -580,7 +618,7 @@ label Act1:
     "I cannot read it yet."
     "But it feels familiar."
     "As though some echo of the words lives in my blood."
-    pause 1.0
+    pause 1.5
     "Then I hear it.."
     "Not from the walls, but from memory.."
     "A voice, deep and steady, carried from my childhood."
@@ -601,7 +639,7 @@ label Act1:
     mo "'And the line will not be severed.'"
     show libitina worr
     l "He told you this?"
-    pause 1.0
+    pause 1.5
     l "He knew?"
     "My chest tightens."
     "My grandfather had spoken of ruin before it came.."
@@ -615,7 +653,7 @@ label Act1:
     mo "He knew we would stand here, at the edge of its grave."
     mo "These words.."
     mo "They are meant for us, Libitina."
-    pause 1.0
+    pause 1.5
     mo "We must find out what this means."
     mo "If it takes us days, weeks, years.."
     mo "So be it."
@@ -626,6 +664,7 @@ label Act1:
 
     # Title Card: Three Years Later
     scene bg 1700Path
+    show fog
     with dissolve_scene_full
     play music "mod_assets\music\Zombie (Cover).ogg" fadein 2.0
     "Three years passed within the stone belly of the crater."
@@ -634,7 +673,7 @@ label Act1:
     "Three years of Libitina’s quiet voice, keeping me anchored when shadows pressed too close."
     "I love her."
     "We’ve gone through hell and back together."
-    pause 1.0
+    pause 1.5
     "At last, the language surrendered itself to me."
     "The meaning was not simple... but it was clear."
     "It’s time I tell Libitina."
@@ -652,7 +691,7 @@ label Act1:
     mo "A portal."
     mo "A passage to another world."
     mo "A place where our people’s power lies waiting."
-    pause 1.0
+    pause 1.5
     mo "The second is the spell I once used, long ago."
     mo "But perfected."
     mo "Refined, you could say."
@@ -675,12 +714,12 @@ label Act1:
     mo"Each one will hold more strength than the last."
     mo"We must claim them, master them, until at last we find the strongest vessel of all."
     mo"Even if it means we have to kill."
-    pause 1.0
+    pause 1.5
     mo"Only then can my power be restored."
     mo"Only then can we return to Blackbriar... and raise our kingdom from its grave."
     mo"Bring the people back."
     mo"And take what’s ours.."
-    pause 1.0
+    pause 1.5
     mo "Libitina, I need you to open the portal for me."
     show libitina awkw
     l "...Me?"
@@ -691,7 +730,7 @@ label Act1:
     mo "You can. You must."
     mo "These words were left for us, not for others."
     mo "The path is ours to walk."
-    pause 1.0
+    pause 1.5
     mo "Without you, Libitina, the kingdom dies with me."
     show libitina conc
     l "...Tell me what to do."
@@ -711,7 +750,7 @@ label Act1:
     show libitina base regalia lsur night at t11
     l "...Father, it’s real."
     mo "More real than anything we have known."
-    pause 1.0
+    pause 1.5
     mo "This is our passage."
     mo "Our reckoning."
     mo "Beyond this rift, the vessels await."
@@ -724,7 +763,6 @@ label Act1:
     mo "No matter what happens."
     mo "We survive."
     mo "Do whatever it takes to restore Blackbriar."
-    show libitina base regalia conc night at t11
     l "I understand."
     l "If it means the kingdom lives again... I will follow you."
     mo "...Then let us begin."
