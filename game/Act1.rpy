@@ -100,111 +100,175 @@ label Act1:
     scene bg EntLibitinaRoom
     with dissolve
     play sound "mod_assets/sfx/crackling fire.ogg"
-    play ambient "mod_assets/ambience/int_day.ogg"
-    pause
+    play music "mod_assets/music/entrance to libitina's room.ogg" fadein 2.0
+    pause 1.5
 
-    "It’s been about two minutes since I stopped in front of Libitina’s cracked door."
-    "The wood is splintered at the hinges. I should have had it repaired weeks ago."
-    "I just never found the time."
-    "And with the way things are, I might as well not ever have the time."
-
-    "For three days now, the wind has felt different."
-    "Every morning is colder than the last."
-    "Every night feels longer, and heavier."
+    "It’s been about two minutes since I stopped outside my daughter, Libitina's door."
+    "The hinges are splintered. I should have fixed them weeks ago."
+    "Didn’t find the time. And now maybe I never will."
+    "Now even the wind feels wary, like it knows we’re running out of time."
+    "Colder in the mornings, and heavier at night."
     "Three days ago, the sky was still clear."
-    "The air had that spark of early autumn, cool but full of promise."
-    "A promise for a successful winter."
+    "The air had a spark in it, like the world was still breathing easily."
+    "A spark that promised something simple, and ordinary."
+    "A normal winter. Or, well… as normal as it could be."
+    "But now that spark feels distant, like a memory fading before my eyes."
 
-    "But then, my men began to falter."
-    "Just like Goro said they would."
-    "At first, it was small things, just like he said."
-    "A spell that fizzled. A torch that refused to light."
-    "Then suddenly, it was nothing. The glow in their palms, the color in their eyes, gone."
-
+    "For the past three days, I’ve hardly slept."
+    "I’ve been in the archives, reading through every ritual, every old scroll."
+    "Chasing whispers of magic that might still work."
+    "Poring over old battle plans, testing spells that should have died with me years ago."
+    "I’ve even spoken to healers, begged for reports, and yet… here we are."
+    "I’ve watched the kingdom falter while pretending I’m fine. Pretending I can still fix it all."
+    "And, maybe I can."
+    "Maybe I can’t."
+    "That’s the burden of being a king."
+    "But, of course my men started faltering, just like Goro warned."
+    "At first, it was just the small things. A fizzled spell. A torch that wouldn’t light."
+    "Then it all went dark."
+    "The glow, the fire in their eyes snuffed out."
     "I told myself it was fatigue."
     "I told myself it would pass."
-    "I told myself not to speak of it, not to give it power by saying it out loud."
-    "Maybe I just didn’t want to see fear reflected back at me."
+    "I told myself to keep quiet. Maybe I did not want to see the fear in their faces."
+
+    show l base neutral at t11
     mo "Fuck."
-    "I didn’t even tell Libitina."
-    "She would ask questions, and she deserves answers I don’t have."
-    "She would’ve asked ‘who caused this?’ Or ‘why is this happening?’"
-    "And I have no goddamn clue!"
 
-    "So I decided to stay quiet. Pretended it was under control."
-    "Pretended I was still the man who could fix things, just like he always has."
-    "But silence doesn’t stop decay."
-    "You can only hide the rot for so long before the smell gives you away."
+    "I didn’t tell Libitina."
+    "She would ask questions I cannot answer."
+    "‘Who did this? Why is it happening?’"
+    "I do not know. That is the bloody truth."
+    "Perhaps it could have been deliberate."
+    "Perhaps another kingdom has done this."
+    "Every falter, every spark that died… maybe it was planned."
+    "But for now, it is only a theory."
 
-    pause 0.5
-    "She knows something is wrong. I can feel it."
-    "I don’t know what words will come when I open that door."
+    pause 1.5
+
+    "So I stayed quiet. Pretended I had control."
+    "But hiding rot doesn’t work forever."
+    "She knows something is off. I can feel it."
+    "I do not know what I will say when I open the door."
     "But she deserves the truth."
-    "And if I can’t give her hope, then I can at least give her honesty."
+    "I push it open."
 
     play sound "mod_assets/sfx/door opening.ogg"
-    scene bg LibitinaRoom with dissolve
+    scene bg LibitinaRoom with fade
+    show libitina base neut fire regalia at t11
 
-    "I gently open the door."
-    "Libitina sits on the floor, legs crossed, and looking down."
-    "The wind from the door blows to her, causing her to flinch slightly."
-    "I step inside slowly, careful not to break the quiet of the room too much."
+    "Libitina sits cross-legged on the floor, head down."
+    "Christ… how will she take this?"
+    "I step inside, hesitantly."
 
-    #show morvayn neutral at center
-    mo "Libitina, there is something I must tell you."
+    mo "Libitina… we need to talk."
 
-    show libitina base neut fire regalia at t31
-    with dissolve
-    "She turns, startled at the sound of my voice breaking the calm."
+    pause 1.5
 
-    show libitina vsur
-    l "What is it, Father?"
-    show libitina worr
-    l "You look pale..."
+    show libitina conc
+    l "You sound different, Father. Is something wrong?"
 
-    mo "I—"
-    mo "There’s no easy way to say this..."
-    mo "The people, they are losing their magic."
-    mo "One by one, their power is fading."
+    mo "Different? Maybe."
+    mo "I’m tired, yes. But it’s not just that."
 
-    show libitina neut2 mouth_b
-    "Her lips part, a soft gasp catching in her chest."
-    "One hand rises instinctively to her heart, pressing there as though steadying herself."
+    l "Don’t worry, Father. You can tell me."
 
-    show libitina sad
-    l "Father..."
-    l "Without magic, what will we have left?"
+    pause 1.5
 
-    show libitina worr
-    mo "We have our people, Lib."
-    mo "And we have me."
+    mo "There’s no easy way to say this."
+    mo "The people… they’re losing their magic."
+    mo "One by one, it’s fading."
 
-    "Her eyes search mine, seeking certainty, trying to draw it from the calm in my voice."
-    "I meet her gaze, placing a hand lightly on her shoulder, the weight of it grounding both of us."
+    pause 0.75
 
-    show libitina amus
-    mo "It is heavy, yes. But we have faced worse burdens."
-    mo "And we will carry this one together."
+    show libitina lsca
+    l "Gone?"
+    l "Father, that’s impossible?"
+    l "Three days ago, I felt it. The power was still there?"
+    l "Well and alive?"
 
-    show libitina sad
-    l "I trust you, Father, but it still feels heavy."
+    mo "Alive enough to fool the vessel, perhaps."
+    mo "But fools rarely last long."
+
+    pause 0.75
+
+    mo "The Festival of the Last Flame."
+    mo "Do you remember that chaos?"
+    mo "Half the apprentices nearly died because of overconfidence?"
 
     show libitina worr
-    "Her fingers curl slightly at her sides."
-    "She does not hide it fully."
+    l "I remember. I was just a child, but I can’t forget the panic, the screams…"
+    l "Is it like that again?"
+
+    mo "Worse. It’s not overconfident this time."
+
+    pause 1.5
+
+    mo "I have a theory, Libitina."
+    mo "That this was intentional, carefully planned."
+    mo "Every falter, every spark that died. It was meant to happen."
+    mo "Another kingdom, a rival, could be behind this."
+    mo "Watching us, probing our weaknesses, wearing us down before they strike."
+
+    show libitina worr at t11
+    l "W-Who would do that?"
+    l "How could they take something so… essential?"
+
+    mo "I do not know, and that is the goddamn truth."
+    mo "I’ve spent three days hunting answers, testing old spells, reading every scroll I could."
+    mo "And still… here we are."
+
+    show libitina worr
+    l "Then we’re defenseless?"
+    l "Father… I’m not afraid of dying. I’m afraid of watching the kingdom fall while we stand here and do nothing."
+
+    mo "Defenseless? Hardly. We are alive, aren’t we? That counts for something."
+    mo "Though, you aren’t completely wrong."
+    mo "There’s nothing we can do right now to stop it. Not yet."
+    mo "But that doesn’t mean we wait helplessly. Every moment we survive, we learn, we prepare."
+    mo "When they strike, we will be ready. That is the only power we have at the moment."
 
     show libitina sad
-    "I squeeze her shoulder once, firm but gentle, a silent promise that she will not face this alone."
+    l "I… I wish I could help now. I feel useless."
+    l "But I remember the festival of the last flame, Father. I remember the panic and how you saved us all then."
 
-    mo "Then we carry it together. Let us not waste these last moments of calm."
-    mo "We will be okay for now. Come with me."
-    mo "We will breathe the air while we can."
-    mo "And take action when we need to."
+    mo "Saved? That’s a flattering way to put it."
+    mo "I barely stopped them from killing themselves."
+    mo "Magic or no magic, even kings can barely hold back chaos."
+    mo "But you… you’ve grown since then."
+    mo "You see fear, and you don’t fold. That’s why I trust you."
 
-    show libitina happ
+    show libitina sad ce
+    l "I trust you too, Father… but it’s heavy."
+    l "This weight… I can feel it."
+    l "Even if we survive, how do we protect everyone else?"
+
+    mo "Protect? Heh, maybe we can, maybe we can’t."
+    mo "The truth is, I don’t know."
+    mo "Not fully. That’s the burden we carry."
+
+    show libitina unsu
+    l "Then how about we carry it together?"
+    l "You and me?"
+
+    mo "Of course, Libitina."
+    mo "We do what we can. We fight. We survive."
+    mo "And when the time comes, we burn brighter than they think possible."
+
     l "Yes, Father."
+    l "But what if we don’t succeed?"
 
-    hide morvayn
+    mo "Then you’ll learn the hard way, like I did."
+    mo "But hear me. Today we will not fail."
+    mo "Not while I draw breath."
+    mo "I will keep you alive, Libitina."
+
+    show libitina 
+    l "…I trust you. I’ll follow."
+
+    mo "Good. Then let’s breathe while we can."
+    mo "Moments of calm… then action when it matters."
+    "We step forward, together, and move outside."
+
     stop sound fadeout 2.0
     scene black with dissolve
     scene bg Village 
@@ -312,7 +376,7 @@ label Act1:
     "I push past the railing, retreating into the shadows of the castle."
 
     "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
-    "I move silently, carefully, guiding Libatina to a safe corner."
+    "I move silently, carefully, guiding libitina to a safe corner."
 
     scene bg Away_Path
     show fog 
