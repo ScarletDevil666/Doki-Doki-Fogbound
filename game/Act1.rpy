@@ -278,175 +278,416 @@ label Act1:
     play ambient "mod_assets/ambience/ext_day.ogg"
     show libitina base neut regalia evening at t31
 
-    "She steps forward, and together we walk toward the door."
-    "The breeze blows lightly on the edges of her dress."
-    "The soft echo of our footsteps stretches down the corridor."
-    "Servants move quietly, carrying messages and scrolls, their murmurs floating faintly as they walk."
+    # SLIDE: BG: Calm B4 The Storm Village
+    scene bg calm_b4_the_storm_village
+    show fog
+    with dissolve
 
+    play sound "sfx_wind.ogg"
+    play music "king_morvayn.ogg"
+    # Sprite Hue: Grey (Rainy Colored Hue)
+
+    "The wind hits us like a tank, fog curling in from the edges of my vision."
+
+    mo "Shit, I swear, if this is just a calm before the storm, I’ll lose what’s left of my patience."
+
+    show libitina base neut regalia evening at t11
+    l "It feels… heavy. Everywhere."
+
+    "We move toward the railing, stepping carefully up the worn stone steps."
+
+    mo "Follow me, Libatina."
+
+    l "Why? Where are we going?"
+
+    mo "Up here, we can see better. Watch the men below, if the possibility of this being intentional really is true."
+    mo "Anticipate every move before they make it."
+
+    l "Will that be enough?"
+
+    mo "Enough? No. But it gives us a chance. That’s all we need for now."
+
+    # BG: BLACK SCREEN: Slowly Fade In:
+    # DO NOT SHOW LIB SPRITES!!!
     scene black with fade
-    pause 0.2
-    scene bg Village
+    "She nods, silently, gripping the railing."
+    "I can feel her tension, tight as a wire, matching mine step for step as we finally reach the top."
+
+    # Slowly Fade In: BG: RAILING (visuals sway)
+    scene bg railing
     show fog
-    with fade
-    show libitina base regalia neut evening at t31
-    "A couple of hours pass."
-    "The two of us are taking in the cool breeze."
-    "The kingdom breathes around us, unaware of the storm bound to happen."
+    with dissolve
+    # (Do not show libitina sprites on railing)
 
-    show libitina amus
-    l "Father, look."
+    mo "Eyes forward. Watch the stairs."
+    mo "Watch the shadows. We wait until we know exactly what we’re facing."
 
-    "Her finger points to a space beyond the fields."
-    hide libitina with dissolve
+    l "I’m right here, Father."
 
-    "At first, my eyes catch only shadows moving between the trees."
+    mo "Good. That’s all I need."
 
-    stop music fadeout 2.0
-    play ambient "mod_assets/ambience/war sounds.ogg"
+    pause 0.75
 
-    scene bg Guards1 
+    # QUICK FADE IN + FADE OUT: MUSIC fades out, SFX wind continues
+    stop music fadeout 1.5
+    play sound "sfx_wind.ogg"
+
+    "A couple hours have passed since Libatina and I stepped out onto the railing."
+    "The fog hasn’t lifted at all."
+    "But that’s the least of our worries."
+    "They could strike at any given moment."
+    "But throughout all the worry, we’ve stayed low, our eyes on the kingdom below."
+
+    fadeout 1.5
+    scene black
+
+    mo "Ya know, Lib."
+    mo "It’s been a while. Maybe we should check on the others."
+    mo "See if anyone’s still holding the walls."
+
+    l "You aren’t wrong."
+    l "We can’t stay up here forever."
+    l "Let’s go."
+
+    "We edge toward the stairs, carefully."
+
+    mo "Follow my lead. Keep low, and don’t speak unless you have to."
+
+    l "I-I will."
+
+    "As we make our way down, a familiar face blocks our path before we reach the bottom."
+
+    play sound "sfx_footsteps.ogg"
+
+    # FAST SLIDE to Morvayns Territory (outdoor)
+    scene bg morvayns_territory_1600
     show fog
-    with fade
-    "But slowly, as I focus, the shapes become clear."
-    "Soldiers, mages, battlemages—an army moving with purpose, unrelenting."
-    "A kingdom that clearly isn’t our own."
-
-    mo "The curse was not a chance. It was preparation."
-    mo "Damn it, how could I have been so careless?"
-    mo "Our enemies chose their moment. And now, they come."
-
-    show libitina base regalia worr evening at t31 with dissolve
-    l "T-They caused this?"
-
-    show libitina worr
-    mo "I’m sure of it."
-    mo "Just..."
-    mo "Stay calm. The walls will hold."
-
-    hide libitina with dissolve
-
-    "Even as I speak, I can see the army spreading across the kingdom, each line precise, each step measured."
-    "The ground seems to shiver beneath their march."
-    "The air is thick with tension, charged as though the storm is not coming but already present."
-
-    "I lift my hands subtly, feeling for the pulse of magic that once ran through the kingdom."
-    mo "Come on, come on..."
-    "It is thin, almost nonexistent. A few flickers, weak sparks that sputter and die."
-
-    scene bg Village1
-    show fog 
-    with dissolve_scene_full
-
-    mo "So much power lost. And yet, they come."
-    mo "They do not wait for us to recover."
-    mo "Why should they?"
-
-    show libitina base regalia worr evening at t31
-    l "Father, can’t you stop them?"
-
-    show libitina sad
-    mo "Not like this. Not now."
-
-    hide libitina with dissolve
-
-    "Every strategy I had rehearsed, every spell I had prepared, falls short."
-    "The curse that has weakened our people is total. Magic cannot save us today."
-    "I feel the weight of the kingdom pressing down, the centuries of power and knowledge reduced to fragile flesh."
-
-    "I step back, my mind racing."
-    "The army moves closer, lines of steel and fire spilling into our lands."
-    "My heart beats steadily, but a familiar edge of fear sharpens."
-    "There is no heroics left. Only survival."
-
-    pause 0.3
-    "There is one path I have kept hidden, a spell forbidden, dangerous, ancient."
-    "One I swore never to use except in the darkest hour. That hour has come."
-    "My last ounce of power..."
-    "If there’s no other way, I’ll use the spell, whatever it costs."
-    "Until then, I will not speak of it to Libitina. Not here, not now."
-    "She must not see. She must not know until we are safe."
-
-    stop ambient fadeout 1.0
-    play music "mod_assets/music/Your Sweet 666 (Cover).ogg" fadein 3.0
-
-    mo "Come with me, Libitina."
-
-    "I step away from the railing, scanning the walls, the terrace, the narrow alleys."
-    "They will flank us if we stay."
-    "I push past the railing, retreating into the shadows of the castle."
-
-    "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
-    "I move silently, carefully, guiding libitina to a safe corner."
-
-    scene bg Away_Path
-    show fog 
     with wipeleft_scene
 
-    "Soldiers and mages begin to appear in courtyards, advancing carefully, testing the defenses."
+    # (you can show lib sprites now - just not on railings or black/white screens)
+    show goro base neut at t11
+    goro "Morvayn, Libatina!"
+    goro "I’ve been looking for you. Thought I’d find you here."
+    goro "Today has been… rough. But we’ll get through it. We always do."
 
-    show libitina base regalia vsca om evening at t31 with dissolve
-    l "Father, what are we going to do?"
+    mo "Damn straight, Goro."
+    mo "How have you been holding up through everything?"
 
-    mo "Our only goal is to survive."
-    mo "Once that’s done, we run, and we take as many with us as possible."
+    goro "Ah… I’ve been—"
 
-    scene bg Guards1
-    show fog 
-    with wipeleft_scene
+    # Visuals - Zooms In To Goro's Forehead
+    play sound "sfx_goro_gunshot.ogg"
+    show screen shake
+    play ambience "ambience_war_fadein.ogg"
+    play sound "sfx_collapse.ogg"
 
-    "Even as I say it, I know survival will demand a sacrifice beyond her understanding."
-    "I feel the pulse of the spell inside me, the one I created long ago."
-    "The secret I had kept for this very moment."
+    "Suddenly his head snaps back."
+    "He collapses onto the steps."
+    "Blood stains the stairs instantly."
 
-    "I attempt to call the wind, to use my power—to shift the air, to raise the ground beneath their feet."
-    "My fingers trace the familiar signs, the incantations whispered for years."
+    play music "your_sweet_six_six_six_cover.ogg"
 
-    play sound "mod_assets/sfx/falter.ogg"
-    queue sound "mod_assets/sfx/small whimper.ogg"
-    "A single soldier falters, pushed backward by a flicker of energy."
-    "A spark lights briefly along the edge of the battlefield, and then nothing."
-    "A soldier pulls him away from the battlefield. He’s knocked out for now."
+    mo "What the fuck!"
+    mo "Libatina, run back up the steps!"
 
-    mo "Damn it..."
+    "We sprint up the stairs instantly, blocking the enemy’s shots."
 
-    "It is not enough. My body strains, my mind stretches, and still the army advances, relentlessly."
-    "A small group attempts to corner us—a handful of soldiers, a mage in the back keeping watch."
+    # FASTLY FADE IN BLACK SCREEN
+    scene black with fade
+    "They’ve finally struck, and this is their way of saying hello."
+    "God, Goro…"
+    "I’ll sulk later."
+    "I have a kingdom I need to protect."
+    "The fog hides them, whoever they are."
 
-    play sound "mod_assets/sfx/faint running.ogg"
-    "There is no time. I catch Libitina’s hand, squeezing it once, and begin to flee."
-    "We move fast, but not recklessly."
-    "Every step echoes against the ground, but it’s our only chance."
+    # Fast Slide to Railing (do not show libitina sprites)
+    scene bg railing
+    show fog
+    with slide
 
-    "Behind us, the enemy advances, their shouts sharp, punctuated by the clatter of armored boots and the hiss of gunsmoke as battlemages test the air."
-    "Arrows streak past, digging into the stone railing or embedding in the ground near our feet."
+    # DO NOT SHOW LIBATINA’S SPRITES!!
+    l "Fucking hell!"
+    l "Father, what do we do?"
 
-    show libitina base regalia sad evening at t31
-    "Libitina clutches my arm, eyes wide, breaths shallow."
-    "Her pace matches mine. I keep a hand on her shoulder, guiding and protecting."
+    mo "Stay down! Don’t move unless I say!"
+    mo "They knew we’d be here."
+    mo "I was right."
+    mo "These bastards planned this!"
 
-    l "Father... I... I can’t—"
+    "Libatina curls closer to me. I can feel her shaking."
+    "I’m barely keeping it together myself!"
+    "Every shadow in the fog feels alive."
+    "Every sound is a threat."
 
-    mo "Focus on me, Libitina. Stay close. Do not look back."
+    mo "It’ll be okay, Libatina, just…"
+    mo "Stay low. Watch the steps. Watch the fog."
+    mo "And for fuck’s sake, don’t let them see us panic!"
 
-    hide libitina with dissolve
+    "The kingdom suddenly feels small, and reckless. And we’re right in the middle of it."
+    "But we have each other."
+    "We can face this."
+    "I shift my gaze to another nearby wall."
+    "That’s when I see it."
 
-    "The kingdom is chaotic."
-    "Servants flee, soldiers fight in disorganized pockets."
-    "Magic flickers weakly in the hands of those who still can cast it, if even at all."
-    "But we cannot wait for reinforcements. The enemy is too strong, too prepared."
-    "The curse has stripped our people of their power, and nothing I do here can stop the tide."
+    # SLOWLY FADE IN: Armed Guards #1 (outdoor)
+    scene bg armed_guards_1
+    show fog
+    with dissolve
+
+    "Their armor, their stance…"
+    "They aren’t here to talk."
+    "I can feel the weight of their weapons from here. They’re coming for blood."
+
+    # FAST SLIDE back to Railing (do not show lib sprites)
+    scene bg railing
+    show fog
+    with slide
+
+    l "What’s our next move?"
+
+    mo "I-I should have guns. Stored in my room for emergencies."
+    mo "Follow me, fast. Now!"
+
+    "I grab her hand, yank her close, and we bolt."
+
+    scene black
+    "Smoke, fog, wind, everything presses against us, thick, and suffocating."
+    "I can hear their shots lingering before us."
+    "We don’t have much time."
+    "Finally, we make it to the bottom."
+
+    # FAST SLIDE - BG: Morvayns Territory (outdoor)
+    scene bg morvayns_territory_1600
+    show fog
+    with slide
+
+    mo "Down into my territory. Keep close. Don’t even think about looking back."
+    mo "We’ll make a stand where we have the advantage."
+
+    show libitina base lsca regalia evening at t11
+    l "I’m scared, Father."
+    l "I don’t know if I can—"
+
+    mo "You have to focus, Libatina."
+    mo "That’s it. You survive by focusing."
+
+    "Her fingers squeeze mine."
+    "She’s scared, yes, but she’s still moving."
+    "She’s not frozen. Not entirely."
+    "I can feel the panic rising in me, too. I taste it in my mouth, bitterly."
+    "But I force it down. I need her to move, I need her to trust me."
+
+    mo "Almost there…"
+    mo "The room is just ahead."
+    mo "Lib, stay tight. One misstep and we’re dead."
+    mo "Guns…"
+    mo "We get the guns, then we decide."
+
+    l "I-Im holding on, Father."
+    l "I trust you."
+
+    # Slide to Morvayns Room (indoor)
+    scene bg morvayns_room
+    with slide
+    play sound "sfx_muffled_rain.ogg"
+    play ambience "ambience_muffled_war.ogg"
+
+    # NARRATION: Sfx: Door Opening
+    play sound "sfx_door_open.ogg"
+    "I fling open the door to my territory."
+    "We immediately run to the shelves."
+
+    pause 0.75
+    scene bg morvayns_room_zoomed
+    with fade
+    "W-What?"
+    "The shelves should be lined with weapons, old but reliable."
+    "But… nothing."
+
+    stop music fadeout 1.5
+    play ambience "ambience_muffled_war.ogg"
+    "Every gun is gone."
+    "Not a single sword or dagger left untouched."
+    "The bastards knew exactly what to take."
+    "I grip the edge of the nearest shelf, trying not to show panic."
+    "Every heartbeat thrums in my chest like a drum."
+
+    scene bg morvayns_room
+    with fade
+    show libitina base upse regalia at t11
+    l "They… they took them all?"
+
+    mo "Y-Yes."
+    mo "And that means we have no fallback."
+    mo "No comfort. Nothing to buy us time if they come for us again."
+
+    pause 1.5
+
+    mo "We have to use the last of it. The magic that still lingers. Every bit we have left."
+
+    show libitina unsu at t11
+    l "Father… you mean?"
+
+    mo "Yes. Every ounce."
+    mo "Libatina, listen. This isn’t a parlor trick."
+    mo "This is life or death. If we fail here, the kingdom fails."
+    mo "Look at me. Keep your focus. Do not flinch, do not doubt."
+
+    pause 0.75
+
+    "The power is faint, but I feel it stirring."
+    "I can barely reach it, but it’s enough if we move fast."
+    "If we move together…"
+
+    l "I-I can feel it too, Father. It’s weak…"
+    l "But it’s there."
+
+    mo "Good. That’s all we need for now."
+    mo "It’s enough."
+    mo "They might have taken our guns, but they haven’t taken our fight."
+    mo "Magic or no magic, we make them regret ever thinking this would be easy."
+
+    pause 0.75
+
+    mo "Now focus, Libatina."
+    mo "Every flicker, every spark counts. We do this right, or nothing else matters."
+
+    # Nothing Else Matters (Cover) fades in
+    play music "nothing_else_matters_cover.ogg" fadein 1.5
+    show libitina base conc regalia at t11
+    l "I’ll stay with you, Father. I’ll do it."
+
+    mo "Together. Always together."
+    mo "Now, let’s make this count."
+    mo "Once we’re out there, we hit the railing and draw every ounce of power we’ve got left."
+
+    l "O-Okay…"
+
+    "We step out into the storm, and make a run for it."
+
+    # longer slide to Railing (outdoor)
+    scene bg railing
+    show fog
+    with slide
+
+    "We eventually reach the railing, ducking and dodging every shot that came our way."
+
+    mo "Do you see them, Libatina?"
+
+    # DO NOT SHOW LIBATINA SPRITES!!
+    l "Y-Yes."
+    l "Let’s finish what they started."
+
+    mo "Damn right we will."
+
+    # Fast Fade In - BG: Armed Soldier (outdoor)
+    scene bg armed_soldier_1600
+    show fog
+    with fade
+
+    # Visuals: Screen sways back and forth if possible
+    #TODO: Scarlet, can you make the screen shake here?
+    "My eyes dart to the soldiers, gunning down innocent mages."
+    "Magic hums weakly in my veins, barely enough to hold a spark."
+    "I draw in a shaky breath, preparing to push the last of it into one strike."
+
+    mo "Let’s see what you’ve got."
+
+    "I thrust my hands forward, pouring every ounce of remaining power into a single hit."
+
+    play sound "sfx_whimper.ogg"
+    play sound "sfx_falter.ogg"
+
+    "The air cracks with energy. A guard nearest to me goes flying, slamming against the stone floor."
+    
+    # Armed Guards #1 (outdoor)
+    scene bg armed_guards_1
+    show fog
+    with fade
+
+    "HA!"
+    "Too easy."
+    "I glance back, ready to crush the next one."
+    "And then it hits me…"
+    "My power isn’t what I thought it was."
+    "That’s when I realize how weak it truly is."
+
+    mo "Shit."
+
+    "The guard slowly lifts his weapon, eyes wide, smiling at me cheekily."
+
+    play sound "sfx_goro_gunshot.ogg"
+    show screen shake
+    "Before I can react, a shot tears through the air, grazing my shoulder."
+
+    "Pain flares, sharp and burning, but I grit my teeth and push through it."
+
+    # Fast slide to Railing (do not show libitina sprites on railing)
+    scene bg railing
+    show fog
+    with slide
+
+    mo "Lib! Downstairs! Now! I’ll meet you there!"
+
+    "Libatina hesitates for a split second, fear written across her face."
+    "I grab her arm, yanking her toward the stairs. Every step is a gamble."
+    "The storm howls around us, mixing with gunfire and desperate screams."
+    "I know if I stay too long, we both die."
+    "Every ounce of strength in my body focuses on keeping her alive."
+
+    mo "Move, Libatina! Don’t stop!"
+
+    "As she vanishes down the stairs, the last sparks of magic curl around my hands, fading fast."
+    "Suddenly, a thought I’ve shoved to the back of my mind for years hits me."
+
+    pause 0.75
+
+    "There’s one path I’ve kept buried, a spell I swore never to touch."
+    "Forbidden, dangerous, old as the kingdom itself."
+    "Only for the darkest hour. And that hour is here."
+    "It kills the caster. Rips the soul clean out and forces it into the nearest corpse."
+    "The spell depends on voluntary sacrifice. you have to kill yourself for it to work."
+    "Then, you receive a second life, trapped in borrowed flesh. A desperate man’s trick."
+    "Apparently, it saved generals centuries ago, but none of them stayed the same. Some came back barely human."
+    "This is my last ounce of power. If everything falls apart, if there’s no other way…"
+    "This is what I’ll throw at them."
+    "I’ll use it. Even if it turns me into something she won’t recognize."
+    "But not now. Not here."
+    "She must not see. She must not know."
+    "She needs her father… not the monster I might become."
+
+    "Finally, I make it downstairs to her."
+
+    mo "Libatina, follow me. Don’t fall behind."
+    mo "There’s a forest not far from here."
+    mo "A place even most of our own people don’t remember."
+    mo "They won’t find us if we move fast."
+    mo "Let’s get the hell out of here!"
+
+    # Away Path (outdoor)
+    scene bg away_path
+    show fog
+    with slide
+
+    play sound "sfx_running_ext.ogg"
+
+    "There is no time. I grab Libatina’s hand, and we begin to flee."
+    "Arrows and bullets streak past us, embedding in the ground near our feet."
+    "Libatina clutches my hand, tightly, panting heavily."
     "We have to survive."
+    "We have to!"
+    "I’m not giving it up, dammit!"
 
-    "We spotted a nearby forest. Its entrance lies open and unguarded—a haven for cover."
+    "Finally, we spot the forest."
+    "Its entrance lies open and unguarded."
+    "A haven for cover."
 
-    show libitina base regalia worr evening at t31 with dissolve
-    l "Father... is it over? Are we—"
+    # show libitina now (outdoor) - she is frightened/scared
+    show libitina base vsca regalia evening at t11
 
-    mo "Not yet. Keep moving. Don’t slow."
+    "We make a break for the trees."
 
-    hide libitina with dissolve
-    stop music fadeout 3.0
-    play ambient "mod_assets/ambience/ext_day.ogg"
+
 
     scene bg 1600Forest
     show fog
