@@ -296,7 +296,7 @@ label Act1:
 
     "We move toward the railing, stepping carefully up the worn stone steps."
 
-    mo "Follow me, Libatina."
+    mo "Follow me, Libitina."
 
     l "Why? Where are we going?"
 
@@ -332,7 +332,7 @@ label Act1:
     stop music fadeout 1.5
     play sound "sfx_wind.ogg"
 
-    "A couple hours have passed since Libatina and I stepped out onto the railing."
+    "A couple hours have passed since Libitina and I stepped out onto the railing."
     "The fog hasn’t lifted at all."
     "But that’s the least of our worries."
     "They could strike at any given moment."
@@ -366,7 +366,7 @@ label Act1:
 
     # (you can show lib sprites now - just not on railings or black/white screens)
     show goro base neut at t11
-    goro "Morvayn, Libatina!"
+    goro "Morvayn, Libitina!"
     goro "I’ve been looking for you. Thought I’d find you here."
     goro "Today has been… rough. But we’ll get through it. We always do."
 
@@ -388,7 +388,7 @@ label Act1:
     play music "your_sweet_six_six_six_cover.ogg"
 
     mo "What the fuck!"
-    mo "Libatina, run back up the steps!"
+    mo "Libitina, run back up the steps!"
 
     "We sprint up the stairs instantly, blocking the enemy’s shots."
 
@@ -414,12 +414,12 @@ label Act1:
     mo "I was right."
     mo "These bastards planned this!"
 
-    "Libatina curls closer to me. I can feel her shaking."
+    "Libitina curls closer to me. I can feel her shaking."
     "I’m barely keeping it together myself!"
     "Every shadow in the fog feels alive."
     "Every sound is a threat."
 
-    mo "It’ll be okay, Libatina, just…"
+    mo "It’ll be okay, Libitina, just…"
     mo "Stay low. Watch the steps. Watch the fog."
     mo "And for fuck’s sake, don’t let them see us panic!"
 
@@ -468,7 +468,7 @@ label Act1:
     l "I’m scared, Father."
     l "I don’t know if I can—"
 
-    mo "You have to focus, Libatina."
+    mo "You have to focus, Libitina."
     mo "That’s it. You survive by focusing."
 
     "Her fingers squeeze mine."
@@ -529,7 +529,7 @@ label Act1:
     l "Father… you mean?"
 
     mo "Yes. Every ounce."
-    mo "Libatina, listen. This isn’t a parlor trick."
+    mo "Libitina, listen. This isn’t a parlor trick."
     mo "This is life or death. If we fail here, the kingdom fails."
     mo "Look at me. Keep your focus. Do not flinch, do not doubt."
 
@@ -549,7 +549,7 @@ label Act1:
 
     pause 0.75
 
-    mo "Now focus, Libatina."
+    mo "Now focus, Libitina."
     mo "Every flicker, every spark counts. We do this right, or nothing else matters."
 
     # Nothing Else Matters (Cover) fades in
@@ -572,9 +572,9 @@ label Act1:
 
     "We eventually reach the railing, ducking and dodging every shot that came our way."
 
-    mo "Do you see them, Libatina?"
+    mo "Do you see them, Libitina?"
 
-    # DO NOT SHOW LIBATINA SPRITES!!
+    # DO NOT SHOW Libitina SPRITES!!
     l "Y-Yes."
     l "Let’s finish what they started."
 
@@ -629,13 +629,13 @@ label Act1:
 
     mo "Lib! Downstairs! Now! I’ll meet you there!"
 
-    "Libatina hesitates for a split second, fear written across her face."
+    "Libitina hesitates for a split second, fear written across her face."
     "I grab her arm, yanking her toward the stairs. Every step is a gamble."
     "The storm howls around us, mixing with gunfire and desperate screams."
     "I know if I stay too long, we both die."
     "Every ounce of strength in my body focuses on keeping her alive."
 
-    mo "Move, Libatina! Don’t stop!"
+    mo "Move, Libitina! Don’t stop!"
 
     "As she vanishes down the stairs, the last sparks of magic curl around my hands, fading fast."
     "Suddenly, a thought I’ve shoved to the back of my mind for years hits me."
@@ -658,7 +658,7 @@ label Act1:
 
     "Finally, I make it downstairs to her."
 
-    mo "Libatina, follow me. Don’t fall behind."
+    mo "Libitina, follow me. Don’t fall behind."
     mo "There’s a forest not far from here."
     mo "A place even most of our own people don’t remember."
     mo "They won’t find us if we move fast."
@@ -673,7 +673,7 @@ label Act1:
 
     "There is no time. I grab Libatina’s hand, and we begin to flee."
     "Arrows and bullets streak past us, embedding in the ground near our feet."
-    "Libatina clutches my hand, tightly, panting heavily."
+    "Libitina clutches my hand, tightly, panting heavily."
     "We have to survive."
     "We have to!"
     "I’m not giving it up, dammit!"
@@ -687,58 +687,121 @@ label Act1:
 
     "We make a break for the trees."
 
-
-
-    scene bg 1600Forest
+    scene bg forest_1600
     show fog
     with fade
-    pause 1.5
 
-    "Branches scratch our faces instantly."
+    play sound "sfx_wind.ogg"
+    play ambience "ambience_war_quiet.ogg"
+    stop sound "sfx_running.ogg" fadeout 1.0
+    play sound "sfx_branches.ogg"
+
+    "Branches tear at our faces the moment we hit the forest."
     "I hear them behind us."
-    "The guards shouting orders, the clang of weapons, the snap of gunpowder."
-    "I think we've reached safety."
-    "For now."
-    "The forest thickens."
-    "For a few precious seconds, the world feels quieter."
+    "Shouts. Orders barked over the chaos."
+    "I let out a shaky sigh."
 
-    show libitina base regalia unsu evening at t21 with dissolve
-    l "Maybe... maybe we're safe..."
-    show libitina at thide
-    hide libitina
+    pause 0.75
+    play sound "sfx_male_sigh.ogg"
 
-    play music "mod_assets/music/Zombie (Cover).ogg" fadein 2.0
-    pause 1.5
-    
-    "But instinct screams at me."
-    "Movement in the shadows, figured crouched behind thick trees, hidden, and waiting."
-    "Only a few seconds remain."
+    "The forest swallows the sounds, thick and foggy."
+    "For a few precious seconds, the world holds its breath."
+    "Just enough for us to catch a heartbeat."
 
-    mo 'LIBITINA! RUN!'
-    
-    "She does not hesitate. Her feet pound the ground as she vanishes down a narrow path I cannot follow with her."
-    "My heart clenches, knowing what must come next."
-    "The spell, long kept secret, waits for this moment."
-    "This is it."
-    "No time to hesitate. No chance for second thoughts."
-    "The kingdom dies fully if I do not act."
-    "The only way to protect her, and the last hope of survival is this."
+    play sound "sfx_female_sigh.ogg"
+
+    show libitina base worr regalia evening at t11
+    l "Maybe… maybe we’re safe…"
+
+    pause 0.75
+
+    show libitina base lsca regalia evening at t11
+    "She presses close, trembling."
+    "I grip her hand tighter, feeling her pulse race against mine."
+
+    pause 0.75
+
+    "But, I should know better. Safety is an illusion, in our circumstances."
+    "The moment we stop, even if only for a second, the world will find us again."
+
+    play music "nothing_else_matters_cover.ogg" fadein 2.0
+    play sound "sfx_footsteps_faint.ogg"
+
+    # Zoomed-in forest (outdoor)
+    scene bg forest_1600_zoomed
+    show fog
+    with fade
+    # Visuals: screen sways back and forth (if possible)
+
+    "Movement in the shadows. Figures crouched behind thick trees, silent, and waiting."
+    "Only seconds. That’s all we’ve got."
+
+    # Screen stops swaying
+    scene bg forest_1600
+    show fog
+    with fade
+
+    mo "Libitina! RUN!"
+
+    play sound "sfx_running_ext.ogg"
+
+    # Gunshots and screen shakes
+    play sound "sfx_goro_gunshot.ogg"
+    show screen shake
+    pause 0.2
+    play sound "sfx_goro_gunshot.ogg"
+    show screen shake
+    pause 0.2
+    play sound "sfx_goro_gunshot.ogg"
+    show screen shake
+
+    show libitina base vsca regalia evening at t11
+    "She doesn’t even think. She bolts, her feet slamming the dirt as she vanishes down a narrow path I can’t follow."
+    "Gunfire and arrows slam into the dirt at her feet, missing her ankles by inches."
+    "But she slips away."
+    "That’s all that matters."
+    "The guards bolt after her, but the forest takes her before they reach her."
+    "She’s got this."
+    "Shit, do I?"
+    "My chest tightens, nerves twisting inside me."
+    "God, this is it."
+    "The spell… the one I swore I’d never touch."
+    "This is why I kept it hidden. Because it kills the caster."
+    "But what choice do I have?"
+    "No time to think. Hesitation gets you dead."
+    "And me? I’m not going out without making it count."
+    "She dies if I stall. Every last damn life in my hands. And I’ll be a corpse if I don’t do this."
 
     pause 1.5
-    play sound "mod_assets/sfx/THROAT SLITTING.ogg"
-    pause 1.5
-    
-    "A single, straight cut opens my throat. Blood spills, warmth fades, and the world tilts."
-    play sound "mod_assets/sfx/collapse.ogg"
-    scene black with fade
-    "Behind me, the enemy is silent."
-    "Then, realization kicks in."
-    pause 1.5
-    play sound "mod_assets/sfx/the king is dead! (sound effect).ogg"
-    en "Everyone's dead! The kingdom is ours!"
+    play sound "sfx_slash.ogg"
+
+    "My throat opens in a single, straight cut."
+
+    # Visuals: blood fades in
+
+    "Hot blood surges, and burns, as my vision tilts."
+
+    play sound "sfx_collapse.ogg"
+    play sound "sfx_thud.ogg"
+
+    # Black screen with blood overlay
+    scene black
+    with fade
+
+    "The enemy freezes."
+    "Silence hangs for the briefest second before panic hits them."
+
+    pause 2.5
+    play sound "sfx_the_king_is_dead.ogg"
+
+    "They have no idea."
+    "They think we’ve lost."
+    "They think the king is dead."
+    "But I’m not. Not yet. Not even close."
+
     stop music fadeout 2.0
-
-    pause 3.0
+    stop sound "sfx_wind.ogg" fadeout 2.0
+    stop ambience fadeout 2.0
 
     scene bg Fire_Village
     show fog
