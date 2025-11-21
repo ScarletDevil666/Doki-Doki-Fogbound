@@ -803,58 +803,86 @@ label Act1:
     stop sound "sfx_wind.ogg" fadeout 2.0
     stop ambience fadeout 2.0
 
-    scene bg Fire_Village
+    # Slow fade in with white flash
+    scene bg fire_village
     show fog
-    show eff_rain_l
-    with dissolve_scene_full
-    play sound "mod_assets/sfx/gasp.ogg"
-    play ambient "mod_assets/ambience/rain_ext.ogg"
+    with fade
 
+    play sound "sfx_gasp.ogg"
     pause 1.5
-    "I awaken slowly, in another soldier's vessel."
-    "Limbs that once were strong, now feel brittle and foreign, weighed down by the shell of someone else."
-    stop ambient fadeout 2.0
-    pause 1.5
+    play sound "sfx_wind.ogg"
+    play sound "sfx_rain_ext.ogg"
+    # Rain effect + fog overlay
+
+    "I wake, startled to find myself still alive, as if death itself miscalculated."
+    "I-I’m not in my bed. Not in my body."
+    "This thing I’m in is stiff, wrong, brittle."
+    "Someone else’s skin, someone else’s bones."
+
+    pause 0.75
+    "Huh? That’s unpleasant."
+    "Not the grandest entrance back to life, I’ll say that."
+
+    pause 2.5
+    play music "where_did_you_sleep_cover.ogg" fadein 2.0
+
+    "Heh.."
     "This."
     "This is the cost."
     "The body dies, but the mind endures."
-    "The shell is borrowed, broken, but the king remains."
-    "I have cheated death, but the world has not cheated me."
-    # The script says to hide Morvayn, but it never said to show him in the first place? Confusion.
-    
-    "I rise on unsteady legs."
-    "Every motion is a reminder this is not my form, not my strength."
-    "And yet, I am here."
-    "Dead soldiers around me."
-    "I can think, plan, breathe."
-    "I take in the empty, silent aura of the once full and spirited kingdom, letting the breeze cool over me."
-    "I take it in slowly, savoring each sense."
-    "My mind reaches for Libitina."
-    "I picture her small, brave, running ahead, untouched by the enemy."
+    "I have cheated death, but life has not cheated me."
+    "It tried."
+    "God knows it tried. But I’m still here."
+    "My mind snaps to Libatina."
+    "Confident, and brave."
+    "She pushes forward."
+    "Alive."
 
-    mo "She is safe, for now."
-    mo "And that is all that matters."
-    mo "For her, I have endured the unbearable."
-    mo "For her, I cast the spell no king should ever wield."
-    pause 1.5
+    mo "She’s fine."
+    mo "I did what had to be done."
+
+    "I rise on unsteady legs, nearly falling over in the process."
+
+    pause 0.75
     "They think the king is dead."
-    "They celebrate as if they have claimed everything."
-    "They do not know the truth. They do not know that the ruler remains."
+    "Ha. Let them celebrate. Let them dance on the ashes like fools."
+    "They think they’ve won. They think this ruin is theirs."
+    "They do not know."
+    "They do not know the ruler still breathes."
     "That I remain."
-    "That the game is not over."
-    "They are all by the forest."
-    "I must move fast."
-    "I take a step forward, then another."
-    "Each movement, each breath, each heartbeat is proof."
-    "Proof that the impossible has happened."
+    "That the game is far from over."
+    "Their path leads to the forest."
+    "I must move fast. Every second counts. Every moment I hesitate is a moment wasted."
 
-    mo "The king is dead... But the ruler lives on..."
-    mo "Bound by the fog."
-    mo "I will find Libitina. She will not be left behind."
-    
-    stop music fadeout 2.0
-    scene black
-    with dissolve_scene_full
+    # Fast fade in/out to Fire Path (outdoor)
+    scene bg fire_path
+    show fog
+    with fade
+
+    "I take a step forward, then another."
+    "My limbs complain, my bones protest, but I don’t care."
+    "Each step, each breath, each heartbeat… proof."
+    "Proof that death can be cheated. Proof that the impossible is real."
+    "That we still have strength even without power."
+
+    pa "The king is dead… but the ruler? The ruler lives. Alive, angry, and ready."
+    pa "Bound by fog, cloaked in the shadows."
+    pa "I will find her."
+    pa "She will not be left behind. Not today, not ever."
+    pa "I will rebuild. I will fight."
+    pa "Even if it takes 100 years.."
+    pa "I will rise from this chaos, and they will learn who they just tried to destroy."
+
+    # Slow fade out
+    stop music fadeout 3.0
+    stop sound "sfx_wind.ogg" fadeout 2.0
+    stop sound "sfx_rain_ext.ogg" fadeout 2.0
+    stop sound "sfx_gasp.ogg" fadeout 2.0
+    stop ambience fadeout 2.0
+
+    scene black with fade
+
+
     pause 1.5
     scene bg 1700Forest
     show fog
