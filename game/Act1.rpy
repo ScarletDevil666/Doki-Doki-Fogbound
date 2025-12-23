@@ -26,7 +26,7 @@ label Act1:
     "I scoff."
     "If anyone should fear the dead, it is me" 
     "Goro pauses at my side, head bowed"
-    show goro neut fire at l21  
+    show goro neut fire at l21
     g "Sire, forgive the intrusion. I bring troubling news." 
     mo "Another matter demanding my judgment?" 
     g "It is troubling, sire. The people are losing their magic one by one." 
@@ -132,7 +132,7 @@ label Act1:
     "I told myself it would pass."
     "I told myself to keep quiet. Maybe I did not want to see the fear in their faces."
 
-    show l base neut regalia at t11
+    show libitina base neut regalia at t11
     mo "Fuck."
 
     "I didn’t tell Libitina."
@@ -328,7 +328,7 @@ label Act1:
     "They could strike at any given moment."
     "But throughout all the worry, we’ve stayed low, our eyes on the kingdom below."
 
-    scene black with dissolve_sceen_full
+    scene black with dissolve
 
     mo "Ya know, Lib."
     mo "It’s been a while. Maybe we should check on the others."
@@ -354,19 +354,19 @@ label Act1:
     with wipeleft_scene
 
     # (you can show lib sprites now - just not on railings or black/white screens)
-    show goro base neut evening at t11
-    goro "Morvayn, Libitina!"
-    goro "I’ve been looking for you. Thought I’d find you here."
-    goro "Today has been… rough. But we’ll get through it. We always do."
+    show goro evening neut at t11
+    g "Morvayn, Libitina!"
+    g "I’ve been looking for you. Thought I’d find you here."
+    g "Today has been… rough. But we’ll get through it. We always do."
 
     mo "Damn straight, Goro."
     mo "How have you been holding up through everything?"
 
-    goro "Ah… I’ve been—"
+    g "Ah… I’ve been—"
 
     # TODO - Zooms In To Goro's Forehead
     play sound goro_gunshot
-    # TODO - show screen shake
+    with Shake((0, 0, 0, 0), 1.0, dist=30)
     play ambient war_sounds fadein 3.0
     play sound collapse
 
@@ -478,7 +478,7 @@ label Act1:
     scene bg morvaynsroom
     with wipeleft_scene
     play sound "sfx_muffled_rain.ogg"
-    # This is a png file! play ambient "ambience_muffled_war.ogg"
+    # This is a png file! play ambient "ambient_muffled_war.ogg"
 
     # NARRATION: Sfx: Door Opening
     play sound door_opening
@@ -552,6 +552,7 @@ label Act1:
     "We step out into the storm, and make a run for it."
 
     # longer slide to Railing (outdoor)
+    define wipeleft_full = CropMove(2.0, "wipeleft")
     scene bg War Railing
     show fog
     with wipeleft_full
@@ -602,7 +603,7 @@ label Act1:
     "The guard slowly lifts his weapon, eyes wide, smiling at me cheekily."
 
     play sound goro_gunshot
-    show screen shake
+    with Shake((0, 0, 0, 0), 1.0, dist=30)
     "Before I can react, a shot tears through the air, grazing my shoulder."
 
     "Pain flares, sharp and burning, but I grit my teeth and push through it."
@@ -652,7 +653,7 @@ label Act1:
     # Away Path (outdoor)
     scene bg Away_Path
     show fog
-    with slide
+    with wipeleft
 
     play sound running_1600
 
@@ -672,12 +673,12 @@ label Act1:
 
     "We make a break for the trees."
 
-    scene bg forest_1600
+    scene bg 1600Forest
     show fog
     with fade
 
     # TODO: Sort out the mess that is the sounds
-    play ambience war_sounds volume 0.5 
+    play ambient war_sounds volume 0.2 
     play sound branches
 
     "Branches tear at our faces the moment we hit the forest."
@@ -712,7 +713,7 @@ label Act1:
     play sound faint_footsteps_ext fadein 0.5
 
     # Zoomed-in forest (outdoor)
-    scene bg forest_1600_zoomed
+    scene bg 1600ForestZoom
     show fog
     with fade
     # Visuals: screen sways back and forth (if possible)
@@ -721,7 +722,7 @@ label Act1:
     "Only seconds. That’s all we’ve got."
 
     # Screen stops swaying
-    scene bg forest_1600
+    scene bg 1600Forest
     show fog
     with fade
 
@@ -731,13 +732,13 @@ label Act1:
     pause 0.5
     # Gunshots and screen shakes
     play sound goro_gunshot
-    show screen shake
+    with Shake((0, 0, 0, 0), 0.5, dist=30)
     pause 0.3
     play sound goro_gunshot
-    show screen shake
+    with Shake((0, 0, 0, 0), 0.5, dist=30)
     pause 0.5
     play sound goro_gunshot
-    show screen shake
+    with Shake((0, 0, 0, 0), 0.5, dist=30)
 
     show libitina base vsca regalia evening at t11
     "She doesn’t even think. She bolts, her feet slamming the dirt as she vanishes down a narrow path I can’t follow."
@@ -757,7 +758,7 @@ label Act1:
     "She dies if I stall. Every last damn life in my hands. And I’ll be a corpse if I don’t do this."
 
     pause 1.5
-    play sound slast
+    play sound slash
 
     "My throat opens in a single, straight cut."
 
@@ -775,7 +776,7 @@ label Act1:
     "Silence hangs for the briefest second before panic hits them."
 
     pause 2.5
-    play sound the_king_is_dead_voice
+    play sound king_is_dead_voice
 
     "They have no idea."
     "They think we’ve lost."
@@ -783,7 +784,7 @@ label Act1:
     "But I’m not. Not yet. Not even close."
 
     stop music fadeout 2.0
-    stop ambience fadeout 2.0
+    stop ambient fadeout 2.0
 
     # Slow fade in with white flash
     scene bg fire_village
@@ -807,7 +808,7 @@ label Act1:
     "Not the grandest entrance back to life, I’ll say that."
 
     pause 2.5
-    play music "where_did_you_sleep_cover.ogg" fadein 2.0
+    play music sleep fadein 2.0
 
     "Heh.."
     "This."
@@ -867,7 +868,7 @@ label Act1:
     scene black with fade
 
     # Fade in game with white flash
-    scene bg forest_1700
+    scene bg 1700Forest
     show fog
     with fade
 
@@ -931,7 +932,7 @@ label Act1:
     "She nods, her eyes steady, and together we slip into the shelter of the trees, carefully."
     stop music fadeout 2.0
     # Medium slide to fiery forest
-    scene bg fiery_forest_1700
+    scene bg 1700ForestFire
     show fog
     with wipeleft_scene
 
@@ -1076,7 +1077,7 @@ label Act1:
     stop music fadeout 1.0
     
     # Scene: 1700 Path (outdoor)
-    scene bg path_1700
+    scene bg 1700Path
     show fog
     with fade
     # Sprite hue: greyish rainyish-blue
@@ -1097,7 +1098,7 @@ label Act1:
     # Fade in/out to path
     scene black
     with fade
-    scene bg path_1700
+    scene bg 1700Path
     show fog
     with fade
 
@@ -1230,7 +1231,7 @@ label Act1:
     # Line cuts off fast
 
     #TODO set textbox "Lib And Morvayn"
-    show screen shake
+    with Shake((0, 0, 0, 0), 1.0, dist=30)
     play sound fall
 
     us "AHHHHHHH"  #TODO line cuts off when sfx ends
@@ -1275,7 +1276,7 @@ label Act1:
 
     # Fast slide to cave text
     scene bg CaveText
-    with slide
+    with wipeleft
 
     "The walls are covered in text I can’t quite recognize."
     "But somehow… they feel familiar."
@@ -1608,7 +1609,7 @@ label Act1:
     # Everything fades out
     stop music fadeout 3.0
     stop sound fadeout 3.0
-    stop ambience fadeout 3.0
+    stop ambient fadeout 3.0
 
 
 

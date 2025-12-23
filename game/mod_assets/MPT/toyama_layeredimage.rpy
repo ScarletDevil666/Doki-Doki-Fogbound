@@ -12,6 +12,10 @@ layeredimage goro:
 
     always base_path + "base.png"
 
+    group af_logic multiple:
+        attribute afm null #This attribute controls whether automatic control of the mouths takes place or not.  Add this tag to a character to enable automatic mouth control, remove it to disable it.
+        attribute afz null
+
     group mood: #Mood determines what the defaults images are for the following attributes:
         #"oe", "ce", "om", "cm", "brow".
         #By changing what the "mood" attribute is, you can easily switch between premade sets of expressions that work well together, speeding up your workflow.

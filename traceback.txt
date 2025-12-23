@@ -1,0 +1,35 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/definitions/splash.rpy", line 9, in script
+    init -100 python:
+  File "game/definitions/splash.rpy", line 9, in script
+    init -100 python:
+  File "game/definitions/splash.rpy", line 13, in <module>
+    raise DDLCRPAsMissing(archive)
+DDLCRPAsMissing: 'images.rpa' was not found in the game folder. Check your DDLC installation for missing RPAs and try again.
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "D:\DDMMaker8-1.5.22-sdk\renpy\bootstrap.py", line 277, in bootstrap
+    renpy.main.main()
+  File "D:\DDMMaker8-1.5.22-sdk\renpy\main.py", line 558, in main
+    renpy.game.context().run(node)
+  File "game/definitions/splash.rpy", line 9, in script
+    init -100 python:
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/future/utils/__init__.py", line 441, in raise_
+  File "game/definitions/splash.rpy", line 9, in script
+    init -100 python:
+  File "D:\DDMMaker8-1.5.22-sdk\renpy\ast.py", line 1131, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "D:\DDMMaker8-1.5.22-sdk\renpy\python.py", line 1061, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/definitions/splash.rpy", line 13, in <module>
+    raise DDLCRPAsMissing(archive)
+DDLCRPAsMissing: 'images.rpa' was not found in the game folder. Check your DDLC installation for missing RPAs and try again.
+
+Windows-10-10.0.26100 AMD64
+Ren'Py 8.0.3.22090809
+Doki Doki Fogbound 0.1
+Tue Dec 23 13:02:22 2025

@@ -24,16 +24,20 @@ image bg CaveInterior = "mod_assets/bgs/Cave Interior (1700).png"
 image bg CaveText = "mod_assets/bgs/Cave Text (1700).png"
 image bg 1400Flashback = "mod_assets/bgs/1400 flashback village.png"
 image bg Away_Path = "mod_assets/bgs/away path.png"
+image bg War Railing = "mod_assets/bgs/1600 war railing (updated).png"
+image bg fire_village = "mod_assets/bgs/1600 firey village.png"
+image bg fire_path = "mod_assets/bgs/1600 firey path.png"
+
 define flash = Fade(.25, 0, .75, color="#fff")
 #characters
-define mo = Character("Morvayn")
-define l = Character("Libatina")
-define g = Character("Goro")
-define en = Character("Enemies")
-define pa = Character("Prince Alaric")
-define gr = Character("Grandfather")
-define us = Character("Us")
-
+define mo = Character("Morvayn", window_background=Image("/mod_assets/UI/text boxes/Morvayn Text Box (1600-1700).png", xalign=0.5, yalign=1.0), who_style='say_label_Morvayn')
+define l = Character("Libitina", window_background=Image("/mod_assets/UI/text boxes/Libatina Text Box (1600-1700).png", xalign=0.5, yalign=1.0), who_style='say_label_Libitina')
+define g = Character("Goro", window_background=Image("/mod_assets/UI/text boxes/Goro Text Box (1600).png", xalign=0.5, yalign=1.0), who_style='say_label_Goro')
+#define en = Character("Enemies")
+define pa = Character("Prince Ale", window_background=Image("/mod_assets/UI/text boxes/Prince Ale_Morvayns Vessel Text Bod (1700).png", xalign=0.5, yalign=1.0), who_style='say_label_Ale')
+define gr = Character("Grandfather", window_background=Image("/mod_assets/UI/text boxes/Morvayns Grandfather Text Box (1400 Flashback).png", xalign=0.5, yalign=1.0), who_style='say_label_Ale')
+define us = Character("Us", window_background=Image("/mod_assets/UI/text boxes/Libatina And Morvayn Text Box (1700).png", xalign=0.5, yalign=1.0), who_style='say_label_Us')
+define ym = Character("Morvayn", window_background=Image("/mod_assets/UI/text boxes/Young Morvayn Text Box (1400 Flashback).png", xalign=0.5, yalign=1.0), who_style='say_label_YMorvayn')
 
 # Sounds
 # Music
@@ -52,6 +56,7 @@ define audio.tallerbeauty = "mod_assets/music/Taller Beauty (Cover).ogg"
 define audio.tragedyhill = "mod_assets/music/Tragedy Hill.ogg"
 define audio.sweet666 = "mod_assets/ost/Your Sweet Six Six Six (Cover-Prologue)-Updated.ogg"
 define audio.zombie = "mod_assets/ost/Zombie (Prologue-Cover).ogg"
+define audio.sleep = "mod_assets/ost/Where Did You Sleep_ (Prologue-Cover).ogg"
 
 # SFX
 define audio.branches = "mod_assets/sfx/Branches.ogg"
@@ -73,7 +78,7 @@ define audio.running_1600 = "mod_assets/sfx/Running (1600).ogg"
 define audio.sayori_laugh = "mod_assets/sfx/sayori laugh.ogg"
 define audio.sayoris_laugh = "mod_assets/sfx/Sayoris Laugh.ogg"
 define audio.school_bell = "mod_assets/sfx/School Bell.ogg"
-define audio.slash = "mod_assets/sfx/Slash.ogg"
+define audio.slash = "mod_assets/sfx/slash_cut (updated).ogg"
 define audio.small_whimper = "mod_assets/sfx/Small Whimper.ogg"
 define audio.king_is_dead_sfx = "mod_assets/sfx/The king is dead! (sound effect).ogg"
 define audio.king_is_dead_voice = "mod_assets/sfx/The King Is Dead! (voice acted sound effect).ogg"

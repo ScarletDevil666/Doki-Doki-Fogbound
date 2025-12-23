@@ -174,7 +174,70 @@ style frame:
 ## and id "window" to apply style properties.
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#say
+style window:
+    xalign 0.5
+    xfill True
+    yalign gui.textbox_yalign
+    ysize gui.textbox_height
 
+    #background Image("gui/textbox.png", xalign=0.5, yalign=1.0)
+
+style window_Morvayn:
+    xalign 0.5
+    xfill True
+    yalign gui.textbox_yalign
+    ysize gui.textbox_height
+    background Image("/mod_assets/UI/text boxes/Morvayn Text Box (1600-1700).png", xalign=0.5, yalign=1.0)
+
+style say_label_Morvayn:
+    color gui.accent_color
+    font gui.name_font
+    size gui.name_text_size
+    xalign gui.name_xalign
+    yalign 0.5
+    outlines [(3, "#ba0018", 0, 0), (1, "#ba0018", 1, 1)]
+style say_label_YMorvayn:
+    color gui.accent_color
+    font gui.name_font
+    size gui.name_text_size
+    xalign gui.name_xalign
+    yalign 0.5
+    outlines [(3, "#f700ffff", 0, 0), (1, "#f700ffff", 1, 1)]
+style say_label_Libitina:
+    color gui.accent_color
+    font gui.name_font
+    size gui.name_text_size
+    xalign gui.name_xalign
+    yalign 0.5
+    outlines [(3, "#630170ff", 0, 0), (1, "#630170ff", 1, 1)]
+style say_label_Ale:
+    color gui.accent_color
+    font gui.name_font
+    size gui.name_text_size
+    xalign gui.name_xalign
+    yalign 0.5
+    outlines [(3, "#03a8b4ff", 0, 0), (1, "#03a8b4ff", 1, 1)]
+style say_label_Us:
+    color gui.accent_color
+    font gui.name_font
+    size gui.name_text_size
+    xalign gui.name_xalign
+    yalign 0.5
+    outlines [(3, "#f78400ff", 0, 0), (1, "#f78400ff", 1, 1)]
+style window_Goro:
+    xalign 0.5
+    xfill True
+    yalign gui.textbox_yalign
+    ysize gui.textbox_height
+    background Transform("/mod_assets/UI/text boxes/Goro Text Box (1600).png", xalign=0.5, yalign=1.0)
+
+style say_label_Goro:
+    color gui.accent_color
+    font gui.name_font
+    size gui.name_text_size
+    xalign gui.name_xalign
+    yalign 0.5
+    outlines [(3, "#00ba38ff", 0, 0), (1, "#00ba38ff", 1, 1)]
 screen say(who, what):
     style_prefix "say"
 
@@ -184,11 +247,9 @@ screen say(who, what):
         text what id "what"
 
         if who is not None:
-
             window:
                 style "namebox"
                 text who id "who"
-
     # If there's a side image, display it above the text. Do not display
     # on the phone variant - there's no room.
     if not renpy.variant("small"):
@@ -205,15 +266,6 @@ style say_thought is say_dialogue
 style namebox is default
 style namebox_label is say_label
 
-
-style window:
-    xalign 0.5
-    xfill True
-    yalign gui.textbox_yalign
-    ysize gui.textbox_height
-
-    background Transform("mod_assets/UI/1600-1700 Text Box.png", xalign=0.5, yalign=1.0)
-
 style window_monika is window:
     background Transform("gui/textbox_monika.png", xalign=0.5, yalign=1.0)
 
@@ -224,7 +276,7 @@ style namebox:
     ypos gui.name_ypos
     ysize gui.namebox_height
 
-    background Frame("gui/namebox.png", gui.namebox_borders, tile=gui.namebox_tile, xalign=gui.name_xalign)
+    background Frame("mod_assets/UI/namebox.png", gui.namebox_borders, tile=gui.namebox_tile, xalign=gui.name_xalign)
     padding gui.namebox_borders.padding
 
 style say_label:
