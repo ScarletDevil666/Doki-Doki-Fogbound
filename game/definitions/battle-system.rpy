@@ -182,13 +182,17 @@ init python:
                 self.next_action[1] = random.choice(enemies)
 
     class Boss(Enemy): # these will have special abilities and will be harder to defeat, also their turn number is not randomized
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:List[MagicAbility], turn_number:int=0):
+        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:List[MagicAbility], *, phases: List[BossPhase], turn_number:int=0):
             super().__init__(name, max_health, strength, defense, max_magic, speed, accuracy, evasion, weakness, magic_abilities)
             self.turn_number = turn_number
+            self.phases = phases
         
         def decide_turn(self):
             return self.turn_number
     
+    class BossPhase:
+        pass # TODO: Decide how this is gonna work
+
     def decide_turn_order(party: List[PartyMember], enemies: List[Enemy | Boss]):
         global turn_order
         turn_order = random.shuffle([*party, *enemies])
