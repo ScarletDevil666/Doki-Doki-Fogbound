@@ -89,13 +89,13 @@ init python:
                             self.follow_up(target)
                 target.health -= damage - target.defense
                 if "PHYSICAL" in target.weaknesses:
-                    return "HIT\nWEAKNESS\n[damage]"
+                    return f"HIT\nWEAKNESS\n{damage}"
                 elif critical:
-                    return "HIT\nCRITICAL\n[damage]"
+                    return f"HIT\nCRITICAL\n{damage}"
                 elif target.is_guarding:
-                    return "HIT\nGUARDED\n[damage]"
-                return "HIT\n[damage]"
-            return "MISS"
+                    return f"HIT\nGUARDED\n{damage}"
+                return f"HIT\n{damage}"
+            return f"MISS"
 
         def magic_attack(self, ability: MagicAbility, target: BattleMember):
             self.magic -= ability.cost
@@ -107,9 +107,9 @@ init python:
                     damage *= 2
                 target.health -= damage - target.defense
                 if ability.element in target.weaknesses:
-                    return "HIT\nWEAKNESS\n[damage]"
-                return "HIT\n[damage]"
-            return "MISS"
+                    return f"HIT\nWEAKNESS\n{damage}"
+                return f"HIT\n{damage}"
+            return f"MISS"
 
         def heal(self, ability: HealingAbility, target: BattleMember):
             self.magic -= ability.cost
@@ -117,8 +117,8 @@ init python:
             target.health += heal
             if target.health > target.max_health:
                 target.health = target.max_health
-                return "FULL\nHEAL\n[heal]"
-            return "HEAL\n[heal]"
+                return f"FULL\nHEAL\n{heal}"
+            return f"HEAL\n{heal}"
 
         def guard(self):
             self.is_guarding = True
