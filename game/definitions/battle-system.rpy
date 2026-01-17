@@ -75,7 +75,7 @@ init python:
         
         def normal_attack(self, target: BattleMember):
             damage = random.randint(self.strength // 2, self.strength)
-            hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion)
+            hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or target.is_guarding
             if hit:
                 if target.is_guarding:
                     damage // 2
@@ -92,13 +92,15 @@ init python:
                     return "HIT\nWEAKNESS\n[damage]"
                 elif critical:
                     return "HIT\nCRITICAL\n[damage]"
+                elif target.is_guarding:
+                    return "HIT\nGUARDED\n[damage]"
                 return "HIT\n[damage]"
             return "MISS"
 
         def magic_attack(self, ability: MagicAbility, target: BattleMember):
             self.magic -= ability.cost
             damage = random.randint(ability.damage // 2, ability.damage)
-            hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion)
+            hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or ability.name == "Follow Up" or target.is_guarding
             renpy.show(ability._image, [ability._transform]) # play animation
             if hit:
                 if ability.element in target.weaknesses:
