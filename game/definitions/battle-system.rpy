@@ -49,7 +49,7 @@ init python:
     """
 
     class MagicAbility:
-        def __init__(self, name: str, description: str, damage: int, cost: int, element: str, effect: str | None = None, effect_chance: int = 0, *, _transform=None, _image=None):
+        def __init__(self, name: str, description: str, damage: int, cost: int, element: str, effect: str | None = None, effect_chance: int = 0, *, _transform=None, _image=None, _sound=None):
             self.name = name
             self.description = description
             self.damage = damage
@@ -59,9 +59,10 @@ init python:
             self.effect_chance = effect_chance
             self._transform = _transform
             self._image = _image
+            self._sound = _sound
     
     class HealingAbility:
-        def __init__(self, name: str, description: str, heal: int, cost: int, negative_effects: list[str] | None = None, negative_effect_chance: int = 0, positive_effect: str | None = None, positive_effect_chance: int = 0, *, _transform=None, _image=None):
+        def __init__(self, name: str, description: str, heal: int, cost: int, negative_effects: list[str] | None = None, negative_effect_chance: int = 0, positive_effect: str | None = None, positive_effect_chance: int = 0, *, _transform=None, _image=None, _sound=None):
             self.name = name
             self.description = description
             self.heal = heal
@@ -72,6 +73,7 @@ init python:
             self.positive_effect_chance = positive_effect_chance
             self._transform = _transform
             self._image = _image
+            self._sound = _sound
 
     class BattleMember(Object): # Parent class for party members and enemies
         def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], follow_up:MagicAbility):
@@ -123,6 +125,7 @@ init python:
             damage = random.randint(ability.damage // 2, ability.damage)
             hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or ability.name == "Follow Up" or target.is_guarding
             renpy.show(ability._image, [ability._transform]) # play animation
+            renpy.play(ability._sound, "sound") # play sound
             if hit:
                 if ability.element in target.weaknesses:
                     damage *= 2
@@ -140,6 +143,8 @@ init python:
         def heal(self, ability: HealingAbility, target: BattleMember):
             self.magic -= ability.cost
             heal = random.randint(ability.heal // 2, ability.heal)
+            renpy.show(ability._image, [ability._transform]) # play animation
+            renpy.play(ability._sound, "sound") # play sound
             if ability.negative_effects is not None and random.randint(1, 100) <= ability.negative_effect_chance:
                 for effect in ability.negative_effects:
                     target.current_effects.remove(effect)
