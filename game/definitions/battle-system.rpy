@@ -27,6 +27,25 @@ init python:
         LIGHT
         DARK
         PHYSICAL
+    
+    Available negative effects:
+        BURN: Reduces the target's health each turn for 3 turns, double damage if weak to fire
+        POISON: Reduces the target's health each turn for 3 turns, double damage if weak to poison
+        STUN: Stuns the target, preventing them from attacking for 1 turn
+        SLEEP: Puts the target to sleep, preventing them from attacking for 3 turns, but they heal each turn
+        PARALYZE: Paralyzes the target, preventing them from attacking for 3 turns
+        MAGIC BLOCK: Prevents the target from using magic for 2 turns # this needs a different name
+        CONFUSE: Randomly chooses the target's action for 3 turns, these include attacking pary members and healing enemies
+        CHARM: Puts the target on the user's side, if party, the player will control what the target doing for the next 3 turns, if enemy, the target will act as an enemy for the next 3 turns
+        FEAR: On turn, 60% chance to force skip turn, 20% chance to run away, 20% chance to actually do commanded action
+        ENRAGE: Force target to only use normal attacks for 3 turns, however strength is boosted
+        TARGET LOCK: Forces the target to only attack the user for 3 turns
+
+    Available positive effects:
+        SHIELD: Increases the target's defense for 3 turns
+        REFLECT: Reflects damage back to the attacker for 3 turns
+        REGENERATE: Heals the target each turn for 3 turns
+        STAT BOOST: Increases the target's stats for 3 turns
     """
 
     class MagicAbility:
@@ -42,18 +61,20 @@ init python:
             self._image = _image
     
     class HealingAbility:
-        def __init__(self, name: str, description: str, heal: int, cost: int, effect: str | None = None, effect_chance: int = 0, *, _transform=None, _image=None):
+        def __init__(self, name: str, description: str, heal: int, cost: int, negative_effects: list[str] | None = None, negative_effect_chance: int = 0, positive_effect: str | None = None, positive_effect_chance: int = 0, *, _transform=None, _image=None):
             self.name = name
             self.description = description
             self.heal = heal
             self.cost = cost
-            self.effect = effect
-            self.effect_chance = effect_chance
+            self.negative_effects = negative_effects
+            self.negative_effect_chance = negative_effect_chance
+            self.positive_effect = positive_effect
+            self.positive_effect_chance = positive_effect_chance
             self._transform = _transform
             self._image = _image
 
     class BattleMember(Object): # Parent class for party members and enemies
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: List[str], magic_abilities:List[MagicAbility | HealingAbility], follow_up:MagicAbility):
+        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], follow_up:MagicAbility):
             self.name = name
             self.max_health = max_health
             self.health = max_health
@@ -105,7 +126,12 @@ init python:
             if hit:
                 if ability.element in target.weaknesses:
                     damage *= 2
-                target.health -= damage - target.defense
+                damage -= target.defense
+                if ability.effect is not None and random.randint(1, 100) <= ability.effect_chance:
+                    target.current_effects.append(ability.effect)
+                if damage < 0:
+                    damage = 0
+                target.health -= damage
                 if ability.element in target.weaknesses:
                     return f"HIT\nWEAKNESS\n{damage}"
                 return f"HIT\n{damage}"
@@ -114,6 +140,11 @@ init python:
         def heal(self, ability: HealingAbility, target: BattleMember):
             self.magic -= ability.cost
             heal = random.randint(ability.heal // 2, ability.heal)
+            if ability.negative_effects is not None and random.randint(1, 100) <= ability.negative_effect_chance:
+                for effect in ability.negative_effects:
+                    target.current_effects.remove(effect)
+            if ability.positive_effect is not None and random.randint(1, 100) <= ability.positive_effect_chance:
+                target.current_effects.append(ability.positive_effect)
             target.health += heal
             if target.health > target.max_health:
                 target.health = target.max_health
@@ -130,7 +161,7 @@ init python:
             return self.magic_attack(self.follow_up, target)
     
     class PartyMember(BattleMember):
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:List[MagicAbility], starting_exp:int=0, level_up:int=100):
+        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:list[MagicAbility], starting_exp:int=0, level_up:int=100):
             super().__init__(name, max_health, strength, defense, max_magic, speed, accuracy, evasion, weakness, magic_abilities)
             self.exp = 0
             self.total_exp = starting_exp
@@ -161,7 +192,7 @@ init python:
             return self.exp_to_next_level - self.exp
         
     class Enemy(BattleMember):
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:List[MagicAbility]):
+        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:list[MagicAbility]):
             super().__init__(name, max_health, strength, defense, max_magic, speed, accuracy, evasion, weakness, magic_abilities)
             self.all_abilities = ["NORMAL", *self.magic_abilities]
             self.next_action = [None, None] # [ability, target], this is here because I believe we can have a certain character reveal the enemy's next action before it happens
@@ -174,7 +205,7 @@ init python:
             elif self.next_action[0] is HealingAbility:
                 return self.heal(self.next_action[0], self.next_action[1])
         
-        def choose_action(self, party: List[PartyMember], enemies: List[Enemy]):
+        def choose_action(self, party: list[PartyMember], enemies: list[Enemy]):
             self.next_action[0] = random.choice(self.all_abilities)
             if self.next_action[0] == "NORMAL" or self.next_action[0] is MagicAbility:
                 self.next_action[1] = random.choice(party)
@@ -182,7 +213,7 @@ init python:
                 self.next_action[1] = random.choice(enemies)
 
     class Boss(Enemy): # these will have special abilities and will be harder to defeat, also their turn number is not randomized
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:List[MagicAbility], *, phases: List[BossPhase], turn_number:int=0):
+        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:list[MagicAbility], *, phases: list[BossPhase], turn_number:int=0):
             super().__init__(name, max_health, strength, defense, max_magic, speed, accuracy, evasion, weakness, magic_abilities)
             self.turn_number = turn_number
             self.phases = phases
@@ -193,7 +224,7 @@ init python:
     class BossPhase:
         pass # TODO: Decide how this is gonna work
 
-    def decide_turn_order(party: List[PartyMember], enemies: List[Enemy | Boss]):
+    def decide_turn_order(party: list[PartyMember], enemies: list[Enemy | Boss]):
         global turn_order
         turn_order = random.shuffle([*party, *enemies])
         global current_turn
@@ -203,5 +234,5 @@ define can_follow_up = [] # fill this with available party members who can follo
 define turn_order = []
 define current_turn = 0
 
-screen battle(party:List[PartyMember], enemies:List[Enemy | Boss]):
+screen battle(party:list[PartyMember], enemies:list[Enemy | Boss]):
     on "show" action Function(decide_turn_order, party, enemies)
