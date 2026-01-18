@@ -228,7 +228,7 @@ init python:
         global turn_order
         # turn_order = random.shuffle([*party, *enemies]) # Just realized this is not how this works, what's supposed to happen is each member of the battle calls a random number using their decide_turn function, and then the list is sorted by those numbers
         global current_turn
-        current_turn = random.randint(0, len(turn_order) - 1)
+        current_turn = random.randint(0, len(turn_order) - 1) # I might just make this 0, but I'll leave it like this for now
 
 define can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
 define turn_order = []
