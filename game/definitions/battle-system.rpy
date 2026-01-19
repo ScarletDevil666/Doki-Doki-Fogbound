@@ -16,6 +16,7 @@
 
 init python:
     import random
+    import asyncio
     """
     Available magic elements:
         FIRE
@@ -48,8 +49,11 @@ init python:
         STAT BOOST: Increases the target's stats for 3 turns
     """
 
+    class BattleException(Exception):
+        pass
+
     class MagicAbility:
-        def __init__(self, name: str, description: str, damage: int, cost: int, element: str, effect: str | None = None, effect_chance: int = 0, *, _transform=None, _image=None, _sound=None):
+        def __init__(self, name: str, description: str, damage: int, cost: int, element: str, effect: str | None = None, effect_chance: int = 0, *, _transform=None, _image=None, _sound=None, multi:bool = False):
             self.name = name
             self.description = description
             self.damage = damage
@@ -60,13 +64,15 @@ init python:
             self._transform = _transform
             self._image = _image
             self._sound = _sound
+            self.multi = multi
     
     class HealingAbility:
-        def __init__(self, name: str, description: str, heal: int, cost: int, negative_effects: list[str] | None = None, negative_effect_chance: int = 0, positive_effect: str | None = None, positive_effect_chance: int = 0, *, _transform=None, _image=None, _sound=None):
+        def __init__(self, name: str, description: str, heal: int, cost: int, negative_effects: list[str] | None = None, negative_effect_chance: int = 0, positive_effect: str | None = None, positive_effect_chance: int = 0, *, _transform=None, _image=None, _sound=None, multi:bool = False):
             self.name = name
             self.description = description
             self.heal = heal
             self.cost = cost
+            self.element = "HEALING"
             self.negative_effects = negative_effects
             self.negative_effect_chance = negative_effect_chance
             self.positive_effect = positive_effect
@@ -74,9 +80,10 @@ init python:
             self._transform = _transform
             self._image = _image
             self._sound = _sound
+            self.multi = multi
 
     class BattleMember(Object): # Parent class for party members and enemies
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], follow_up:MagicAbility):
+        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], follow_up:MagicAbility, band_together_attack:MagicAbility):
             self.name = name
             self.max_health = max_health
             self.health = max_health
@@ -92,6 +99,7 @@ init python:
             self.is_guarding = False
             self.current_effects = []
             self.follow_up = follow_up
+            self.band_together_attack = band_together_attack
 
         def decide_turn(self):
             return random.randint(1, self.speed)
@@ -109,8 +117,10 @@ init python:
                         critical = random.randint(1, self.strength) > random.randint(1, target.defense)
                         if critical:
                             damage *= 2
-                            self.follow_up(target)
-                target.health -= damage - target.defense
+                damage -= target.defense
+                if damage < 0:
+                    damage = 0
+                target.health -= damage
                 if "PHYSICAL" in target.weaknesses:
                     return f"HIT\nWEAKNESS\n{damage}"
                 elif critical:
@@ -120,12 +130,13 @@ init python:
                 return f"HIT\n{damage}"
             return f"MISS"
 
-        def magic_attack(self, ability: MagicAbility, target: BattleMember):
-            self.magic -= ability.cost
+        async def magic_attack_single(self, ability: MagicAbility, target: BattleMember):
             damage = random.randint(ability.damage // 2, ability.damage)
             hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or ability.name == "Follow Up" or target.is_guarding
-            renpy.show(ability._image, [ability._transform]) # play animation
-            renpy.play(ability._sound, "sound") # play sound
+            if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice as well as the animation playing twice
+                self.magic -= ability.cost
+                renpy.show(ability._image, [ability._transform]) # play animation
+                renpy.play(ability._sound, "sound") # play sound
             if hit:
                 if ability.element in target.weaknesses:
                     damage *= 2
@@ -140,11 +151,20 @@ init python:
                 return f"HIT\n{damage}"
             return f"MISS"
 
-        def heal(self, ability: HealingAbility, target: BattleMember):
-            self.magic -= ability.cost
-            heal = random.randint(ability.heal // 2, ability.heal)
+        async def magic_attack_multi(self, ability: MagicAbility, targets: list[BattleMember]):
+            if not ability.multi:
+                raise BattleException("This ability is not multi-target (why did you call this when it was clearly for multi-target?)")
             renpy.show(ability._image, [ability._transform]) # play animation
             renpy.play(ability._sound, "sound") # play sound
+            attacks = [self.magic_attack_single(ability, target) for target in targets]
+            return await asyncio.gather(*attacks)
+
+        async def heal_single(self, ability: HealingAbility, target: BattleMember):
+            heal = random.randint(ability.heal // 2, ability.heal)
+            if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice as well as the animation playing twice
+                self.magic -= ability.cost
+                renpy.show(ability._image, [ability._transform]) # play animation
+                renpy.play(ability._sound, "sound") # play sound
             if ability.negative_effects is not None and random.randint(1, 100) <= ability.negative_effect_chance:
                 for effect in ability.negative_effects:
                     target.current_effects.remove(effect)
@@ -155,6 +175,15 @@ init python:
                 target.health = target.max_health
                 return f"FULL\nHEAL\n{heal}"
             return f"HEAL\n{heal}"
+        
+        async def heal_multi(self, ability: HealingAbility, targets: list[BattleMember]):
+            if not ability.multi:
+                raise BattleException("This ability is not multi-target (why did you call this when it was clearly for multi-target?)")
+            self.magic -= ability.cost
+            renpy.show(ability._image, [ability._transform]) # play animation
+            renpy.play(ability._sound, "sound") # play sound
+            heals = [self.heal_single(ability, target) for target in targets]
+            return await asyncio.gather(*heals)
 
         def guard(self):
             self.is_guarding = True
@@ -162,12 +191,19 @@ init python:
         def stop_guarding(self):
             self.is_guarding = False
 
-        def follow_up(self, target: BattleMember):
-            return self.magic_attack(self.follow_up, target)
+        async def follow_up(self, target: BattleMember | None = None, multi_target: list[BattleMember] | None = None):
+            if self.follow_up.multi:
+                return await self.magic_attack_multi(self.follow_up, multi_target)
+            return await self.magic_attack_single(self.follow_up, target)
+        
+        async def band_together_ability(self, targets: list[BattleMember]):
+            if not self.band_together.multi:
+                raise BattleException("Band Together Ability must be a multi-target ability")
+            return self.magic_attack_multi(self.band_together, targets)
     
     class PartyMember(BattleMember):
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:list[MagicAbility], starting_exp:int=0, level_up:int=100):
-            super().__init__(name, max_health, strength, defense, max_magic, speed, accuracy, evasion, weakness, magic_abilities)
+        def __init__(self, *args, starting_exp:int=0, level_up:int=100, **kwargs):
+            super().__init__(*args, **kwargs)
             self.exp = 0
             self.total_exp = starting_exp
             self.level = 1
@@ -197,9 +233,9 @@ init python:
             return self.exp_to_next_level - self.exp
         
     class Enemy(BattleMember):
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:list[MagicAbility]):
-            super().__init__(name, max_health, strength, defense, max_magic, speed, accuracy, evasion, weakness, magic_abilities)
-            self.all_abilities = ["NORMAL", *self.magic_abilities]
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.all_abilities = ("NORMAL", *self.magic_abilities)
             self.next_action = [None, None] # [ability, target], this is here because I believe we can have a certain character reveal the enemy's next action before it happens
         
         def attack(self, target: BattleMember):
@@ -226,18 +262,81 @@ init python:
         def decide_turn(self):
             return self.turn_number
     
-    class BossPhase:
-        pass # TODO: Decide how this is gonna work
+    class BossPhase(Boss):
+        def __init__(self, health_needed: int, abilites_available: tuple[int]):
+            self.health_needed = health_needed
+            self.abilities_available = super().all_abilities[abilites_available[0]:abilites_available[1]]
 
     def decide_turn_order(party: list[PartyMember], enemies: list[Enemy | Boss]):
         global turn_order
-        # turn_order = random.shuffle([*party, *enemies]) # Just realized this is not how this works, what's supposed to happen is each member of the battle calls a random number using their decide_turn function, and then the list is sorted by those numbers
+        turn_numbers = {}
+        for member in [*party, *enemies]:
+            turn_numbers[member] = member.decide_turn()
+        turn_order.clear()
+        turn_order = sorted(turn_numbers, key=turn_numbers.get, reverse=True)
         global current_turn
-        current_turn = random.randint(0, len(turn_order) - 1) # I might just make this 0, but I'll leave it like this for now
+        current_turn = 0
+    
+    def fill_follow_up(party: list[PartyMember], enemies: list[Enemy | Boss]):
+        global can_follow_up
+        can_follow_up.clear()
+        global turn_order
+        global current_turn
+        who_started = turn_order[current_turn]
+        if who_started is PartyMember:
+            for member in party:
+                can_follow_up.append(member)
+        else:
+            for member in enemies:
+                can_follow_up.append(member)
+        can_follow_up.remove(who_started)
+    
+    async def band_together_attack(party: list[PartyMember], enemies: list[Enemy | Boss]):
+        global turn_order
+        global current_turn
+        who_started = turn_order[current_turn]
+        attacks = [member.band_together_ability(enemies if who_started is PartyMember else party) for member in (party if isinstance(who_started, PartyMember) else enemies)]
+        return await asyncio.gather(*attacks)
+    
+    def next_turn():
+        global current_turn
+        global turn_order
+        global followed_up
+        current_turn += 1
+        current_turn %= len(turn_order)
+        followed_up.clear()
 
 define can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
+define followed_up = [] # this will be filled with party members who have already followed up, this will be cleared at the start of each turn, if this matches the party during any turn, then the band together attack will happen
 define turn_order = []
 define current_turn = 0
+define selected_ability = None
 
 screen battle(party:list[PartyMember], enemies:list[Enemy | Boss]):
     on "show" action Function(decide_turn_order, party, enemies)
+
+define ability_description = ""
+screen ability_selection(member:PartyMember):
+    frame:
+        xysize (100, 700)
+        frame: # frame for the viewport
+            viewport: # viewport for the ability buttons
+                has vbox
+                for ability in member.magic_abilities:
+                    button: # button for the ability
+                        hovered SetVariable("ability_description", ability.description)
+                        unhovered SetVariable("ability_description", "")
+                        action [SetVariable("selected_ability", ability), Hide("ability_selection")]
+                        hbox:
+                            add "[ability.element].png" # will change this if the image happens to be in a different folder
+                            frame:
+                                xysize (50, 10)
+                                text ability.name
+                            frame:
+                                xysize (10, 10)
+                                text ability.cost
+        frame: # frame for the ability description
+            text ability_description
+
+screen party_member_stats(member:PartyMember, taking_turn:bool):
+    pass # TODO: display this in a concise fashion where it will only show the information needed to be shown in battle, this information is, name, icon (maybe if we decide to have these), health, max health, magic, and max magic (could have bars for these)
