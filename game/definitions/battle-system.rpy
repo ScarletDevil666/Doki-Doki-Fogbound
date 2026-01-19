@@ -339,4 +339,4 @@ screen ability_selection(member:PartyMember):
             text ability_description
 
 screen party_member_stats(member:PartyMember, taking_turn:bool):
-    pass # TODO: display this in a concise fashion where it will only show the information needed to be shown in battle, this information is, name, icon (maybe if we decide to have these), health, max health, magic, and max magic (could have bars for these)
+    pass # TODO: display this in a concise fashion where it will only show the information needed to be shown in battle, this information is, name, icon (maybe if we decide to have these), health, max health, magic, and max magic (could have bars for these), also highlight the screen if the turn is being taken
