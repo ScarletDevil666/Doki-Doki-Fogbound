@@ -92,7 +92,7 @@ init python:
                 self.current_effects[effect] -= 1
                 if self.current_effects[effect] <= 0:
                     del self.current_effects[effect]
-                    cured += f"CURED {effect}\n"
+                    cured += f"WORE OFF {effect}\n"
             return cured
 
         def apply_effect(self, effect: str):
