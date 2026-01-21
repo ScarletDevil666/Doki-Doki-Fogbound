@@ -2,7 +2,7 @@
 # The battle starts by calling the screen and loading in the party and enemies as lists, then the turn order is randomized and the battle begins
 # Party members are gonna have to be created using the character class, and enemies are gonna be created using the enemy class
 # On a party member's turn, the player can choose to do a normal attack (these are physical element), use an item, use magic (magic is limited, so be careful), or guard to reduce damage by 50%
-# If a party member gets a critical hit (which is a 20% chance) or hit the enemies weakness, they will deal double damage and the player gets to choose a different party member to follow up
+# If a party member gets a critical hit or hit the enemies weakness, they will deal double damage and the player gets to choose a different party member to follow up
 #   Follow ups are predetermined attacks and they are gaurenteed to hit, meaning you won't choose what that party member does, but you can choose who does it, they can only do one attack on follow ups
 #      You can not choose the same party member to follow up as the one who got the critical hit
 #   If a follow up hits a critical or weakness like before, another follow up is triggered, otherwise, the turn is ended
@@ -28,25 +28,6 @@ init python:
         LIGHT
         DARK
         PHYSICAL
-    
-    Available negative effects:
-        BURN: Reduces the target's health each turn for 3 turns, double damage if weak to fire
-        POISON: Reduces the target's health each turn for 3 turns, double damage if weak to poison
-        STUN: Stuns the target, preventing them from attacking for 1 turn
-        SLEEP: Puts the target to sleep, preventing them from attacking for 3 turns, but they heal each turn
-        PARALYZE: Paralyzes the target, preventing them from attacking for 3 turns
-        MAGIC BLOCK: Prevents the target from using magic for 2 turns # this needs a different name
-        CONFUSE: Randomly chooses the target's action for 3 turns, these include attacking pary members and healing enemies
-        CHARM: Puts the target on the user's side, if party, the player will control what the target doing for the next 3 turns, if enemy, the target will act as an enemy for the next 3 turns
-        FEAR: On turn, 60% chance to force skip turn, 20% chance to run away, 20% chance to actually do commanded action
-        ENRAGE: Force target to only use normal attacks for 3 turns, however strength is boosted
-        TARGET LOCK: Forces the target to only attack the user for 3 turns
-
-    Available positive effects:
-        SHIELD: Increases the target's defense for 3 turns
-        REFLECT: Reflects damage back to the attacker for 3 turns
-        REGENERATE: Heals the target each turn for 3 turns
-        STAT BOOST: Increases the target's stats for 3 turns
     """
 
     class BattleException(Exception):
@@ -82,7 +63,7 @@ init python:
             self._sound = _sound
             self.multi = multi
 
-    class BattleMember(Object): # Parent class for party members and enemies
+    class BattleMember(object): # Parent class for party members and enemies
         def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], follow_up:MagicAbility, band_together_attack:MagicAbility):
             self.name = name
             self.max_health = max_health
@@ -94,22 +75,35 @@ init python:
             self.speed = speed
             self.accuracy = accuracy
             self.evasion = evasion
-            self.weakness = weakness
+            self.weaknesses = weaknesses
             self.magic_abilities = magic_abilities
             self.is_guarding = False
-            self.current_effects = []
+            self.current_effects = {}
+            self.effect_tick = 0
             self.follow_up = follow_up
             self.band_together_attack = band_together_attack
 
         def decide_turn(self):
             return random.randint(1, self.speed)
         
+        def effect_tick_down(self):
+            for effect in self.current_effects:
+                self.current_effects[effect] -= 1
+                if self.current_effects[effect] <= 0:
+                    del self.current_effects[effect]
+
+        def apply_effect(self, effect: str):
+            if effect in self.current_effects:
+                self.current_effects[effect] += 3
+            else:
+                self.current_effects[effect] = 3
+        
         def normal_attack(self, target: BattleMember):
             damage = random.randint(self.strength // 2, self.strength)
             hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or target.is_guarding
             if hit:
                 if target.is_guarding:
-                    damage // 2
+                    damage //= 2
                 else:
                     if "PHYSICAL" in target.weaknesses:
                         damage *= 2
@@ -133,6 +127,7 @@ init python:
         async def magic_attack_single(self, ability: MagicAbility, target: BattleMember):
             damage = random.randint(ability.damage // 2, ability.damage)
             hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or ability.name == "Follow Up" or target.is_guarding
+            affected = ""
             if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice as well as the animation playing twice
                 self.magic -= ability.cost
                 renpy.show(ability._image, [ability._transform]) # play animation
@@ -142,13 +137,15 @@ init python:
                     damage *= 2
                 damage -= target.defense
                 if ability.effect is not None and random.randint(1, 100) <= ability.effect_chance:
-                    target.current_effects.append(ability.effect)
+                    target.apply_effect(ability.effect)
+                    affected = ability.effect
+                    affected += "D" if affected.endswith("E") else "ED"
                 if damage < 0:
                     damage = 0
                 target.health -= damage
                 if ability.element in target.weaknesses:
-                    return f"HIT\nWEAKNESS\n{damage}"
-                return f"HIT\n{damage}"
+                    return f"HIT\nWEAKNESS\n{damage}\n{affected}"
+                return f"HIT\n{damage}\n{affected}"
             return f"MISS"
 
         async def magic_attack_multi(self, ability: MagicAbility, targets: list[BattleMember]):
@@ -161,15 +158,19 @@ init python:
 
         async def heal_single(self, ability: HealingAbility, target: BattleMember):
             heal = random.randint(ability.heal // 2, ability.heal)
+            affected = ""
             if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice as well as the animation playing twice
                 self.magic -= ability.cost
                 renpy.show(ability._image, [ability._transform]) # play animation
                 renpy.play(ability._sound, "sound") # play sound
             if ability.negative_effects is not None and random.randint(1, 100) <= ability.negative_effect_chance:
                 for effect in ability.negative_effects:
-                    target.current_effects.remove(effect)
+                    del target.current_effects[effect]
+                    affected += f"CURED {effect}\n"
             if ability.positive_effect is not None and random.randint(1, 100) <= ability.positive_effect_chance:
-                target.current_effects.append(ability.positive_effect)
+                target.apply_effect(ability.positive_effect)
+                affected += ability.positive_effect
+                affected += "D" if affected.endswith("E") else "ED"
             target.health += heal
             if target.health > target.max_health:
                 target.health = target.max_health
@@ -191,15 +192,15 @@ init python:
         def stop_guarding(self):
             self.is_guarding = False
 
-        async def follow_up(self, target: BattleMember | None = None, multi_target: list[BattleMember] | None = None):
+        async def perform_follow_up(self, target: BattleMember | None = None, multi_target: list[BattleMember] | None = None):
             if self.follow_up.multi:
                 return await self.magic_attack_multi(self.follow_up, multi_target)
             return await self.magic_attack_single(self.follow_up, target)
         
         async def band_together_ability(self, targets: list[BattleMember]):
-            if not self.band_together.multi:
+            if not self.band_together_attack.multi:
                 raise BattleException("Band Together Ability must be a multi-target ability")
-            return self.magic_attack_multi(self.band_together, targets)
+            return self.magic_attack_multi(self.band_together_attack, targets)
     
     class PartyMember(BattleMember):
         def __init__(self, *args, starting_exp:int=0, level_up:int=100, **kwargs):
@@ -241,31 +242,32 @@ init python:
         def attack(self, target: BattleMember):
             if self.next_action[0] == "NORMAL":
                 return self.normal_attack(self.next_action[1])
-            elif self.next_action[0] is MagicAbility:
+            elif isinstance(self.next_action[0], MagicAbility):
                 return self.magic_attack(self.next_action[0], self.next_action[1])
-            elif self.next_action[0] is HealingAbility:
+            elif isinstance(self.next_action[0], HealingAbility):
                 return self.heal(self.next_action[0], self.next_action[1])
+            return "NOT AN ATTACK"
         
         def choose_action(self, party: list[PartyMember], enemies: list[Enemy]):
             self.next_action[0] = random.choice(self.all_abilities)
-            if self.next_action[0] == "NORMAL" or self.next_action[0] is MagicAbility:
+            if self.next_action[0] == "NORMAL" or isinstance(self.next_action[0], MagicAbility):
                 self.next_action[1] = random.choice(party)
-            elif self.next_action[0] is HealingAbility:
+            elif isinstance(self.next_action[0], HealingAbility):
                 self.next_action[1] = random.choice(enemies)
 
     class Boss(Enemy): # these will have special abilities and will be harder to defeat, also their turn number is not randomized
-        def __init__(self, name: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weakness: str, magic_abilities:list[MagicAbility], *, phases: list[BossPhase], turn_number:int=0):
-            super().__init__(name, max_health, strength, defense, max_magic, speed, accuracy, evasion, weakness, magic_abilities)
+        def __init__(self, *args, phases: tuple[BossPhase], turn_number:int=0, **kwargs):
+            super().__init__(*args, **kwargs)
             self.turn_number = turn_number
             self.phases = phases
+            self.abilities_available = self.all_abilities[phases[0].abilites_available[0]:phases[0].abilites_available[1]]
         
         def decide_turn(self):
             return self.turn_number
     
-    class BossPhase(Boss):
+    class BossPhase:
         def __init__(self, health_needed: int, abilites_available: tuple[int]):
             self.health_needed = health_needed
-            self.abilities_available = super().all_abilities[abilites_available[0]:abilites_available[1]]
 
     def decide_turn_order(party: list[PartyMember], enemies: list[Enemy | Boss]):
         global turn_order
@@ -283,19 +285,20 @@ init python:
         global turn_order
         global current_turn
         who_started = turn_order[current_turn]
-        if who_started is PartyMember:
+        if isinstance(who_started, PartyMember):
             for member in party:
                 can_follow_up.append(member)
         else:
             for member in enemies:
                 can_follow_up.append(member)
-        can_follow_up.remove(who_started)
+        if who_started in can_follow_up:
+            can_follow_up.remove(who_started)
     
     async def band_together_attack(party: list[PartyMember], enemies: list[Enemy | Boss]):
         global turn_order
         global current_turn
         who_started = turn_order[current_turn]
-        attacks = [member.band_together_ability(enemies if who_started is PartyMember else party) for member in (party if isinstance(who_started, PartyMember) else enemies)]
+        attacks = [member.band_together_ability(enemies if isinstance(who_started, PartyMember) else party) for member in (party if isinstance(who_started, PartyMember) else enemies)]
         return await asyncio.gather(*attacks)
     
     def next_turn():
@@ -305,17 +308,84 @@ init python:
         current_turn += 1
         current_turn %= len(turn_order)
         followed_up.clear()
+    
+    def effect_update(target: BattleMember, effect: str):
+        """
+        Available negative effects:
+            BURN: Reduces the target's health each turn for 3 turns, double damage if weak to fire
+            POISON: Reduces the target's health each turn for 3 turns, double damage if weak to poison
+            SLEEP: Puts the target to sleep, preventing them from attacking for 3 turns, but they heal each turn
+            PARALYZE: Paralyzes the target, preventing them from attacking for 3 turns
+            MAGIC BLOCK: Prevents the target from using magic for 2 turns # this needs a different name
+            CONFUSE: Randomly chooses the target's action for 3 turns, these include attacking pary members and healing enemies
+            CHARM: Puts the target on the user's side, if party, the player will control what the target doing for the next 3 turns, if enemy, the target will act as an enemy for the next 3 turns
+            FEAR: On turn, 60% chance to force skip turn, 20% chance to run away, 20% chance to actually do commanded action
+            ENRAGE: Force target to only use normal attacks for 3 turns, however strength is boosted
 
-define can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
-define followed_up = [] # this will be filled with party members who have already followed up, this will be cleared at the start of each turn, if this matches the party during any turn, then the band together attack will happen
-define turn_order = []
-define current_turn = 0
-define selected_ability = None
+        Available positive effects:
+            SHIELD: Increases the target's defense for 3 turns
+            REFLECT: Reflects damage back to the attacker for 3 turns
+            REGENERATE: Heals the target each turn for 3 turns
+            STAT BOOST: Increases the target's stats for 3 turns
+        """
+        match effect:
+            case "BURN":
+                damage = target.max_health // 10
+                target.health -= damage
+                return f"BURN\n{damage}"
+            case "POISON":
+                damage = target.max_health // 10
+                target.health -= damage
+                return f"POISON\n{damage}"
+            case "REGENERATE":
+                heal = target.max_health // 10
+                target.health += heal
+                if target.health > target.max_health:
+                    target.health = target.max_health
+                return f"REGENERATE\n{heal}"
+            case "SLEEP":
+                heal = target.max_health // 10
+                target.health += heal
+                if target.health > target.max_health:
+                    target.health = target.max_health
+                magic_recovery = target.max_magic // 10
+                target.magic += magic_recovery
+                if target.magic > target.max_magic:
+                    target.magic = target.max_magic
+                return f"SLEEP\n{heal}\n{magic_recovery}"
+            case _:
+                return ""
 
-screen battle(party:list[PartyMember], enemies:list[Enemy | Boss]):
-    on "show" action Function(decide_turn_order, party, enemies)
+default can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
+default followed_up = [] # this will be filled with party members who have already followed up, this will be cleared at the start of each turn, if this matches the party during any turn, then the band together attack will happen
+default turn_order = []
+default current_turn = 0
+default selected_ability = None
 
-define ability_description = ""
+label battle(party:list[PartyMember], enemies:list[Enemy | Boss]):
+    $ decide_turn_order(party, enemies)
+label battle_loop:
+    $ current_actor = turn_order[current_turn]
+    $ current_actor.stop_guarding()
+    
+    if all(e.health <= 0 for e in enemies):
+        jump battle_victory
+    if all(p.health <= 0 for p in party):
+        jump battle_defeat
+
+    if current_actor.health > 0 and "PARALYZE" not in current_actor.current_effects and "SLEEP" not in current_actor.current_effects:
+        if isinstance(current_actor, PartyMember) != "CHARM" in current_actor.current_effects:
+            call player_turn_menu(current_actor)
+        else:
+            call enemy_turn_logic(current_actor)
+    for effect in current_actor.current_effects:
+        $ effect_update(current_actor, effect)
+    $ current_actor.effect_tick_down()
+    $ next_turn()
+    
+    jump battle_loop
+
+default ability_description = ""
 screen ability_selection(member:PartyMember):
     frame:
         xysize (100, 700)
