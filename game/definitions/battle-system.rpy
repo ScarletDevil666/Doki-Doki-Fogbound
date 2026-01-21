@@ -87,10 +87,13 @@ init python:
             return random.randint(1, self.speed)
         
         def effect_tick_down(self):
+            cured = ""
             for effect in self.current_effects:
                 self.current_effects[effect] -= 1
                 if self.current_effects[effect] <= 0:
                     del self.current_effects[effect]
+                    cured += f"CURED {effect}\n"
+            return cured
 
         def apply_effect(self, effect: str):
             if effect in self.current_effects:
