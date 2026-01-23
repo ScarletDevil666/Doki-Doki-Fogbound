@@ -1,0 +1,13 @@
+.vscode
+*.rpa
+*.rpyc
+*.bak
+DDLC.exe
+DDLC.py
+DDLC.sh
+errors.txt
+log.txt
+traceback.txt
+game/cache
+game/saves
+game/firstrun
