@@ -34,7 +34,7 @@ init python:
         pass
 
     class MagicAbility:
-        def __init__(self, name: str, description: str, damage: int, cost: int, element: str, effect: str | None = None, effect_chance: float = 0, *, _transform=None, _image=None, _sound=None, multi:bool = False):
+        def __init__(self, name: str, description: str, damage: int, cost: int, element: str, effect: str | None = None, effect_chance: float = 0, *, _transform=None, _image: renpy.Displayable = None, _sound=None, multi:bool = False):
             self.name = name
             self.description = description
             self.damage = damage
@@ -48,7 +48,7 @@ init python:
             self.multi = multi
     
     class HealingAbility:
-        def __init__(self, name: str, description: str, heal: int, cost: int, negative_effects: list[str] | None = None, negative_effect_chance: float = 0, positive_effect: str | None = None, positive_effect_chance: float = 0, *, _transform=None, _image=None, _sound=None, multi:bool = False):
+        def __init__(self, name: str, description: str, heal: int, cost: int, negative_effects: list[str] | None = None, negative_effect_chance: float = 0, positive_effect: str | None = None, positive_effect_chance: float = 0, *, _transform=None, _image: renpy.Displayable = None, _sound=None, multi:bool = False):
             self.name = name
             self.description = description
             self.heal = heal
@@ -394,6 +394,11 @@ init python:
             
             seg_name = f"seg_{i}"
             renpy.image(seg_name, At(Crop(crop_rect, img_name)))
+            if i % 2 == 0:
+                target_transform = scroll_left(scroll_speed)
+            else:
+                target_transform = scroll_right(scroll_speed)
+            renpy.show(seg_name, [target_transform])
 
 transform scroll_left(delay):
     subpixel True
@@ -408,6 +413,7 @@ transform scroll_right(delay):
     xpos -1.0
     linear delay xpos 0.0
     repeat
+
 
 default can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
 default followed_up = [] # this will be filled with party members who have already followed up, this will be cleared at the start of each turn, if this matches the party during any turn, then the band together attack will happen
@@ -428,7 +434,7 @@ label battle(party, enemies, _music = audio.default_battle_music, *, override_vi
     $ followed_up = []
     $ selected_ability = None
     # TODO: show scrolling image
-    call split_scroll
+    # $ define_scrolling_segments("(night_morning) yuris kitchen.png")
     show battle_start at truecenter
     pause 4.5
     hide battle_start with None
