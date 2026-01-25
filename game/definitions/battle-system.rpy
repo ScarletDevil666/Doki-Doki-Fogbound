@@ -384,34 +384,19 @@ init python:
                         target.magic = target.max_magic
                     r += f"SLEEP\n{heal}\n{magic_recovery}\n"
         return r
-    
-    def define_scrolling_segments(img_name, num_segments=8, scroll_speed=10.0):
-        total_width = 1280
-        segment_width = total_width / num_segments
-        
-        for i in range(num_segments):
-            crop_rect = (i * segment_width, 0, segment_width, 1080)
-            
-            seg_name = f"seg_{i}"
-            renpy.image(seg_name, At(Crop(crop_rect, img_name)))
-            if i % 2 == 0:
-                target_transform = scroll_left(scroll_speed)
-            else:
-                target_transform = scroll_right(scroll_speed)
-            renpy.show(seg_name, [target_transform])
 
-transform scroll_left(delay):
+transform scroll_left(t):
     subpixel True
     xtile 2
     xpos 0.0
-    linear delay xpos -1.0
+    linear t xpos -1.0
     repeat
 
-transform scroll_right(delay):
+transform scroll_right(t):
     subpixel True
     xtile 2
     xpos -1.0
-    linear delay xpos 0.0
+    linear t xpos 0.0
     repeat
 
 
@@ -424,7 +409,7 @@ default checkpoint_to_jump = "battle_loop"
 default start_of_battle = "battle_loop"
 default last_checkpoint = None
 
-label battle(party, enemies, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}):
+label battle(party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}):
     if last_checkpoint is None:
         $ decide_turn_order(party, enemies)
     
@@ -433,11 +418,12 @@ label battle(party, enemies, _music = audio.default_battle_music, *, override_vi
     $ can_follow_up = []
     $ followed_up = []
     $ selected_ability = None
-    # TODO: show scrolling image
-    # $ define_scrolling_segments("(night_morning) yuris kitchen.png")
+    scene expression transition_background at scroll_right(0.175)
     show battle_start at truecenter
-    pause 4.5
+    with Fade(0.1, 0.0, 0.1, color="#fff")
+    pause 4.3
     hide battle_start with None
+    scene expression battle_background
     show screen party_stats(party)
     with Fade(1.0, 0.0, 0.5, color="#fff")
 
@@ -541,4 +527,4 @@ image battle_start:
 
 label test_battle:
     "BEGINNING TEST"
-    call battle([test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_1, test_enemy_2])
+    call battle([test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
