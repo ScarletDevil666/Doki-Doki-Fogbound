@@ -104,7 +104,7 @@ init python:
         
         def normal_attack(self, target) -> str:
             damage = random.randint(self.strength // 2, self.strength)
-            hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or target.is_guarding
+            hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or target.is_guarding
             if hit:
                 if target.is_guarding:
                     damage //= 2
@@ -130,7 +130,7 @@ init python:
 
         async def magic_attack_single(self, ability: MagicAbility, target) -> str:
             damage = random.randint(ability.damage // 2, ability.damage)
-            hit = random.randint(1, self.accuracy) > random.randint(1, target.evasion) or ability.name == "Follow Up" or target.is_guarding
+            hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or ability.name == "Follow Up" or target.is_guarding
             affected = ""
             if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice as well as the animation playing twice
                 self.magic -= ability.cost
@@ -349,6 +349,7 @@ init python:
             CHARM: Puts the target on the user's side, if party, the player will control what the target doing for the next 3 turns, if enemy, the target will act as an enemy for the next 3 turns
             FEAR: On turn, 60% chance to force skip turn, 20% chance to run away, 20% chance to actually do commanded action
             ENRAGE: Force target to only use normal attacks for 3 turns, however strength is boosted
+            BLIND: Severe, and I mean severe, disadvantage on accuracy for 3 turns
 
         Available positive effects:
             SHIELD: Increases the target's defense for 3 turns
@@ -357,7 +358,7 @@ init python:
             STAT BOOST: Increases the target's stats for 3 turns
         """
         r: str = ""
-        for effect in target.effects:
+        for effect in target.current_effects:
             match effect:
                 case "BURN":
                     damage = target.max_health // 10
@@ -396,6 +397,7 @@ transform scroll_right(t):
     subpixel True
     xtile 2
     xpos -1.0
+    blur 1 / t
     linear t xpos 0.0
     repeat
 
@@ -406,9 +408,10 @@ default turn_order = []
 default current_turn = 0
 default selected_ability = None
 default checkpoint_to_jump = "battle_loop"
-default start_of_battle = "battle_loop"
-default last_checkpoint = None
+default start_of_battle = "battle_loop" # set this to the starting label of each battle
+default last_checkpoint = None # set this to the checkpoint label of each battle phase (None if it is the very start of the battle)
 
+# It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 label battle(party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}):
     if last_checkpoint is None:
         $ decide_turn_order(party, enemies)
@@ -425,31 +428,34 @@ label battle(party, enemies, transition_background, battle_background, _music = 
     hide battle_start with None
     scene expression battle_background
     show screen party_stats(party)
+    # TODO: show enemies screen
     with Fade(1.0, 0.0, 0.5, color="#fff")
+    show screen turn_order_display
+    pause 2.25
+    pause # temp
 
-    call battle_loop(party, enemies, override_victory, override_defeat, victory_args, defeat_args, victory_kwargs, defeat_kwargs)
-label battle_loop(party, enemies, override_victory, override_defeat, victory_args, defeat_args, victory_kwargs, defeat_kwargs):
-    $ current_actor = turn_order[current_turn]
-    $ current_actor.stop_guarding()
-    
-    if all(e.health <= 0 for e in enemies):
-        call expression override_victory pass (*victory_args, **victory_kwargs)
-        return
-    if all(p.health <= 0 for p in party):
-        call expression override_defeat pass (*defeat_args, **defeat_kwargs)
-        jump expression checkpoint_to_jump
+    label battle_loop:
+        $ current_actor = turn_order[current_turn]
+        $ current_actor.stop_guarding()
+
+        if all(e.health <= 0 for e in enemies):
+            call expression override_victory pass (*victory_args, **victory_kwargs)
+            return
+        if all(p.health <= 0 for p in party):
+            call expression override_defeat pass (*defeat_args, **defeat_kwargs)
+            jump expression checkpoint_to_jump
 
 
-    if current_actor.health > 0 and "PARALYZE" not in current_actor.current_effects and "SLEEP" not in current_actor.current_effects:
-        if isinstance(current_actor, PartyMember) != "CHARM" in current_actor.current_effects:
-            call player_turn_menu(current_actor)
-        else:
-            call enemy_turn_logic(current_actor)
-    $ effect_update(current_actor)
-    $ current_actor.effect_tick_down()
-    $ next_turn()
-    
-    jump battle_loop
+        if current_actor.health > 0 and "PARALYZE" not in current_actor.current_effects and "SLEEP" not in current_actor.current_effects:
+            if isinstance(current_actor, PartyMember) != "CHARM" in current_actor.current_effects:
+                call player_turn_menu(current_actor)
+            else:
+                call enemy_turn_logic(current_actor)
+        $ effect_update(current_actor)
+        $ current_actor.effect_tick_down()
+        $ next_turn()
+
+        jump battle_loop
 
 default ability_description = ""
 screen ability_selection(member):
@@ -476,34 +482,64 @@ screen ability_selection(member):
 
 # TODO: display this in a concise fashion where it will only show the information needed to be shown in battle, this information is, name, icon (maybe if we decide to have these), health, max health, magic, and max magic (could have bars for these), also highlight the screen if the turn is being taken
 screen party_stats(party):
-    fixed:
-        xysize (1280, 100)
-        hbox:
-            xalign 0.5
-            for member in party:
-                frame:
-                    xysize (100, 100)
-                    if member == turn_order[current_turn]:
-                        background "#000" # TODO: replace this with the turn highlight
-                    else:
-                        background "#333" # TODO: replace this with the unhighlight
-                    vbox:
-                        #add "[member.icon].png" # Who knows if we will have icons for our party members
-                        frame:
-                            xysize (50, 10)
-                            vbox:
-                                text member.kanji size 25
-                                text member.name size 15
-                        frame:
-                            xysize (10, 10)
-                            text "HEALTH: [member.health]/[member.max_health]"
-                        frame:
-                            xysize (10, 10)
-                            text "MAGIC: [member.magic]/[member.max_magic]"
+    hbox:
+        xalign 0.5
+        for member in party:
+            frame:
+                xysize (320, 150)
+                if member == turn_order[current_turn]:
+                    background "#3338" # TODO: replace this with the turn highlight
+                else:
+                    background "#0008" # TODO: replace this with the unhighlight
+                vbox:
+                    #add "[member.icon].png" # Who knows if we will have icons for our party members
+                    text member.kanji size 25 font battle_font
+                    text member.name size 15 font battle_font
+                    text "HEALTH: [member.health]/[member.max_health]" font battle_font
+                    text "MAGIC: [member.magic]/[member.max_magic]" font battle_font
 
+screen turn_order_display:
+    frame at turn_order_transform:
+        background "#0000"
+        ysize 23*len(turn_order)
+        hbox:
+            xalign 0.0
+            frame:
+                xsize 2
+                background "#000"
+            vbox:
+                yalign 0.5
+                for member in turn_order:
+                    frame:
+                        xysize (150, 21)
+                        if member == turn_order[current_turn]:
+                            background "#3338" # TODO: replace this with the turn highlight
+                        else:
+                            background "#1118" # TODO: replace this with the unhighlight
+                        text member.name size 13 yalign 0.5 font battle_font
+
+transform turn_order_transform:
+    on show:
+        xalign 0.5
+        yalign 0.5
+        yoffset -720
+        zoom 2.0
+        easeout 0.5 yoffset 0
+        1.25
+        ease 0.5 xalign 0.9 zoom 1.0
+        easein_elastic 0.2 xalign 0.0 xpos 0
+    on hide:
+        easeout_quart 0.5 yzoom 0
+
+label player_turn_menu(current_actor):
+    return # TODO: implement this
+
+label enemy_turn_logic(current_actor):
+    return # TODO: implement this
 
 
 define audio.default_battle_music = "<loop 34.259 to 119.484>mod_assets/music/PLACEHOLDER BATTLE (Delete later).mp3"
+define battle_font = "mod_assets/fonts/NotoSerifJP-Regular.otf"
 
 # battle_member_template = BattleMember("Name", "Kanji", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 # TODO: fully define these
@@ -527,4 +563,6 @@ image battle_start:
 
 label test_battle:
     "BEGINNING TEST"
+    $ start_of_battle = "test_battle"
+    $ last_checkpoint = None
     call battle([test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
