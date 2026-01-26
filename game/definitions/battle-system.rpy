@@ -244,9 +244,11 @@ init python:
             return self.exp_to_next_level - self.exp
         
     class Enemy(BattleMember):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args, _image: renpy.Displayable, exp: int, **kwargs):
             super().__init__(*args, **kwargs)
             self.all_abilities = ("NORMAL", *self.magic_abilities)
+            self.exp = exp # This is the experience that will be obtained upon killing this enemy
+            self._image = _image
             self.next_action = [None, None] # [ability, target], this is here because I believe we can have a certain character reveal the enemy's next action before it happens
         
         def attack(self, target: BattleMember) -> str:
@@ -548,8 +550,8 @@ default test_sayori = PartyMember("Sayori", "さより", 300, 30, 20, 100, 250, 
 default test_yuri = PartyMember("Yuri", "百合", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""), starting_exp = 99999)
 default test_natsuki = PartyMember("Natsuki", "無月", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""), starting_exp = 99999)
 
-default test_enemy_1 = Enemy("Enemy 1", "敵1", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
-default test_enemy_2 = Enemy("Enemy 2", "敵2", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
+default test_enemy_1 = Enemy("Enemy 1", "敵1", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""), _image=None, exp=10)
+default test_enemy_2 = Enemy("Enemy 2", "敵2", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""), _image=None, exp=10)
 #default test_boss = Boss("Boss", "ボス", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 
 image battle_start:
