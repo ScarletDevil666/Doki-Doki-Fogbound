@@ -92,6 +92,7 @@ init python:
             self.current_effects = {}
             self.effect_tick = 0
             self.follow_up = follow_up
+            self.confuse_action = [None, None]
             self.band_together_attack = band_together_attack
 
         def decide_turn(self) -> int:
@@ -213,6 +214,14 @@ init python:
             if not self.band_together_attack.multi:
                 raise BattleException("Band Together Ability must be a multi-target ability")
             return self.magic_attack_multi(self.band_together_attack, targets)
+        
+        def confuse_choose_action(self, party: list, enemies: list):
+            all_abilities = ["Normal Attack", *self.magic_abilities]
+            for ability in all_abilities:
+                if isinstance(ability, (MagicAbility, HealingAbility)) and ability.multi:
+                    all_abilities.remove(ability)
+            self.confuse_action[0] = random.choice(all_abilities)
+            self.confuse_action[1] = random.choice([*party, *enemies])
     
     class PartyMember(BattleMember):
         def __init__(self, *args, starting_exp:int=0, level_up:int=100, new_abilities:dict[int:list[MagicAbility | HealingAbility]]={}, max_level: int = 99, **kwargs):
@@ -223,6 +232,7 @@ init python:
             self.exp_to_next_level = level_up
             self.new_abilities = new_abilities
             self.max_level = max_level
+            self.charm_action = [None, None]
             self.gain_exp(self.total_exp)
 
         def level_up(self) -> str:
@@ -252,6 +262,21 @@ init python:
         def get_needed_exp(self) -> int:
             return self.exp_to_next_level - self.exp
         
+        def charm_choose_action(self, party: list, enemies: list):
+            all_abilities = ["Normal Attack", *self.magic_abilities]
+            self.charm_action[0] = random.choice(all_abilities)
+            if self.charm_action[0] == "Normal Attack" or isinstance(self.charm_action[0], MagicAbility):
+                if self.charm_action[0] == "Normal Attack" or not self.charm_action[0].multi:
+                    self.charm_action[1] = random.choice(party)
+                else:
+                    self.charm_action[1] = party
+            elif isinstance(self.charm_action[0], HealingAbility):
+                if self.charm_action[0].multi:
+                    self.charm_action[1] = enemies
+                else:
+                    self.charm_action[1] = random.choice(enemies)
+        
+        
     class Enemy(BattleMember):
         def __init__(self, *args, _image: str, exp: int, **kwargs):
             super().__init__(*args, **kwargs)
@@ -272,9 +297,15 @@ init python:
         def choose_action(self, party: list[PartyMember], enemies: list) -> None:
             self.next_action[0] = random.choice(self.all_abilities)
             if self.next_action[0] == "Normal Attack" or isinstance(self.next_action[0], MagicAbility):
-                self.next_action[1] = random.choice(party)
+                if self.next_action[0] == "Normal Attack" or not self.next_action[0].multi:
+                    self.next_action[1] = random.choice(party)
+                else:
+                    self.next_action[1] = party
             elif isinstance(self.next_action[0], HealingAbility):
-                self.next_action[1] = random.choice(enemies)
+                if self.next_action[0].multi:
+                    self.next_action[1] = enemies
+                else:
+                    self.next_action[1] = random.choice(enemies)
 
     class Boss(Enemy): # these will have special abilities and will be harder to defeat, also their turn number is not randomized
         def __init__(self, *args, phases: tuple, turn_number:int=-1, **kwargs):
@@ -295,9 +326,15 @@ init python:
         def choose_action(self, party: list[PartyMember], enemies: list) -> None:
             self.next_action[0] = random.choice(self.abilities_available)
             if self.next_action[0] == "Normal Attack" or isinstance(self.next_action[0], MagicAbility):
-                self.next_action[1] = random.choice(party)
+                if self.next_action[0] == "Normal Attack" or not self.next_action[0].multi:
+                    self.next_action[1] = random.choice(party)
+                else:
+                    self.next_action[1] = party
             elif isinstance(self.next_action[0], HealingAbility):
-                self.next_action[1] = random.choice(enemies)
+                if self.next_action[0].multi:
+                    self.next_action[1] = enemies
+                else:
+                    self.next_action[1] = random.choice(enemies)
 
         def force_choose_action(self, ability: MagicAbility | HealingAbility, targets: list[BattleMember]) -> None:
             self.next_action[0] = ability
@@ -364,7 +401,7 @@ init python:
             CONFUSE: Randomly chooses the target's action for 3 turns, these include attacking pary members and healing enemies
             CHARM: Puts the target on the user's side, if party, the player will control what the target doing for the next 3 turns, if enemy, the target will act as an enemy for the next 3 turns
             FEAR: On turn, 60% chance to force skip turn, 20% chance to run away, 20% chance to actually do commanded action
-            ENRAGE: Force target to only use normal attacks for 3 turns, however strength is boosted
+            ENRAGE: Force target to only use normal attacks for 3 turns, however strength is buffed
             BLIND: Severe, and I mean severe, disadvantage on accuracy for 3 turns
             STAT DEBUFF: Reduces the target's stats for 3 turns
 
@@ -407,7 +444,7 @@ init python:
         for enemy in enemies:
             enemy.choose_action(party, enemies)
     
-    def get_article(word): # Curse English grammar for making me write a function like this!!!  (No acronym handling, but I don't think we'll need that)
+    def get_article(word) -> str: # Curse English grammar for making me write a function like this!!!  (No acronym handling, but I don't think we'll need that)
         import re
         word = word.lower().strip()
         if not word:
@@ -495,11 +532,25 @@ label battle(party, enemies, transition_background, battle_background, _music = 
         if current_actor.health > 0 and "PARALYZE" not in current_actor.current_effects and "SLEEP" not in current_actor.current_effects:
             "[current_actor.name] takes their turn!"
             if isinstance(current_actor, PartyMember) != ("CHARM" in current_actor.current_effects):
-                call screen battle_choice
+                if isinstance(current_actor, Enemy):
+                    "[current_actor.name] is charmed!  You're in control!"
+                if "CONFUSE" in current_actor.current_effects:
+                    "[current_actor.name] is confused!"
+                    $ current_actor.confuse_choose_action(party, enemies)
+                    $ selected_ability = current_actor.confuse_action[0]
+                    $ selected_target = current_actor.confuse_action[1]
+                else:
+                    call screen battle_choice
             else:
-                $ selected_ability = current_actor.next_action[0]
-                $ target = current_actor.next_action[1]
-                $ current_actor.choose_action(party, enemies)
+                if isinstance(current_actor, PartyMember):
+                    "[current_actor.name] is charmed!  They're in control!"
+                    $ current_actor.charm_choose_action(party, enemies)
+                    $ selected_ability = current_actor.charm_action[0]
+                    $ selected_target = current_actor.charm_action[1]
+                else:
+                    $ selected_ability = current_actor.next_action[0]
+                    $ target = current_actor.next_action[1]
+                    $ current_actor.choose_action(party, enemies)
 
             # TODO: write a function that determines where the ability results should be shown on the screen and use it to show a screen that plays an animation showing the results
             if selected_ability == "Guard":
@@ -530,6 +581,8 @@ label battle(party, enemies, transition_background, battle_background, _music = 
                 "[current_actor.name] is paralyzed!"
             elif "SLEEP" in current_actor.current_effects:
                 "[current_actor.name] is asleep!"
+            else:
+                "[current_actor.name] is can't act for unknown reasons!"
 
         # follow ups
         if "WEAKNESS" in ability_results or "CRITICAL" in ability_results:
@@ -709,7 +762,7 @@ transform from_top(t=0.5, d=0.0):
         d
         easein_quart t yoffset 0
     on hide:
-        easeout_quart t yoffset -720
+        easeout_quart t*0.5 yoffset -720
 
 transform from_bottom(t=0.5, d=0.0):
     on show:
@@ -717,7 +770,7 @@ transform from_bottom(t=0.5, d=0.0):
         d
         easein_quart t yoffset 0
     on hide:
-        easeout_quart t yoffset 720
+        easeout_quart t*0.5 yoffset 720
 
 label battle_victory:
     call screen victory_screen
