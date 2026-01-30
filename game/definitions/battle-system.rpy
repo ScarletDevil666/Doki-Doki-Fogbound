@@ -197,12 +197,19 @@ init python:
         def stop_guarding(self) -> None:
             self.is_guarding = False
 
-        async def perform_follow_up(self, target = None, multi_target: list | None = None) -> str | list[str]:
+        def perform_follow_up(self, target = None, multi_target: list | None = None) -> str | list[str]:
+            global can_follow_up
+            global followed_up
+            if self in can_follow_up:
+                can_follow_up.remove(self)
+                followed_up.append(self)
+            else:
+                raise BattleException("This member isn't in the follow up list.")
             if self.follow_up.multi:
-                return await self.magic_attack_multi(self.follow_up, multi_target)
-            return await self.magic_attack_single(self.follow_up, target)
+                return self.magic_attack_multi(self.follow_up, multi_target)
+            return self.magic_attack_single(self.follow_up, target)
         
-        async def band_together_ability(self, targets: list) -> list[str]:
+        def band_together_ability(self, targets: list) -> list[str]:
             if not self.band_together_attack.multi:
                 raise BattleException("Band Together Ability must be a multi-target ability")
             return self.magic_attack_multi(self.band_together_attack, targets)
@@ -325,13 +332,16 @@ init python:
                 can_follow_up.append(member)
         if who_started in can_follow_up:
             can_follow_up.remove(who_started)
+        for member in can_follow_up:
+            if any(for effect in member.current_effects if effect in available_negative_effects):
+                can_follow_up.remove(member)
     
-    async def band_together_attack(party: list[PartyMember], enemies: list[Enemy | Boss]) -> list[str]:
+    def band_together_attack(party: list[PartyMember], enemies: list[Enemy | Boss]) -> list[str]:
         global turn_order
         global current_turn
         who_started = turn_order[current_turn]
         attacks = [member.band_together_ability(enemies if isinstance(who_started, PartyMember) else party) for member in (party if isinstance(who_started, PartyMember) else enemies)]
-        return await asyncio.gather(*attacks)
+        return attacks
     
     def next_turn() -> None:
         global current_turn
@@ -341,6 +351,8 @@ init python:
         current_turn %= len(turn_order)
         followed_up.clear()
     
+    available_negative_effects = ("BURN", "POISON", "SLEEP", "PARALYZE", "MAGIC BLOCK", "CONFUSE", "CHARM", "FEAR", "ENRAGE", "BLIND", "STAT DEBUFF")
+    available_positive_effects = ("SHIELD", "REFLECT", "REGENERATE", "STAT BUFF")
     def effect_update(target: BattleMember) -> str:
         """
         Available negative effects:
@@ -354,12 +366,13 @@ init python:
             FEAR: On turn, 60% chance to force skip turn, 20% chance to run away, 20% chance to actually do commanded action
             ENRAGE: Force target to only use normal attacks for 3 turns, however strength is boosted
             BLIND: Severe, and I mean severe, disadvantage on accuracy for 3 turns
+            STAT DEBUFF: Reduces the target's stats for 3 turns
 
         Available positive effects:
             SHIELD: Negates damage on the target for 3 turns
             REFLECT: Reflects damage back to the attacker for 3 turns
             REGENERATE: Heals the target each turn for 3 turns
-            STAT BOOST: Increases the target's stats for 3 turns
+            STAT BUFF: Increases the target's stats for 3 turns
         """
         r: str = ""
         for effect in target.current_effects:
@@ -467,6 +480,7 @@ label battle(party, enemies, transition_background, battle_background, _music = 
     label battle_loop:
         $ current_actor = turn_order[current_turn]
         $ current_actor.stop_guarding()
+        $ followed_up.clear()
 
         if all(e.health <= 0 for e in enemies):
             call expression override_victory pass (*victory_args, **victory_kwargs)
@@ -475,12 +489,11 @@ label battle(party, enemies, transition_background, battle_background, _music = 
             call expression override_defeat pass (*defeat_args, **defeat_kwargs)
             jump expression checkpoint_to_jump
 
-        "[current_actor.name] takes their turn!"
-
         $ selected_ability = None
         $ selected_target = None
         $ ability_results = None
         if current_actor.health > 0 and "PARALYZE" not in current_actor.current_effects and "SLEEP" not in current_actor.current_effects:
+            "[current_actor.name] takes their turn!"
             if isinstance(current_actor, PartyMember) != ("CHARM" in current_actor.current_effects):
                 call screen battle_choice
             else:
@@ -488,31 +501,36 @@ label battle(party, enemies, transition_background, battle_background, _music = 
                 $ target = current_actor.next_action[1]
                 $ current_actor.choose_action(party, enemies)
 
-        # TODO: write a function that determines where the ability results should be shown on the screen and use it to show a screen that plays an animation showing the results
-        if selected_ability == "Guard":
-            $ ability_results = current_actor.guard()
-            "[current_actor.name] raises their guard!"
-        elif isinstance(selected_ability, Item):
-            $ ability_results = selected_ability.use_item(selected_target)
-            "[current_actor.name] uses [get_article(selected_ability.name)] [selected_ability.name]!"
-        elif isinstance(selected_ability, (MagicAbility, HealingAbility)):
-            if isinstance(selected_ability, HealingAbility):
-                if selected_ability.multi:
-                    $ ability_results = current_actor.heal_single(selected_ability, selected_target)
+            # TODO: write a function that determines where the ability results should be shown on the screen and use it to show a screen that plays an animation showing the results
+            if selected_ability == "Guard":
+                $ ability_results = current_actor.guard()
+                "[current_actor.name] raises their guard!"
+            elif isinstance(selected_ability, Item):
+                $ ability_results = selected_ability.use_item(selected_target)
+                "[current_actor.name] uses [get_article(selected_ability.name)] [selected_ability.name]!"
+            elif isinstance(selected_ability, (MagicAbility, HealingAbility)):
+                if isinstance(selected_ability, HealingAbility):
+                    if selected_ability.multi:
+                        $ ability_results = current_actor.heal_single(selected_ability, selected_target)
+                    else:
+                        $ ability_results = current_actor.heal_multi(selected_ability, selected_target)
                 else:
-                    $ ability_results = current_actor.heal_multi(selected_ability, selected_target)
+                    if selected_ability.multi:
+                        $ ability_results = current_actor.magic_attack_multi(selected_ability, selected_target)
+                    else:
+                        $ ability_results = current_actor.magic_attack_single(selected_ability, selected_target)
+                play sound selected_ability._sound
+                show expression selected_ability._image at selected_ability._transform
+                "[current_actor.name] casts [selected_ability.name]!"
             else:
-                if selected_ability.multi:
-                    $ ability_results = current_actor.magic_attack_multi(selected_ability, selected_target)
-                else:
-                    $ ability_results = current_actor.magic_attack_single(selected_ability, selected_target)
-            play sound selected_ability._sound
-            show expression selected_ability._image at selected_ability._transform
-            "[current_actor.name] casts [selected_ability.name]!"
-        else:
-            $ ability_results = current_actor.normal_attack(selected_target)
-            "[current_actor.name] attacks!"
-        
+                $ ability_results = current_actor.normal_attack(selected_target)
+                "[current_actor.name] attacks!"
+        elif current_actor.health > 0:
+            if "PARALYZE" in current_actor.current_effects:
+                "[current_actor.name] is paralyzed!"
+            elif "SLEEP" in current_actor.current_effects:
+                "[current_actor.name] is asleep!"
+
         # follow ups
         if "WEAKNESS" in ability_results or "CRITICAL" in ability_results:
             $ can_follow_up.append(current_actor)
