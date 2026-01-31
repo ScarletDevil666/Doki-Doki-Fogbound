@@ -130,31 +130,36 @@ init python:
                 if damage < 0:
                     damage = 0
                 target.health -= damage
+                if target.is_guarding:
+                    return f"HIT\nGUARDED\n{damage}"
                 if "PHYSICAL" in target.weaknesses:
                     return f"HIT\nWEAKNESS\n{damage}"
-                elif critical:
+                if critical:
                     return f"HIT\nCRITICAL\n{damage}"
-                elif target.is_guarding:
-                    return f"HIT\nGUARDED\n{damage}"
                 return f"HIT\n{damage}"
             return f"MISS"
 
         def magic_attack_single(self, ability: MagicAbility, target) -> str:
             damage = random.randint(ability.damage // 2, ability.damage)
-            hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or ability.name == "Follow Up" or target.is_guarding
+            hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or ability.name == "Follow Up" or ability.name == "Band Together" or target.is_guarding
             affected = ""
             if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice
                 self.magic -= ability.cost
             if hit:
-                if ability.element in target.weaknesses:
-                    damage *= 2
+                if target.is_guarding:
+                    damage //= 2
+                else:
+                    if ability.element in target.weaknesses:
+                        damage *= 2
                 damage -= target.defense
-                if ability.effect is not None and random.uniform(1.0, 100.0) <= ability.effect_chance:
+                if ability.effect is not None and random.random() <= (ability.effect_chance / 100.0):
                     target.apply_effect(ability.effect)
                     f"APPLIED {ability.effect}\n"
                 if damage < 0:
                     damage = 0
                 target.health -= damage
+                if target.is_guarding:
+                    return f"HIT\nGUARDED\n{damage}\n{affected}"
                 if ability.element in target.weaknesses:
                     return f"HIT\nWEAKNESS\n{damage}\n{affected}"
                 return f"HIT\n{damage}\n{affected}"
@@ -217,8 +222,8 @@ init python:
         
         def confuse_choose_action(self, party: list, enemies: list):
             all_abilities = ["Normal Attack", *self.magic_abilities]
-            for ability in all_abilities:
-                if isinstance(ability, (MagicAbility, HealingAbility)) and ability.multi:
+            for ability in all_abilities[1:]:
+                if ability.multi or ability.cost > self.magic:
                     all_abilities.remove(ability)
             self.confuse_action[0] = random.choice(all_abilities)
             self.confuse_action[1] = random.choice([*party, *enemies])
@@ -264,6 +269,9 @@ init python:
         
         def charm_choose_action(self, party: list, enemies: list):
             all_abilities = ["Normal Attack", *self.magic_abilities]
+            for ability in all_abilities[1:]:
+                if ability.cost > self.magic:
+                    all_abilities.remove(ability)
             self.charm_action[0] = random.choice(all_abilities)
             if self.charm_action[0] == "Normal Attack" or isinstance(self.charm_action[0], MagicAbility):
                 if self.charm_action[0] == "Normal Attack" or not self.charm_action[0].multi:
@@ -388,7 +396,7 @@ init python:
         current_turn %= len(turn_order)
         followed_up.clear()
     
-    available_negative_effects = ("BURN", "POISON", "SLEEP", "PARALYZE", "MAGIC BLOCK", "CONFUSE", "CHARM", "FEAR", "ENRAGE", "BLIND", "STAT DEBUFF")
+    available_negative_effects = ("BURN", "POISON", "SLEEP", "PARALYZE", "FREEZE", "SEAL", "CONFUSE", "CHARM", "FEAR", "ENRAGE", "BLIND", "STAT DEBUFF")
     available_positive_effects = ("SHIELD", "REFLECT", "REGENERATE", "STAT BUFF")
     def effect_update(target: BattleMember) -> str:
         """
@@ -397,7 +405,8 @@ init python:
             POISON: Reduces the target's health each turn for 3 turns, double damage if weak to poison
             SLEEP: Puts the target to sleep, preventing them from attacking for 3 turns, but they heal each turn
             PARALYZE: Paralyzes the target, preventing them from attacking for 3 turns
-            MAGIC BLOCK: Prevents the target from using magic for 2 turns # this needs a different name
+            FREEZE: Freezes the target, preventing them from attacking for 3 turns, also gaurentees critical from normal attacks (this will break the freeze effect)
+            SEAL: Prevents the target from using magic for 3 turns
             CONFUSE: Randomly chooses the target's action for 3 turns, these include attacking pary members and healing enemies
             CHARM: Puts the target on the user's side, if party, the player will control what the target doing for the next 3 turns, if enemy, the target will act as an enemy for the next 3 turns
             FEAR: On turn, 60% chance to force skip turn, 20% chance to run away, 20% chance to actually do commanded action
