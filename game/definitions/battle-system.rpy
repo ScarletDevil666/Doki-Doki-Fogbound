@@ -151,6 +151,10 @@ init python:
                 else:
                     if ability.element in target.weaknesses:
                         damage *= 2
+                    elif ability.element == "PHYSICAL":
+                        critical = random.randint(1, self.strength) > random.randint(1, target.defense)
+                        if critical:
+                            damage *= 2
                 damage -= target.defense
                 if ability.effect is not None and random.random() <= (ability.effect_chance / 100.0):
                     target.apply_effect(ability.effect)
@@ -162,6 +166,8 @@ init python:
                     return f"HIT\nGUARDED\n{damage}\n{affected}"
                 if ability.element in target.weaknesses:
                     return f"HIT\nWEAKNESS\n{damage}\n{affected}"
+                if critical:
+                    return f"HIT\nCRITICAL\n{damage}"
                 return f"HIT\n{damage}\n{affected}"
             return f"MISS"
 
