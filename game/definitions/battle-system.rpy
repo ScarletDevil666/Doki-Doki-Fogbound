@@ -1,19 +1,3 @@
-# So this is gonna be a whole thing, here's my idea for this battle system:
-# The battle starts by calling the screen and loading in the party and enemies as lists, then the turn order is randomized and the battle begins
-# Party members are gonna have to be created using the character class, and enemies are gonna be created using the enemy class
-# On a party member's turn, the player can choose to do a normal attack (these are physical element), use an item, use magic (magic is limited, so be careful), or guard to reduce damage by 50%
-# If a party member gets a critical hit or hit the enemies weakness, they will deal double damage and the player gets to choose a different party member to follow up
-#   Follow ups are predetermined attacks and they are gaurenteed to hit, meaning you won't choose what that party member does, but you can choose who does it, they can only do one attack on follow ups
-#      You can not choose the same party member to follow up as the one who got the critical hit
-#   If a follow up hits a critical or weakness like before, another follow up is triggered, otherwise, the turn is ended
-#       You can not choose any party member that has already attacked this turn
-#   If all party members manage to hit weaknesses on all follow ups, they will all band together and attack at the same time, dealing massive damage.  This will end the turn.
-# On an enemy's turn, they will choose a random party member to attack and deal damage to them
-# Enemies can do everything that party members can do, but they can also use special abilities once certain conditions are fulfilled
-# Enemies will never guard or use items
-#
-# Yes, the follow up system takes inspiration from P5X, I did not think of too much originality here.  But that's okay.
-
 init python:
     import random
     import asyncio
@@ -116,6 +100,7 @@ init python:
         def normal_attack(self, target) -> str:
             damage = random.randint(self.strength // 2, self.strength)
             hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or target.is_guarding
+            affected = ""
             if hit:
                 if target.is_guarding:
                     damage //= 2
@@ -130,13 +115,15 @@ init python:
                 if damage < 0:
                     damage = 0
                 target.health -= damage
+                if target.health <= 0:
+                    affected += f"KILLED\n"
                 if target.is_guarding:
-                    return f"HIT\nGUARDED\n{damage}"
+                    return f"HIT\nGUARDED\n{damage}\n{affected}"
                 if "PHYSICAL" in target.weaknesses:
-                    return f"HIT\nWEAKNESS\n{damage}"
+                    return f"HIT\nWEAKNESS\n{damage}\n{affected}"
                 if critical:
-                    return f"HIT\nCRITICAL\n{damage}"
-                return f"HIT\n{damage}"
+                    return f"HIT\nCRITICAL\n{damage}\n{affected}"
+                return f"HIT\n{damage}\n{affected}"
             return f"MISS"
 
         def magic_attack_single(self, ability: MagicAbility, target) -> str:
@@ -162,12 +149,17 @@ init python:
                 if damage < 0:
                     damage = 0
                 target.health -= damage
+                if target.health <= 0:
+                    affected += f"KILLED\n"
+                    global active_enemies
+                    if target in active_enemies: # if this is false, the target is a party member, you do not remove from the active party list
+                        active_enemies.remove(target)
                 if target.is_guarding:
                     return f"HIT\nGUARDED\n{damage}\n{affected}"
                 if ability.element in target.weaknesses:
                     return f"HIT\nWEAKNESS\n{damage}\n{affected}"
                 if critical:
-                    return f"HIT\nCRITICAL\n{damage}"
+                    return f"HIT\nCRITICAL\n{damage}\n{affected}"
                 return f"HIT\n{damage}\n{affected}"
             return f"MISS"
 
@@ -232,7 +224,8 @@ init python:
                 if ability.multi or ability.cost > self.magic:
                     all_abilities.remove(ability)
             self.confuse_action[0] = random.choice(all_abilities)
-            self.confuse_action[1] = random.choice([*party, *enemies])
+            all_members = [*party, *enemies]
+            self.confuse_action[1] = random.choice([member for member in all_members if member.health > 0])
     
     class PartyMember(BattleMember):
         def __init__(self, *args, starting_exp:int=0, level_up:int=100, new_abilities:dict[int:list[MagicAbility | HealingAbility]]={}, max_level: int = 99, **kwargs):
@@ -281,14 +274,14 @@ init python:
             self.charm_action[0] = random.choice(all_abilities)
             if self.charm_action[0] == "Normal Attack" or isinstance(self.charm_action[0], MagicAbility):
                 if self.charm_action[0] == "Normal Attack" or not self.charm_action[0].multi:
-                    self.charm_action[1] = random.choice(party)
+                    self.charm_action[1] = random.choice([member for member in party if member.health > 0])
                 else:
                     self.charm_action[1] = party
             elif isinstance(self.charm_action[0], HealingAbility):
                 if self.charm_action[0].multi:
                     self.charm_action[1] = enemies
                 else:
-                    self.charm_action[1] = random.choice(enemies)
+                    self.charm_action[1] = random.choice([member for member in enemies if member.health > 0])
         
         
     class Enemy(BattleMember):
@@ -312,14 +305,14 @@ init python:
             self.next_action[0] = random.choice(self.all_abilities)
             if self.next_action[0] == "Normal Attack" or isinstance(self.next_action[0], MagicAbility):
                 if self.next_action[0] == "Normal Attack" or not self.next_action[0].multi:
-                    self.next_action[1] = random.choice(party)
+                    self.next_action[1] = random.choice([member for member in party if member.health > 0])
                 else:
                     self.next_action[1] = party
             elif isinstance(self.next_action[0], HealingAbility):
                 if self.next_action[0].multi:
                     self.next_action[1] = enemies
                 else:
-                    self.next_action[1] = random.choice(enemies)
+                    self.next_action[1] = random.choice([member for enemies in party if member.health > 0])
 
     class Boss(Enemy): # these will have special abilities and will be harder to defeat, also their turn number is not randomized
         def __init__(self, *args, phases: tuple, turn_number:int=-1, **kwargs):
@@ -341,14 +334,14 @@ init python:
             self.next_action[0] = random.choice(self.abilities_available)
             if self.next_action[0] == "Normal Attack" or isinstance(self.next_action[0], MagicAbility):
                 if self.next_action[0] == "Normal Attack" or not self.next_action[0].multi:
-                    self.next_action[1] = random.choice(party)
+                    self.next_action[1] = random.choice([member for member in party if member.health > 0])
                 else:
                     self.next_action[1] = party
             elif isinstance(self.next_action[0], HealingAbility):
                 if self.next_action[0].multi:
                     self.next_action[1] = enemies
                 else:
-                    self.next_action[1] = random.choice(enemies)
+                    self.next_action[1] = random.choice([member for enemies in party if member.health > 0])
 
         def force_choose_action(self, ability: MagicAbility | HealingAbility, targets: list[BattleMember]) -> None:
             self.next_action[0] = ability
@@ -375,7 +368,7 @@ init python:
         global turn_order
         global current_turn
         who_started = turn_order[current_turn]
-        if isinstance(who_started, PartyMember):
+        if isinstance(who_started, PartyMember) != ("CHARM" in who_started.current_effects)):
             for member in party:
                 can_follow_up.append(member)
         else:
@@ -384,7 +377,7 @@ init python:
         if who_started in can_follow_up:
             can_follow_up.remove(who_started)
         for member in can_follow_up:
-            if any(for effect in member.current_effects if effect in available_negative_effects):
+            if member.health <= 0 or any(for effect in member.current_effects if effect in available_negative_effects):
                 can_follow_up.remove(member)
     
     def band_together_attack(party: list[PartyMember], enemies: list[Enemy | Boss]) -> list[str]:
@@ -495,10 +488,13 @@ transform scroll_right(t):
 default can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
 default followed_up = [] # this will be filled with party members who have already followed up, this will be cleared at the start of each turn, if this matches the party during any turn, then the band together attack will happen
 default turn_order = []
+default active_party = []
+default active_enemies = [] # remember to remove each enemy that is defeated from this list
 default current_turn = 0
 default selected_ability = None
 default selected_target = None
 default current_actor = None
+default follow_up_actor = None
 default ability_results = None
 default checkpoint_to_jump = "battle_loop"
 default start_of_battle = "battle_loop" # set this to the starting label of each battle
@@ -509,6 +505,8 @@ default inventory = [] # fill this with any items that are obtained along the wa
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
 label battle(party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}):
     if last_checkpoint is None:
+        $ active_party = party
+        $ active_enemies = enemies
         $ decide_turn_order(party, enemies)
     
     $ renpy.music.play(_music)
@@ -598,10 +596,12 @@ label battle(party, enemies, transition_background, battle_background, _music = 
                 "[current_actor.name] is asleep!"
             else:
                 "[current_actor.name] is can't act for unknown reasons!"
+        else:
+            "[current_actor.name] is dead!"
 
         # follow ups
-        if "WEAKNESS" in ability_results or "CRITICAL" in ability_results:
-            $ can_follow_up.append(current_actor)
+        if "CONFUSE" not in current_actor.current_effects and ("WEAKNESS" in ability_results or "CRITICAL" in ability_results):
+            $ fill_follow_up(party, enemies)
             call follow_up_loop
         
         $ effect_update(current_actor)
@@ -657,7 +657,6 @@ screen item_selection:
         frame: # frame for the item description
             text item_description
 
-# TODO: display this in a concise fashion where it will only show the information needed to be shown in battle, this information is, name, icon (maybe if we decide to have these), health, max health, magic, and max magic (could have bars for these), also highlight the screen if the turn is being taken
 screen party_stats(party):
     for member in party:
         button at from_top(3.5, 0.5 * party.index(member)):
@@ -737,7 +736,6 @@ screen battle_choice:
                     text _("BACK") size 25 font battle_font align (0.5, 0.5) text_align 0.5
                     action SetVariable("selected_ability", None)
 
-
 screen turn_order_display:
     frame at turn_order_transform:
         background "#0000"
@@ -786,6 +784,35 @@ transform from_bottom(t=0.5, d=0.0):
         easein_quart t yoffset 0
     on hide:
         easeout_quart t*0.5 yoffset 720
+
+label follow_up_loop:
+    if can_follow_up == []:
+        "No one is available to follow up!"
+        return
+
+    if isinstance(current_actor, PartyMember) != ("CHARM" in current_actor.current_effects):
+        if len(followed_up) == len(active_party)-1:
+            $ band_together_attack(party, enemies)
+            "The whole party bands together!"
+            return
+        else:
+            call screen follow_up_choice
+    else:
+        if len(followed_up) == len(active_enemies)-1:
+            $ band_together_attack(party, enemies)
+            "All the enemies band together!"
+            return
+        $ follow_up_actor = random.choice(can_follow_up)
+        $ target = random.choice([member for member in party if member.health > 0])
+    
+    $ followed_up.append(follow_up_actor)
+    $ ability_results = follow_up_actor.perform_follow_up(target)
+    "[follow_up_actor.name] follows up!"
+
+    if "WEAKNESS" in ability_results or "CRITICAL" in ability_results:
+        jump follow_up_loop
+
+    return
 
 label battle_victory:
     call screen victory_screen
