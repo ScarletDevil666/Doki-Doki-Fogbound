@@ -807,6 +807,7 @@ label follow_up_loop:
     
     $ followed_up.append(follow_up_actor)
     $ ability_results = follow_up_actor.perform_follow_up(target)
+    show expression follow_up_actor.follow_up._image at follow_up_actor.follow_up._transform
     "[follow_up_actor.name] follows up!"
 
     if "WEAKNESS" in ability_results or "CRITICAL" in ability_results:
@@ -823,9 +824,16 @@ label battle_defeat:
 
 screen game_over:
     add Solid("#000")
-    text _("Death has fallen upon you...") size 50 font battle_font align (0.5, 0.5) text_align 0.5
+    text _("Death has fallen upon you...") size 50 font medieval_font align (0.5, 0.5) text_align 0.5
+    vbox:
+        xalign 0.5
+        textbutton _("RESTART BATTLE") size 15 font medieval_font color "#fff"" action [SetVariable("checkpoint_to_jump", start_of_battle), Return()]
+        textbutton _("LAST CHECKPOINT") size 15 font medieval_font color "#fff" insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), Return()])
+        textbutton _("TITLE SCREEN") size 15 font medieval_font action color "#fff8" action MainMenu(True, False)
+        textbutton _("QUIT GAME") size 15 font medieval_font color "#fff" action Quit()
 
 define audio.default_battle_music = "<loop 34.259 to 119.484>mod_assets/music/PLACEHOLDER BATTLE (Delete later).mp3"
+define medieval_font = "mod_assets/fonts/PowerdarkBold-O9RP.ttf"
 define battle_font = "mod_assets/fonts/NotoSerifJP-Regular.otf"
 
 # battle_member_template = BattleMember(_("Name"), "Kanji", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
