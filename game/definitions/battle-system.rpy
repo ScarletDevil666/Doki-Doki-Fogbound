@@ -508,6 +508,9 @@ label battle(party, enemies, transition_background, battle_background, _music = 
         $ active_party = party
         $ active_enemies = enemies
         $ decide_turn_order(party, enemies)
+        $ s_rank_possible = True
+    else:
+        $ s_rank_possible = False
     
     $ renpy.music.play(_music)
     $ current_turn = 0
@@ -815,20 +818,24 @@ label follow_up_loop:
 
     return
 
+default battle_rank = ""
+default s_rank_possible = True
+
 label battle_victory:
     call screen victory_screen
     return
 
 label battle_defeat:
     call screen game_over
+    return
 
 screen game_over:
     add Solid("#000")
     text _("Death has fallen upon you...") size 50 font medieval_font align (0.5, 0.5) text_align 0.5
     vbox:
         xalign 0.5
-        textbutton _("RESTART BATTLE") size 15 font medieval_font color "#fff"" action [SetVariable("checkpoint_to_jump", start_of_battle), Return()]
         textbutton _("LAST CHECKPOINT") size 15 font medieval_font color "#fff" insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), Return()])
+        textbutton _("RESTART BATTLE") size 15 font medieval_font color "#fff"" action [SetVariable("checkpoint_to_jump", start_of_battle), Return()]
         textbutton _("TITLE SCREEN") size 15 font medieval_font action color "#fff8" action MainMenu(True, False)
         textbutton _("QUIT GAME") size 15 font medieval_font color "#fff" action Quit()
 
