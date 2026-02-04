@@ -368,7 +368,7 @@ init python:
         global turn_order
         global current_turn
         who_started = turn_order[current_turn]
-        if isinstance(who_started, PartyMember) != ("CHARM" in who_started.current_effects)):
+        if isinstance(who_started, PartyMember) != ("CHARM" in who_started.current_effects):
             for member in party:
                 can_follow_up.append(member)
         else:
@@ -377,7 +377,7 @@ init python:
         if who_started in can_follow_up:
             can_follow_up.remove(who_started)
         for member in can_follow_up:
-            if member.health <= 0 or any(for effect in member.current_effects if effect in available_negative_effects):
+            if member.health <= 0 or any(effect for effect in member.current_effects if effect in available_negative_effects):
                 can_follow_up.remove(member)
     
     def band_together_attack(party: list[PartyMember], enemies: list[Enemy | Boss]) -> list[str]:
@@ -509,10 +509,10 @@ label battle(party, enemies, transition_background, battle_background, _music = 
         $ active_enemies = enemies
         $ decide_turn_order(party, enemies)
         $ s_rank_possible = True
-    else:
-        $ s_rank_possible = False
     
-    $ renpy.music.play(_music)
+    if _music is not None:
+        $ renpy.music.play(_music)
+    $ quick_menu = False
     $ current_turn = 0
     $ can_follow_up = []
     $ followed_up = []
@@ -523,8 +523,8 @@ label battle(party, enemies, transition_background, battle_background, _music = 
     pause 4.3
     hide battle_start with None
     scene expression battle_background
+    show screen enemies_display(enemies)
     show screen party_stats(party)
-    # TODO: show enemies screen
     with Fade(1.0, 0.0, 0.5, color="#fff")
     show screen turn_order_display
     pause 2.25
@@ -536,15 +536,18 @@ label battle(party, enemies, transition_background, battle_background, _music = 
         $ followed_up.clear()
 
         if all(e.health <= 0 for e in enemies):
+            $ quick_menu = True
             call expression override_victory pass (*victory_args, **victory_kwargs)
             return
         if all(p.health <= 0 for p in party):
+            $ quick_menu = True
             call expression override_defeat pass (*defeat_args, **defeat_kwargs)
             jump expression checkpoint_to_jump
 
         $ selected_ability = None
         $ selected_target = None
         $ ability_results = None
+        $ follow_up_actor = None
         if current_actor.health > 0 and "PARALYZE" not in current_actor.current_effects and "SLEEP" not in current_actor.current_effects:
             "[current_actor.name] takes their turn!"
             if isinstance(current_actor, PartyMember) != ("CHARM" in current_actor.current_effects):
@@ -565,7 +568,7 @@ label battle(party, enemies, transition_background, battle_background, _music = 
                     $ selected_target = current_actor.charm_action[1]
                 else:
                     $ selected_ability = current_actor.next_action[0]
-                    $ target = current_actor.next_action[1]
+                    $ selected_target = current_actor.next_action[1]
                     $ current_actor.choose_action(party, enemies)
 
             # TODO: write a function that determines where the ability results should be shown on the screen and use it to show a screen that plays an animation showing the results
@@ -610,7 +613,7 @@ label battle(party, enemies, transition_background, battle_background, _music = 
         $ effect_update(current_actor)
         $ current_actor.effect_tick_down()
         if current_actor.current_effects != {}:
-            "[current_actor.name] gets affected by their current conditions!"
+            "[current_actor.name] gets affected by their current effects!"
         $ next_turn()
 
         jump battle_loop
@@ -666,9 +669,9 @@ screen party_stats(party):
             xysize (1280 // len(party), 150)
             xpos (1280 // len(party)) * party.index(member)
             if member == turn_order[current_turn]:
-                background "#3338" # TODO: replace this with the turn highlight
+                background "#3338" # turn highlight
             else:
-                background "#0008" # TODO: replace this with the unhighlight
+                background "#0008" # unhighlight
             hover_background "#5558"
             vbox:
                 #add "[member.icon].png" # Who knows if we will have icons for our party members
@@ -676,7 +679,27 @@ screen party_stats(party):
                 text member.name size 15 font battle_font
                 text "HEALTH: [member.health]/[member.max_health]" font battle_font
                 text "MAGIC: [member.magic]/[member.max_magic]" font battle_font
-            action If(isinstance(selected_ability, HealingAbility), [SetVariable("selected_target", member), Return()])
+            action If(selected_target is None and isinstance(selected_ability, HealingAbility) and not isinstance(follow_up_actor, PartyMember), [SetVariable("selected_target", member), Return()])
+
+default scanned_action = ""
+screen enemies_display(enemies):
+    text scanned_action xalign 0.5 yalign 1.0
+    for enemy in enemies:
+        button at from_bottom(3.5, 0.5 * enemies.index(enemy)):
+            xysize (1280 // len(enemies), 400)
+            xpos (1280 // len(enemies)) * enemies.index(enemy)
+            yalign 0.75
+            if enemy == turn_order[current_turn]:
+                background "#3338" # turn highlight
+            else:
+                background "#0000" # unhighlight
+            hover_background "#5558"
+            add enemy._image xalign 0.5 yalign 0.5
+            text enemy.name xalign 0.5 size 13 font battle_font
+            action If(selected_target is None and (isinstance(selected_ability, (MagicAbility, str)) or isinstance(follow_up_actor, PartyMember)), [SetVariable("selected_target", enemy), Return()], If(current_actor == test_monika or current_actor == monika, NullAction()))
+            hovered If(current_actor == test_monika or current_actor == monika, SetVariable("scanned_action", "NEXT ACTION: [enemy.next_action[0] if isinstance(enemy.next_action[0], str) else enemy.next_action[0].name]\nTARGET: [enemy.next_action[1].name]"))
+            unhovered SetVariable("scanned_action", "")
+                
 
 screen battle_choice:
     frame at from_top(1.0):
@@ -754,9 +777,9 @@ screen turn_order_display:
                     frame:
                         xysize (150, 21)
                         if member == turn_order[current_turn]:
-                            background "#3338" # TODO: replace this with the turn highlight
+                            background "#3338" # turn highlight
                         else:
-                            background "#1118" # TODO: replace this with the unhighlight
+                            background "#1118" # unhighlight
                         text member.name size 13 yalign 0.5 font battle_font
 
 transform turn_order_transform:
@@ -788,7 +811,16 @@ transform from_bottom(t=0.5, d=0.0):
     on hide:
         easeout_quart t*0.5 yoffset 720
 
+transform fade_top(t=0.5, d=0.0):
+    on show:
+        yoffset -10 alpha 0.0
+        d
+        easein_quart t yoffset 0 alpha 1.0
+    on hide:
+        easeout_quart t yoffset -10 alpha 0.0
+
 label follow_up_loop:
+    $ follow_up_actor = None
     if can_follow_up == []:
         "No one is available to follow up!"
         return
@@ -826,18 +858,17 @@ label battle_victory:
     return
 
 label battle_defeat:
+    stop music
     call screen game_over
     return
 
 screen game_over:
     add Solid("#000")
-    text _("Death has fallen upon you...") size 50 font medieval_font align (0.5, 0.5) text_align 0.5
-    vbox:
-        xalign 0.5
-        textbutton _("LAST CHECKPOINT") size 15 font medieval_font color "#fff" insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), Return()])
-        textbutton _("RESTART BATTLE") size 15 font medieval_font color "#fff"" action [SetVariable("checkpoint_to_jump", start_of_battle), Return()]
-        textbutton _("TITLE SCREEN") size 15 font medieval_font action color "#fff8" action MainMenu(True, False)
-        textbutton _("QUIT GAME") size 15 font medieval_font color "#fff" action Quit()
+    text _("Death has fallen upon you") size 100 font medieval_font align (0.5, 0.5) text_align 0.5 at fade_top(5.0, 1.0)
+    textbutton _("LAST CHECKPOINT") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 0 text_insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), SetVariable("s_rank_possible", False), Return()]) at fade_top(1.0, 1.5)
+    textbutton _("RESTART BATTLE") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 30 action [SetVariable("checkpoint_to_jump", start_of_battle), Return()] at fade_top(1.0, 2.0)
+    textbutton _("TITLE SCREEN") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 60 action MainMenu(True, False) at fade_top(1.0, 2.5)
+    textbutton _("QUIT GAME") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 90 action Quit() at fade_top(1.0, 3.0)
 
 define audio.default_battle_music = "<loop 34.259 to 119.484>mod_assets/music/PLACEHOLDER BATTLE (Delete later).mp3"
 define medieval_font = "mod_assets/fonts/PowerdarkBold-O9RP.ttf"
@@ -849,6 +880,7 @@ default test_monika = PartyMember(_("Monika"), "モニカ", 300, 30, 20, 100, 25
 default test_sayori = PartyMember(_("Sayori"), "さより", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
 default test_yuri = PartyMember(_("Yuri"), "百合", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
 default test_natsuki = PartyMember(_("Natsuki"), "無月", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
+default monika = PartyMember(_("Monika"), "モニカ", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
 
 default test_enemy_1 = Enemy(_("Enemy 1"), "敵1", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
 default test_enemy_2 = Enemy(_("Enemy 2"), "敵2", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
