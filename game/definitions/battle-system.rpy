@@ -864,6 +864,7 @@ label battle_defeat:
 
 screen game_over:
     add Solid("#000")
+    add "noise" alpha 0.05
     text _("Death has fallen upon you") size 100 font medieval_font align (0.5, 0.5) text_align 0.5 at fade_top(5.0, 1.0)
     textbutton _("LAST CHECKPOINT") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 0 text_insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), SetVariable("s_rank_possible", False), Return()]) at fade_top(1.0, 1.5)
     textbutton _("RESTART BATTLE") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 30 action [SetVariable("checkpoint_to_jump", start_of_battle), Return()] at fade_top(1.0, 2.0)
