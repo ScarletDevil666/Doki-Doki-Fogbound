@@ -479,6 +479,7 @@ transform scroll_left(t):
     subpixel True
     xtile 2
     xpos 0.0
+    blur 1.0 / t
     linear t xpos -1.0
     repeat
 
@@ -486,7 +487,7 @@ transform scroll_right(t):
     subpixel True
     xtile 2
     xpos -1.0
-    blur 1 // t
+    blur 1.0 / t
     linear t xpos 0.0
     repeat
 
