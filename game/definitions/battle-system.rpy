@@ -1,6 +1,6 @@
 init python:
     import random
-    import asyncio
+    from abc import ABC, abstractmethod
     """
     Available magic elements:
         FIRE
@@ -49,15 +49,21 @@ init python:
             self._sound = _sound
             self.multi = multi
     
-    class Item: # inherit off of this for healing items and attack items
-        def __init__(self, name: str, description: str):
+    class Item(ABC): # inherit off of this for healing items and attack items
+        def __init__(self, name: str, description: str, cast_time: float):
             self.name = name
             self.description = description
+            self.cast_time = cast_time
         
-        def use_item(self, target): # pure virtual function
-            pass
+        @abstractmethod
+        def use_item(self, target):
+            global party_inventory
+            if self in party_inventory:
+                party_inventory.remove(self)
+            else:
+                raise BattleException("Item not in inventory")
 
-    class BattleMember(object): # Parent class for party members and enemies
+    class BattleMember(object, ABC): # Parent class for party members and enemies
         def __init__(self, name: str, kanji: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], follow_up:MagicAbility, band_together_attack:MagicAbility):
             self.name = name
             self.kanji = kanji
@@ -151,9 +157,6 @@ init python:
                 target.health -= damage
                 if target.health <= 0:
                     affected += f"KILLED\n"
-                    global active_enemies
-                    if target in active_enemies: # if this is false, the target is a party member, you do not remove from the active party list
-                        active_enemies.remove(target)
                 if target.is_guarding:
                     return f"HIT\nGUARDED\n{damage}\n{affected}"
                 if ability.element in target.weaknesses:
@@ -174,11 +177,11 @@ init python:
             affected = ""
             if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice
                 self.magic -= ability.cost
-            if ability.negative_effects is not None and random.uniform(1.0, 100.0) <= ability.negative_effect_chance:
+            if ability.negative_effects is not None and random.random()*100.0 <= ability.negative_effect_chance:
                 for effect in ability.negative_effects:
                     del target.current_effects[effect]
                     affected += f"CURED {effect}\n"
-            if ability.positive_effect is not None and random.uniform(1.0, 100.0) <= ability.positive_effect_chance:
+            if ability.positive_effect is not None and random.random()*100.0 <= ability.positive_effect_chance:
                 target.apply_effect(ability.positive_effect)
                 affected += f"APPLIED {ability.positive_effect}\n"
             target.health += heal
@@ -187,7 +190,7 @@ init python:
                 return f"FULL\nHEAL\n{heal}\n{affected}"
             return f"HEAL\n{heal}\n{affected}"
         
-        def heal_multi(self, ability: HealingAbility, targets: list)-> list[str]:
+        def heal_multi(self, ability: HealingAbility, targets: list) -> list[str]:
             if not ability.multi:
                 raise BattleException("This ability is not multi-target (why did you call this when it was clearly for multi-target?)")
             self.magic -= ability.cost
@@ -468,6 +471,9 @@ init python:
             return "an"
 
         return "a"
+    
+    def get_target_center(target) -> tuple[float, float]:
+        pass # TODO: get the center coordinates of the target on the screen
 
 transform scroll_left(t):
     subpixel True
@@ -499,7 +505,7 @@ default ability_results = None
 default checkpoint_to_jump = "battle_loop"
 default start_of_battle = "battle_loop" # set this to the starting label of each battle
 default last_checkpoint = None # set this to the checkpoint label of each battle phase (None if it is the very start of the battle)
-default inventory = [] # fill this with any items that are obtained along the way, they will be used in battles mostly
+default party_inventory = [] # fill this with any items that are obtained along the way, they will be used in battles mostly
 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
@@ -523,7 +529,7 @@ label battle(party, enemies, transition_background, battle_background, _music = 
     pause 4.3
     hide battle_start with None
     scene expression battle_background
-    show screen enemies_display(enemies)
+    show screen enemies_display
     show screen party_stats(party)
     with Fade(1.0, 0.0, 0.5, color="#fff")
     show screen turn_order_display
@@ -537,10 +543,16 @@ label battle(party, enemies, transition_background, battle_background, _music = 
 
         if all(e.health <= 0 for e in enemies):
             $ quick_menu = True
+            hide party_stats
+            hide turn_order_display
             call expression override_victory pass (*victory_args, **victory_kwargs)
+            hide enemies_display
             return
         if all(p.health <= 0 for p in party):
             $ quick_menu = True
+            hide party_stats
+            hide turn_order_display
+            hide enemies_display
             call expression override_defeat pass (*defeat_args, **defeat_kwargs)
             jump expression checkpoint_to_jump
 
@@ -573,12 +585,16 @@ label battle(party, enemies, transition_background, battle_background, _music = 
 
             # TODO: write a function that determines where the ability results should be shown on the screen and use it to show a screen that plays an animation showing the results
             if selected_ability == "Guard":
+                show screen attack_results_display(0.0)
+                $ selected_target = current_actor
                 $ ability_results = current_actor.guard()
                 "[current_actor.name] raises their guard!"
             elif isinstance(selected_ability, Item):
+                show screen attack_results_display(selected_ability.cast_time)
                 $ ability_results = selected_ability.use_item(selected_target)
                 "[current_actor.name] uses [get_article(selected_ability.name)] [selected_ability.name]!"
             elif isinstance(selected_ability, (MagicAbility, HealingAbility)):
+                show screen attack_results_display(selected_ability.cast_time)
                 if isinstance(selected_ability, HealingAbility):
                     if selected_ability.multi:
                         $ ability_results = current_actor.heal_single(selected_ability, selected_target)
@@ -601,7 +617,7 @@ label battle(party, enemies, transition_background, battle_background, _music = 
             elif "SLEEP" in current_actor.current_effects:
                 "[current_actor.name] is asleep!"
             else:
-                "[current_actor.name] is can't act for unknown reasons!"
+                "[current_actor.name] can't act for unknown reasons!"
         else:
             "[current_actor.name] is dead!"
 
@@ -617,6 +633,17 @@ label battle(party, enemies, transition_background, battle_background, _music = 
         $ next_turn()
 
         jump battle_loop
+
+screen attack_results_display(delay):
+    text ability_results at results_transform(delay, get_target_center(selected_target))
+    timer delay+3.0 action Hide("attack_results_display")
+
+transform results_transform(d, c):
+    xcenter c[0]
+    ycenter c[1]
+    on show:
+        pass
+
 
 default ability_description = ""
 screen ability_selection(member):
@@ -649,7 +676,7 @@ screen item_selection:
         frame: # frame for the viewport
             viewport: # viewport for the item buttons
                 has vbox
-                for item in inventory:
+                for item in party_inventory:
                     button: # button for the item
                         hovered SetVariable("item_description", item.description)
                         unhovered SetVariable("item_description", "")
@@ -682,12 +709,12 @@ screen party_stats(party):
             action If(selected_target is None and isinstance(selected_ability, HealingAbility) and not isinstance(follow_up_actor, PartyMember), [SetVariable("selected_target", member), Return()])
 
 default scanned_action = ""
-screen enemies_display(enemies):
+screen enemies_display:
     text scanned_action xalign 0.5 yalign 1.0
-    for enemy in enemies:
-        button at from_bottom(3.5, 0.5 * enemies.index(enemy)):
-            xysize (1280 // len(enemies), 400)
-            xpos (1280 // len(enemies)) * enemies.index(enemy)
+    for enemy in active_enemies:
+        button at from_bottom(3.5, 0.5 * active_enemies.index(enemy)):
+            xysize (1280 // len(active_enemies), 400)
+            xpos (1280 // len(active_enemies)) * active_enemies.index(enemy)
             yalign 0.75
             if enemy == turn_order[current_turn]:
                 background "#3338" # turn highlight
@@ -765,22 +792,19 @@ screen battle_choice:
 screen turn_order_display:
     frame at turn_order_transform:
         background "#0000"
-        ysize 23*len(turn_order)
-        hbox:
-            xalign 0.0
-            frame:
-                xsize 2
-                background "#000"
-            vbox:
-                yalign 0.5
-                for member in turn_order:
-                    frame:
-                        xysize (150, 21)
-                        if member == turn_order[current_turn]:
-                            background "#3338" # turn highlight
-                        else:
-                            background "#1118" # unhighlight
-                        text member.name size 13 yalign 0.5 font battle_font
+        ysize 20*len(turn_order)
+        frame:
+            xsize 2
+            background "#000"
+        vbox at xzoom_open(0.5, 0.5):
+            for member in turn_order:
+                frame:
+                    xysize (150, 20)
+                    if member == turn_order[current_turn]:
+                        background "#3338" # turn highlight
+                    else:
+                        background "#1118" # unhighlight
+                    text member.name size 13 yalign 0.5 font battle_font
 
 transform turn_order_transform:
     on show:
@@ -793,7 +817,15 @@ transform turn_order_transform:
         easein_quart 0.5 xalign 0.9 zoom 1.0
         easein_elastic 0.2 xalign 0.0 xpos 0
     on hide:
-        easeout_quart 0.5 yzoom 0
+        easeout_quart 1.0 xoffset -300
+
+transform xzoom_open(t=0.5, d=0.0):
+    on show:
+        xzoom 0.0
+        d
+        easein_quart t xzoom 1.0
+    on hide:
+        easeout_quart t xzoom 0.0
 
 transform from_top(t=0.5, d=0.0):
     on show:
@@ -828,6 +860,7 @@ label follow_up_loop:
     if isinstance(current_actor, PartyMember) != ("CHARM" in current_actor.current_effects):
         if len(followed_up) == len(active_party)-1:
             $ band_together_attack(party, enemies)
+            show expression follow_up_actor.band_together_attack._image at follow_up_actor.band_together_attack._transform
             "The whole party bands together!"
             return
         else:
@@ -835,13 +868,14 @@ label follow_up_loop:
     else:
         if len(followed_up) == len(active_enemies)-1:
             $ band_together_attack(party, enemies)
+            show expression follow_up_actor.band_together_attack._image at follow_up_actor.band_together_attack._transform
             "All the enemies band together!"
             return
         $ follow_up_actor = random.choice(can_follow_up)
-        $ target = random.choice([member for member in party if member.health > 0])
+        $ selected_target = random.choice([member for member in party if member.health > 0])
     
     $ followed_up.append(follow_up_actor)
-    $ ability_results = follow_up_actor.perform_follow_up(target)
+    $ ability_results = follow_up_actor.perform_follow_up(selected_target)
     show expression follow_up_actor.follow_up._image at follow_up_actor.follow_up._transform
     "[follow_up_actor.name] follows up!"
 
