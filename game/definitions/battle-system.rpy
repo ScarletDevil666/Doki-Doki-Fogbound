@@ -127,24 +127,6 @@ init python:
                 return f"HIT\n{damage}\n{affected}"
             return f"MISS"
         
-        def single(self, target) -> str:
-            heal = random.randint(ability.heal // 2, ability.heal)
-            affected = ""
-            if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice
-                self.magic -= ability.cost
-            if ability.negative_effects is not None and random.random()*100.0 <= ability.negative_effect_chance:
-                for effect in ability.negative_effects:
-                    del target.current_effects[effect]
-                    affected += f"CURED {effect}\n"
-            if ability.positive_effect is not None and random.random()*100.0 <= ability.positive_effect_chance:
-                target.apply_effect(ability.positive_effect)
-                affected += f"APPLIED {ability.positive_effect}\n"
-            target.health += heal
-            if target.health > target.max_health:
-                target.health = target.max_health
-                return f"FULL\nHEAL\n{heal}\n{affected}"
-            return f"HEAL\n{heal}\n{affected}"
-        
         def multiple(self, targets) -> list[str]:
             if not self.multi:
                 raise BattleException("This item is not multi-target (why did you call this when it was clearly for multi-target?)")
@@ -152,10 +134,11 @@ init python:
             return attacks
         
     class HealingItem(Item):
-        def __init__(self, name: str, description: str, damage: int, element: str, cast_time: float, effect: str | None = None, effect_chance: float = 0, *, _transform=None, _image: str = None, _sound=None, multi:bool = False):
+        def __init__(self, name: str, description: str, heal: int, magic: int, element: str, cast_time: float, effect: str | None = None, effect_chance: float = 0, *, _transform=None, _image: str = None, _sound=None, multi:bool = False):
             self.name = name
             self.description = description
-            self.damage = damage
+            self.heal = heal
+            self.magic = magic
             self.element = element
             self.cast_time = cast_time # this will be used as a delay before showing the results
             self.effect = effect
@@ -172,6 +155,24 @@ init python:
                 return self.multiple(target)
             return self.single(target)
         
+        def single(self, target) -> str:
+            heal = random.randint(ability.heal // 2, ability.heal)
+            magic_recovery = random.randint(ability.magic // 2, ability.magic)
+            affected = ""
+            if ability.negative_effects is not None and random.random()*100.0 <= ability.negative_effect_chance:
+                for effect in ability.negative_effects:
+                    del target.current_effects[effect]
+                    affected += f"CURED {effect}\n"
+            if ability.positive_effect is not None and random.random()*100.0 <= ability.positive_effect_chance:
+                target.apply_effect(ability.positive_effect)
+                affected += f"APPLIED {ability.positive_effect}\n"
+            target.health += heal
+            target.magic += magic_recovery
+            if target.health > target.max_health:
+                target.health = target.max_health
+                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected}"
+            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected}"
+
         def multiple(self, targets) -> list[str]:
             if not self.multi:
                 raise BattleException("This item is not multi-target (why did you call this when it was clearly for multi-target?)")
@@ -304,8 +305,8 @@ init python:
             target.health += heal
             if target.health > target.max_health:
                 target.health = target.max_health
-                return f"FULL\nHEAL\n{heal}\n{affected}"
-            return f"HEAL\n{heal}\n{affected}"
+                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{affected}"
+            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{affected}"
         
         def heal_multi(self, ability: HealingAbility, targets: list) -> list[str]:
             if not ability.multi:
@@ -662,7 +663,7 @@ default party_inventory = [] # fill this with any items that are obtained along 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
 # If battle is called twice in the same sequence (i.e. something you'd do for boss phase transitions or something), DO NOT CHANGE THE NAME FOR THE BATTLE
-label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True):
+label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, transition=True, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True):
     if last_checkpoint is None:
         $ active_party = party
         $ active_enemies = enemies
@@ -680,15 +681,19 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
         $ party_restoration(party)
     if restore_enemies:
         $ enemies_restoration(enemies)
-    scene expression transition_background at scroll_right(0.175)
-    show battle_start at truecenter
-    with Fade(0.1, 0.0, 0.1, color="#fff")
-    pause 4.3
-    hide battle_start with None
+    if transition:
+        scene expression transition_background at scroll_right(0.175)
+        show battle_start at truecenter
+        with Fade(0.1, 0.0, 0.1, color="#fff")
+        pause 4.3
+        hide battle_start with None
     scene expression battle_background
     show screen enemies_display
     show screen party_stats(party)
-    with Fade(1.0, 0.0, 0.5, color="#fff")
+    if transition:
+        with Fade(1.0, 0.0, 0.5, color="#fff")
+    else:
+        with Fade(0.1, 0.0, 0.5, color="#fff")
     show screen turn_order_display
     pause 2.25
     $ decide_enemy_actions(enemies, party) # placed so the enemies have a decided move at the start of the battle
@@ -784,7 +789,7 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
             "[current_actor.name] is dead!"
 
         # follow ups
-        if "CONFUSE" not in current_actor.current_effects and ("WEAKNESS" in ability_results or "CRITICAL" in ability_results):
+        if "CONFUSE" not in current_actor.current_effects and (("WEAKNESS" in ability_results or "CRITICAL" in ability_results) if isinstance(ability_results, str) else any(("WEAKNESS" in result or "CRITICAL" in result) for result in ability_results)):
             $ fill_follow_up(party, enemies)
             call follow_up_loop
         
@@ -983,7 +988,7 @@ screen battle_choice:
     key "K_k" action If(selected_ability is None, SetVariable("selected_ability", "Kill Yourself"))
 
 screen turn_order_display:
-    frame at [turn_order_transform, xzoom_open(0.5, 0.5)]:
+    frame at [turn_order_transform, xzoom_open(0.5, 0.5, 0.01)]:
         background "#0000"
         ysize 23*len(turn_order)
         hbox:
@@ -1001,6 +1006,11 @@ screen turn_order_display:
                             background "#1118" # TODO: replace this with the unhighlight
                         text member.name size 13 yalign 0.5 font battle_font
 
+transform single_target_lock:
+    on show:
+        xcenter get_target_center(selected_target)[0]
+        ycenter get_target_center(selected_target)[1]
+
 transform turn_order_transform:
     on show:
         xalign 0.5
@@ -1014,9 +1024,9 @@ transform turn_order_transform:
     on hide:
         easeout_quart 1.0 xoffset -300
 
-transform xzoom_open(t=0.5, d=0.0):
+transform xzoom_open(t=0.5, d=0.0, xstart=0.0):
     on show:
-        xzoom 0.0
+        xzoom xstart
         d
         easein_quart t xzoom 1.0
     on hide:
@@ -1074,7 +1084,7 @@ label follow_up_loop:
     show expression follow_up_actor.follow_up._image at follow_up_actor.follow_up._transform
     "[follow_up_actor.name] follows up!"
 
-    if "WEAKNESS" in ability_results or "CRITICAL" in ability_results:
+    if (("WEAKNESS" in ability_results or "CRITICAL" in ability_results) if isinstance(ability_results, str) else any(("WEAKNESS" in result or "CRITICAL" in result) for result in ability_results)):
         jump follow_up_loop
 
     return
