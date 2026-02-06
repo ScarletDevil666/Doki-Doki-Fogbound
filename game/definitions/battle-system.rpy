@@ -281,7 +281,7 @@ init python:
                     return f"HIT\nWEAKNESS\n{damage}\n{affected[0:-2]}"
                 if critical:
                     return f"HIT\nCRITICAL\n{damage}\n{affected[0:-2]}"
-                return f"HIT\n{damage}\n{affected[0:-2]}"
+                return f"HIT\n{damage}\n{affected[0:-2]}" # 0:-2 on the affected to remove the ending newline
             return f"MISS"
 
         def magic_attack_multi(self, ability: MagicAbility, targets: list) -> list[str]:
