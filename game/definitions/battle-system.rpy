@@ -62,6 +62,121 @@ init python:
                 party_inventory.remove(self)
             else:
                 raise BattleException("Item not in inventory")
+        
+        @abstractmethod
+        def single(self, target):
+            pass
+        
+        @abstractmethod
+        def multiple(self, targets):
+            pass
+    
+    class AttackItem(Item):
+        def __init__(self, name: str, description: str, damage: int, element: str, cast_time: float, effect: str | None = None, effect_chance: float = 0, *, _transform=None, _image: str = None, _sound=None, multi:bool = False):
+            self.name = name
+            self.description = description
+            self.damage = damage
+            self.element = element
+            self.cast_time = cast_time # this will be used as a delay before showing the results
+            self.effect = effect
+            self.effect_chance = effect_chance
+            self._transform = _transform
+            self._image = _image
+            self._sound = _sound
+            self.multi = multi
+        
+        def use_item(self, target):
+            super().use_item(target)
+
+            if self.multi:
+                return self.multiple(target)
+            return self.single(target)
+
+        def single(self, target) -> str:
+            damage = random.randint(self.damage // 2, self.damage)
+            hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or self.name == "Follow Up" or self.name == "Band Together" or target.is_guarding
+            affected = ""
+            critical = False
+            if not self.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice
+                self.magic -= self.cost
+            if hit:
+                if target.is_guarding:
+                    damage //= 2
+                else:
+                    if self.element in target.weaknesses:
+                        damage *= 2
+                    elif self.element == "PHYSICAL":
+                        critical = random.randint(1, self.strength) > random.randint(1, target.defense)
+                        if critical:
+                            damage *= 2
+                damage -= target.defense
+                if self.effect is not None and random.random() <= (self.effect_chance / 100.0):
+                    target.apply_effect(self.effect)
+                    f"APPLIED {self.effect}\n"
+                if damage < 0:
+                    damage = 0
+                target.health -= damage
+                if target.health <= 0:
+                    affected += f"KILLED\n"
+                if target.is_guarding:
+                    return f"HIT\nGUARDED\n{damage}\n{affected}"
+                if self.element in target.weaknesses:
+                    return f"HIT\nWEAKNESS\n{damage}\n{affected}"
+                if critical:
+                    return f"HIT\nCRITICAL\n{damage}\n{affected}"
+                return f"HIT\n{damage}\n{affected}"
+            return f"MISS"
+        
+        def single(self, target) -> str:
+            heal = random.randint(ability.heal // 2, ability.heal)
+            affected = ""
+            if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice
+                self.magic -= ability.cost
+            if ability.negative_effects is not None and random.random()*100.0 <= ability.negative_effect_chance:
+                for effect in ability.negative_effects:
+                    del target.current_effects[effect]
+                    affected += f"CURED {effect}\n"
+            if ability.positive_effect is not None and random.random()*100.0 <= ability.positive_effect_chance:
+                target.apply_effect(ability.positive_effect)
+                affected += f"APPLIED {ability.positive_effect}\n"
+            target.health += heal
+            if target.health > target.max_health:
+                target.health = target.max_health
+                return f"FULL\nHEAL\n{heal}\n{affected}"
+            return f"HEAL\n{heal}\n{affected}"
+        
+        def multiple(self, targets) -> list[str]:
+            if not self.multi:
+                raise BattleException("This item is not multi-target (why did you call this when it was clearly for multi-target?)")
+            attacks = [self.single(target) for target in targets]
+            return attacks
+        
+    class HealingItem(Item):
+        def __init__(self, name: str, description: str, damage: int, element: str, cast_time: float, effect: str | None = None, effect_chance: float = 0, *, _transform=None, _image: str = None, _sound=None, multi:bool = False):
+            self.name = name
+            self.description = description
+            self.damage = damage
+            self.element = element
+            self.cast_time = cast_time # this will be used as a delay before showing the results
+            self.effect = effect
+            self.effect_chance = effect_chance
+            self._transform = _transform
+            self._image = _image
+            self._sound = _sound
+            self.multi = multi
+        
+        def use_item(self, target):
+            super().use_item(target)
+
+            if self.multi:
+                return self.multiple(target)
+            return self.single(target)
+        
+        def multiple(self, targets) -> list[str]:
+            if not self.multi:
+                raise BattleException("This item is not multi-target (why did you call this when it was clearly for multi-target?)")
+            attacks = [self.single(target) for target in targets]
+            return attacks
 
     class BattleMember(object, ABC): # Parent class for party members and enemies
         def __init__(self, name: str, kanji: str, max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], follow_up:MagicAbility, band_together_attack:MagicAbility):
@@ -107,6 +222,7 @@ init python:
             damage = random.randint(self.strength // 2, self.strength)
             hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or target.is_guarding
             affected = ""
+            critical = False
             if hit:
                 if target.is_guarding:
                     damage //= 2
@@ -136,6 +252,7 @@ init python:
             damage = random.randint(ability.damage // 2, ability.damage)
             hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or ability.name == "Follow Up" or ability.name == "Band Together" or target.is_guarding
             affected = ""
+            critical = False
             if not ability.multi: # since this is used in the multi-target function, I want to prevent the cost from being subtracted twice
                 self.magic -= ability.cost
             if hit:
@@ -491,10 +608,22 @@ init python:
             center: int = 1280 // (len(active_enemies)*2)
             left: int = 1280 // len(active_enemies) * active_enemies.index(target)
             x = left + center
-            y = 300
+            y = 435
         else:
             BattleException("Target isn't actively in this battle")
         return (x, y)
+    
+    def party_restoration(party: list[PartyMember]) -> None:
+        for member in party:
+            member.health = member.max_health
+            member.magic = member.max_magic
+            member.current_effects.clear()
+    
+    def enemies_restoration(enemies: list[Enemy | Boss]) -> None:
+        for enemy in enemies:
+            enemy.health = enemy.max_health
+            enemy.magic = enemy.max_magic
+            enemy.current_effects.clear()
 
 transform scroll_left(t):
     subpixel True
@@ -533,12 +662,11 @@ default party_inventory = [] # fill this with any items that are obtained along 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
 # If battle is called twice in the same sequence (i.e. something you'd do for boss phase transitions or something), DO NOT CHANGE THE NAME FOR THE BATTLE
-label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}):
+label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True):
     if last_checkpoint is None:
         $ active_party = party
         $ active_enemies = enemies
         $ decide_turn_order(party, enemies)
-        $ s_rank_possible = True
     
     if _music is not None:
         $ renpy.music.play(_music)
@@ -548,6 +676,10 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
     $ can_follow_up = []
     $ followed_up = []
     $ selected_ability = None
+    if restore_party:
+        $ party_restoration(party)
+    if restore_enemies:
+        $ enemies_restoration(enemies)
     scene expression transition_background at scroll_right(0.175)
     show battle_start at truecenter
     with Fade(0.1, 0.0, 0.1, color="#fff")
@@ -568,16 +700,16 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
 
         if all(e.health <= 0 for e in enemies):
             $ quick_menu = True
-            hide party_stats
-            hide turn_order_display
+            hide screen party_stats
+            hide screen turn_order_display
             call expression override_victory pass (*victory_args, **victory_kwargs)
-            hide enemies_display
+            hide screen enemies_display
             return
         if all(p.health <= 0 for p in party):
             $ quick_menu = True
-            hide party_stats
-            hide turn_order_display
-            hide enemies_display
+            hide screen party_stats
+            hide screen turn_order_display
+            hide screen enemies_display
             call expression override_defeat pass (*defeat_args, **defeat_kwargs)
             jump expression checkpoint_to_jump
 
@@ -634,7 +766,7 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
                 "[current_actor.name] casts [selected_ability.name]!"
             elif selected_ability == "Normal Attack":
                 $ ability_results = current_actor.normal_attack(selected_target)
-                show screen attack_results_display(1.0)
+                show screen attack_results_display(0.25)
                 "[current_actor.name] attacks!"
             else:
                 $ selected_target = party
@@ -656,9 +788,11 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
             $ fill_follow_up(party, enemies)
             call follow_up_loop
         
-        $ effect_update(current_actor)
+        $ ability_results = effect_update(current_actor)
+        $ selected_target = current_actor
         $ current_actor.effect_tick_down()
         if current_actor.current_effects != {}:
+            show screen attack_results_display(0.0)
             "[current_actor.name] gets affected by their current effects!"
         $ next_turn()
 
@@ -668,7 +802,7 @@ screen attack_results_display(delay, center = None):
     if isinstance(ability_results, list):
         for result in range(len(ability_results)):
             text ability_results[result] text_align 0.5 at results_transform(delay, get_target_center(selected_target[result]) if center is None else center)
-    else:
+    elif ability_results is not None:
         text ability_results text_align 0.5 at results_transform(delay, get_target_center(selected_target) if center is None else center)
     timer delay+2.0 action Hide("attack_results_display")
 
@@ -735,6 +869,8 @@ screen party_stats(party):
             xpos (1280 // len(party)) * party.index(member)
             if member == turn_order[current_turn]:
                 background "#3338" # turn highlight
+            elif isinstance(selected_ability, HealingAbility) and selected_ability.multi:
+                background "#5558"
             else:
                 background "#0008" # unhighlight
             hover_background "#5558"
@@ -744,11 +880,11 @@ screen party_stats(party):
                 text member.name size 15 font battle_font
                 text "HEALTH: [member.health]/[member.max_health]" font battle_font
                 text "MAGIC: [member.magic]/[member.max_magic]" font battle_font
-            action If(selected_target is None and isinstance(selected_ability, HealingAbility) and not isinstance(follow_up_actor, PartyMember), [SetVariable("selected_target", member), Return()])
+            action If(selected_target is None and isinstance(selected_ability, HealingAbility), [If(isinstance(selected_ability, HealingAbility) and selected_ability.multi, SetVariable("selected_target", active_party), SetVariable("selected_target", member)), Return()])
 
 default scanned_action = ""
 screen enemies_display:
-    text scanned_action xalign 0.5 yalign 1.0
+    text scanned_action xalign 0.5 yalign 1.0 text_align 0.5
     for enemy in active_enemies:
         button at from_bottom(3.5, 0.5 * active_enemies.index(enemy)):
             xysize (1280 // len(active_enemies), 400)
@@ -756,12 +892,14 @@ screen enemies_display:
             yalign 0.75
             if enemy == turn_order[current_turn]:
                 background "#3338" # turn highlight
+            elif isinstance(selected_ability, MagicAbility) and selected_ability.multi:
+                background "#5558"
             else:
                 background "#0000" # unhighlight
             hover_background "#5558"
             add enemy._image xalign 0.5 yalign 0.5
-            text enemy.name xalign 0.5 size 13 font battle_font
-            action If(selected_target is None and (isinstance(selected_ability, (MagicAbility, str)) or isinstance(follow_up_actor, PartyMember)), [SetVariable("selected_target", enemy), Return()], If(current_actor == test_monika or current_actor == monika, NullAction()))
+            text enemy.name xalign 0.5 size 13 font battle_font text_align 0.5
+            action If(selected_target is None and (isinstance(selected_ability, (MagicAbility, str)) or isinstance(follow_up_actor, PartyMember)), [If(isinstance(selected_ability, MagicAbility) and selected_ability.multi, SetVariable("selected_target", active_enemies), SetVariable("selected_target", enemy)), Return()], If(current_actor == test_monika or current_actor == monika, NullAction()))
             hovered If(current_actor == test_monika or current_actor == monika, SetVariable("scanned_action", "NEXT ACTION: [enemy.next_action[0] if isinstance(enemy.next_action[0], str) else enemy.next_action[0].name]\nTARGET: [enemy.next_action[1].name]"))
             unhovered SetVariable("scanned_action", "")          
 
@@ -845,21 +983,23 @@ screen battle_choice:
     key "K_k" action If(selected_ability is None, SetVariable("selected_ability", "Kill Yourself"))
 
 screen turn_order_display:
-    frame at turn_order_transform:
+    frame at [turn_order_transform, xzoom_open(0.5, 0.5)]:
         background "#0000"
-        ysize 20*len(turn_order)
-        frame:
-            xsize 2
-            background "#000"
-        vbox at xzoom_open(0.5, 0.5):
-            for member in turn_order:
-                frame:
-                    xysize (150, 20)
-                    if member == turn_order[current_turn]:
-                        background "#3338" # turn highlight
-                    else:
-                        background "#1118" # unhighlight
-                    text member.name size 13 yalign 0.5 font battle_font
+        ysize 23*len(turn_order)
+        hbox:
+            frame:
+                xsize 2
+                background "#000"
+            vbox:
+                yalign 0.5
+                for member in turn_order:
+                    frame:
+                        xysize (150, 21)
+                        if member == turn_order[current_turn]:
+                            background "#3338" # TODO: replace this with the turn highlight
+                        else:
+                            background "#1118" # TODO: replace this with the unhighlight
+                        text member.name size 13 yalign 0.5 font battle_font
 
 transform turn_order_transform:
     on show:
@@ -939,9 +1079,6 @@ label follow_up_loop:
 
     return
 
-default battle_rank = ""
-default s_rank_possible = True
-
 label battle_victory:
     call screen victory_screen
     return
@@ -955,7 +1092,7 @@ screen game_over:
     add Solid("#000")
     add "noise" alpha 0.05
     text _("Death has fallen upon you") size 100 font medieval_font align (0.5, 0.5) text_align 0.5 at fade_top(5.0, 1.0)
-    textbutton _("LAST CHECKPOINT") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 0 text_insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), SetVariable("s_rank_possible", False), Return()]) at fade_top(1.0, 1.5)
+    textbutton _("LAST CHECKPOINT") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 0 text_insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), Return()]) at fade_top(1.0, 1.5)
     textbutton _("RESTART BATTLE") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 30 action [SetVariable("checkpoint_to_jump", start_of_battle), Return()] at fade_top(1.0, 2.0)
     textbutton _("TITLE SCREEN") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 60 action MainMenu(True, False) at fade_top(1.0, 2.5)
     textbutton _("QUIT GAME") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 90 action Quit() at fade_top(1.0, 3.0)
@@ -992,5 +1129,3 @@ label test_battle:
     call battle("TEST BATTLE", [test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
     "TEST COMPLETE"
     return
-
-default persistent.highest_ranks = {}
