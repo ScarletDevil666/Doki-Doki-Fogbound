@@ -472,8 +472,29 @@ init python:
 
         return "a"
     
-    def get_target_center(target) -> tuple[float, float]:
-        pass # TODO: get the center coordinates of the target on the screen
+    def kill_yourself(targets: list[BattleMember]) -> list[str]:
+        for target in targets:
+            target.health = 0
+        return [f"KILLED\n" for _ in targets]
+    
+    def get_target_center(target) -> tuple[int, int]:
+        x: int = 0
+        y: int = 0
+        global active_party
+        global active_enemies
+        if target in active_party:
+            center: int = 1280 // (len(active_party)*2)
+            left: int = 1280 // len(active_party) * active_party.index(target)
+            x = left + center
+            y = 75
+        elif target in active_enemies:
+            center: int = 1280 // (len(active_enemies)*2)
+            left: int = 1280 // len(active_enemies) * active_enemies.index(target)
+            x = left + center
+            y = 300
+        else:
+            BattleException("Target isn't actively in this battle")
+        return (x, y)
 
 transform scroll_left(t):
     subpixel True
@@ -492,6 +513,7 @@ transform scroll_right(t):
     repeat
 
 
+default name_of_battle = ""
 default can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
 default followed_up = [] # this will be filled with party members who have already followed up, this will be cleared at the start of each turn, if this matches the party during any turn, then the band together attack will happen
 default turn_order = []
@@ -510,7 +532,8 @@ default party_inventory = [] # fill this with any items that are obtained along 
 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
-label battle(party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}):
+# If battle is called twice in the same sequence (i.e. something you'd do for boss phase transitions or something), DO NOT CHANGE THE NAME FOR THE BATTLE
+label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}):
     if last_checkpoint is None:
         $ active_party = party
         $ active_enemies = enemies
@@ -519,6 +542,7 @@ label battle(party, enemies, transition_background, battle_background, _music = 
     
     if _music is not None:
         $ renpy.music.play(_music)
+    $ name_of_battle = name
     $ quick_menu = False
     $ current_turn = 0
     $ can_follow_up = []
@@ -584,18 +608,16 @@ label battle(party, enemies, transition_background, battle_background, _music = 
                     $ selected_target = current_actor.next_action[1]
                     $ current_actor.choose_action(party, enemies)
 
-            # TODO: write a function that determines where the ability results should be shown on the screen and use it to show a screen that plays an animation showing the results
             if selected_ability == "Guard":
-                show screen attack_results_display(0.0)
                 $ selected_target = current_actor
                 $ ability_results = current_actor.guard()
+                show screen attack_results_display(0.0)
                 "[current_actor.name] raises their guard!"
             elif isinstance(selected_ability, Item):
-                show screen attack_results_display(selected_ability.cast_time)
                 $ ability_results = selected_ability.use_item(selected_target)
+                show screen attack_results_display(selected_ability.cast_time)
                 "[current_actor.name] uses [get_article(selected_ability.name)] [selected_ability.name]!"
             elif isinstance(selected_ability, (MagicAbility, HealingAbility)):
-                show screen attack_results_display(selected_ability.cast_time)
                 if isinstance(selected_ability, HealingAbility):
                     if selected_ability.multi:
                         $ ability_results = current_actor.heal_single(selected_ability, selected_target)
@@ -608,10 +630,17 @@ label battle(party, enemies, transition_background, battle_background, _music = 
                         $ ability_results = current_actor.magic_attack_single(selected_ability, selected_target)
                 play sound selected_ability._sound
                 show expression selected_ability._image at selected_ability._transform
+                show screen attack_results_display(selected_ability.cast_time)
                 "[current_actor.name] casts [selected_ability.name]!"
-            else:
+            elif selected_ability == "Normal Attack":
                 $ ability_results = current_actor.normal_attack(selected_target)
+                show screen attack_results_display(1.0)
                 "[current_actor.name] attacks!"
+            else:
+                $ selected_target = party
+                $ ability_results = kill_yourself(selected_target)
+                show screen attack_results_display(0.0)
+                "The party comits suicide!"
         elif current_actor.health > 0:
             if "PARALYZE" in current_actor.current_effects:
                 "[current_actor.name] is paralyzed!"
@@ -635,16 +664,24 @@ label battle(party, enemies, transition_background, battle_background, _music = 
 
         jump battle_loop
 
-screen attack_results_display(delay):
-    text ability_results at results_transform(delay, get_target_center(selected_target))
-    timer delay+3.0 action Hide("attack_results_display")
+screen attack_results_display(delay, center = None):
+    if isinstance(ability_results, list):
+        for result in range(len(ability_results)):
+            text ability_results[result] text_align 0.5 at results_transform(delay, get_target_center(selected_target[result]) if center is None else center)
+    else:
+        text ability_results text_align 0.5 at results_transform(delay, get_target_center(selected_target) if center is None else center)
+    timer delay+2.0 action Hide("attack_results_display")
 
 transform results_transform(d, c):
     xcenter c[0]
     ycenter c[1]
     on show:
-        pass
-
+        xoffset -1280
+        alpha 0.0
+        d
+        linear 0.1 xoffset -10 alpha 1.0
+        linear 1.0 xoffset 10 
+        linear 0.1 xoffset 1280 alpha 0.0
 
 default ability_description = ""
 screen ability_selection(member):
@@ -726,8 +763,7 @@ screen enemies_display:
             text enemy.name xalign 0.5 size 13 font battle_font
             action If(selected_target is None and (isinstance(selected_ability, (MagicAbility, str)) or isinstance(follow_up_actor, PartyMember)), [SetVariable("selected_target", enemy), Return()], If(current_actor == test_monika or current_actor == monika, NullAction()))
             hovered If(current_actor == test_monika or current_actor == monika, SetVariable("scanned_action", "NEXT ACTION: [enemy.next_action[0] if isinstance(enemy.next_action[0], str) else enemy.next_action[0].name]\nTARGET: [enemy.next_action[1].name]"))
-            unhovered SetVariable("scanned_action", "")
-                
+            unhovered SetVariable("scanned_action", "")          
 
 screen battle_choice:
     frame at from_top(1.0):
@@ -778,6 +814,23 @@ screen battle_choice:
                     hover_background "#3338"
                     text _("BACK") size 25 font battle_font align (0.5, 0.5) text_align 0.5
                     action SetVariable("selected_ability", None)
+            elif selected_ability == "Kill Yourself": # This is mainly gonna be used to reset the battle
+                frame:
+                    xsize 600
+                    background "#0000"
+                    text _("Confirm to commit suicide?") size 25 font battle_font align (0.5, 0.5) text_align 0.5
+                button:
+                    xsize 300
+                    background "#0000"
+                    hover_background "#3338"
+                    text _("CONFIRM") size 25 font battle_font align (0.5, 0.5) text_align 0.5
+                    action Return()
+                button:
+                    xsize 300
+                    background "#0000"
+                    hover_background "#3338"
+                    text _("BACK") size 25 font battle_font align (0.5, 0.5) text_align 0.5
+                    action SetVariable("selected_ability", None)
             else:
                 frame:
                     xsize 900
@@ -789,6 +842,7 @@ screen battle_choice:
                     hover_background "#3338"
                     text _("BACK") size 25 font battle_font align (0.5, 0.5) text_align 0.5
                     action SetVariable("selected_ability", None)
+    key "K_k" action If(selected_ability is None, SetVariable("selected_ability", "Kill Yourself"))
 
 screen turn_order_display:
     frame at turn_order_transform:
@@ -935,6 +989,8 @@ label test_battle:
     "BEGINNING TEST"
     $ start_of_battle = "test_battle"
     $ last_checkpoint = None
-    call battle([test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
+    call battle("TEST BATTLE", [test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
     "TEST COMPLETE"
     return
+
+default persistent.highest_ranks = {}
