@@ -119,12 +119,12 @@ init python:
                 if target.health <= 0:
                     affected += f"KILLED\n"
                 if target.is_guarding:
-                    return f"HIT\nGUARDED\n{damage}\n{affected}"
+                    return f"HIT\nGUARDED\n{damage}\n{affected[0:-2]}"
                 if self.element in target.weaknesses:
-                    return f"HIT\nWEAKNESS\n{damage}\n{affected}"
+                    return f"HIT\nWEAKNESS\n{damage}\n{affected[0:-2]}"
                 if critical:
-                    return f"HIT\nCRITICAL\n{damage}\n{affected}"
-                return f"HIT\n{damage}\n{affected}"
+                    return f"HIT\nCRITICAL\n{damage}\n{affected[0:-2]}"
+                return f"HIT\n{damage}\n{affected[0:-2]}"
             return f"MISS"
         
         def multiple(self, targets) -> list[str]:
@@ -170,8 +170,8 @@ init python:
             target.magic += magic_recovery
             if target.health > target.max_health:
                 target.health = target.max_health
-                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected}"
-            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected}"
+                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
+            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
 
         def multiple(self, targets) -> list[str]:
             if not self.multi:
@@ -241,12 +241,12 @@ init python:
                 if target.health <= 0:
                     affected += f"KILLED\n"
                 if target.is_guarding:
-                    return f"HIT\nGUARDED\n{damage}\n{affected}"
+                    return f"HIT\nGUARDED\n{damage}\n{affected[0:-2]}"
                 if "PHYSICAL" in target.weaknesses:
-                    return f"HIT\nWEAKNESS\n{damage}\n{affected}"
+                    return f"HIT\nWEAKNESS\n{damage}\n{affected[0:-2]}"
                 if critical:
-                    return f"HIT\nCRITICAL\n{damage}\n{affected}"
-                return f"HIT\n{damage}\n{affected}"
+                    return f"HIT\nCRITICAL\n{damage}\n{affected[0:-2]}"
+                return f"HIT\n{damage}\n{affected[0:-2]}"
             return f"MISS"
 
         def magic_attack_single(self, ability: MagicAbility, target) -> str:
@@ -276,12 +276,12 @@ init python:
                 if target.health <= 0:
                     affected += f"KILLED\n"
                 if target.is_guarding:
-                    return f"HIT\nGUARDED\n{damage}\n{affected}"
+                    return f"HIT\nGUARDED\n{damage}\n{affected[0:-2]}"
                 if ability.element in target.weaknesses:
-                    return f"HIT\nWEAKNESS\n{damage}\n{affected}"
+                    return f"HIT\nWEAKNESS\n{damage}\n{affected[0:-2]}"
                 if critical:
-                    return f"HIT\nCRITICAL\n{damage}\n{affected}"
-                return f"HIT\n{damage}\n{affected}"
+                    return f"HIT\nCRITICAL\n{damage}\n{affected[0:-2]}"
+                return f"HIT\n{damage}\n{affected[0:-2]}"
             return f"MISS"
 
         def magic_attack_multi(self, ability: MagicAbility, targets: list) -> list[str]:
@@ -305,8 +305,8 @@ init python:
             target.health += heal
             if target.health > target.max_health:
                 target.health = target.max_health
-                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{affected}"
-            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{affected}"
+                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{affected[0:-2]}"
+            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{affected[0:-2]}"
         
         def heal_multi(self, ability: HealingAbility, targets: list) -> list[str]:
             if not ability.multi:
