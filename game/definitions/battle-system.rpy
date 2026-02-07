@@ -250,7 +250,7 @@ init python:
             return f"MISS"
 
         def magic_attack_single(self, ability: MagicAbility, target) -> str:
-            damage = random.randint(ability.damage // 2, ability.damage)
+            damage = random.randint(ability.damage // 2, ability.damage)+self.max_magic
             hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or ability.name == "Follow Up" or ability.name == "Band Together" or target.is_guarding
             affected = ""
             critical = False
@@ -1165,10 +1165,21 @@ define battle_font = "mod_assets/fonts/NotoSerifJP-Regular.otf"
     #     ALMIGHTY
 # battle_member_template = BattleMember(_("Name"), "Kanji", max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 # TODO: fully define these
-default test_monika = PartyMember(_("Monika"), "モニカ", 300, 30, 30, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "ALMIGHTY", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
-default test_sayori = PartyMember(_("Sayori"), "さより", 200, 40, 20, 100, 400, 75, 50, ["WIND", "ELECTRIC", "FIRE"], [], MagicAbility("Follow Up", "", 100, 0, "LIGHT", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
-default test_yuri = PartyMember(_("Yuri"), "百合",       400, 20, 50, 200, 100, 50, 20, ["LIGHT", "ICE", "ALMIGHTY"], [], MagicAbility("Follow Up", "", 100, 0, "DARK", 1.0, multi=True), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
-default test_natsuki = PartyMember(_("Natsuki"), "無月", 200, 60, 10, 100, 350, 85, 40, ["WATER", "EARTH", "DARK"], [], MagicAbility("Follow Up", "", 100, 0, "PHYSICAL", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
+default test_monika = PartyMember(_("Monika"), "モニカ", 300, 30, 30, 100, 250, 35, 30, [], [
+
+], MagicAbility("Follow Up", "", 100, 0, "ALMIGHTY", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
+default test_sayori = PartyMember(_("Sayori"), "さより", 200, 40, 20, 100, 400, 75, 50, ["WIND", "ELECTRIC", "FIRE"], [
+
+], MagicAbility("Follow Up", "", 100, 0, "LIGHT", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
+default test_yuri = PartyMember(_("Yuri"), "百合",       400, 20, 50, 200, 100, 50, 20, ["LIGHT", "ICE", "ALMIGHTY"], [
+    MagicAbility(_("Stab"), "Stab a single enemy straight in the heart", 250, 15, "DARK", 1.0),
+    MagicAbility(_("Knife Storm"), "A flurry of knives that swirl around, hitting all enemies", 200, 20, "DARK", 1.0, multi=True),
+    MagicAbility(_("Poison Syringe"), "Inject a single enemy with poison through the veins", 100, 10, "DARK", 1.0, "POISON", 75.0)
+], MagicAbility("Follow Up", "", 500, 0, "DARK", 1.0, multi=True), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
+default test_natsuki = PartyMember(_("Natsuki"), "無月", 200, 60, 10, 100, 350, 85, 40, ["WATER", "EARTH", "DARK"], [
+    MagicAbility(_("Beat Up"), "PUNCHPUNCHPUNCHPUNCHPUNCHPUNCHPUNCH\non a single enemy", 250, 15, "PHYSICAL", 1.0),
+    MagicAbility(_("Whirlwind"), "Spin around a single enemy in a whirlwind of hand attacks, chance of inflicting confuse", 200, 20, "WIND", 1.0, "CONFUSE", 25.0)
+], MagicAbility("Follow Up", "", 350, 0, "PHYSICAL", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
 
 default monika = PartyMember(_("Monika"), "モニカ",      300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
 
