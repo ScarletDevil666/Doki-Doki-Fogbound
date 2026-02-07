@@ -231,7 +231,7 @@ init python:
                     if "PHYSICAL" in target.weaknesses:
                         damage *= 2
                     else:
-                        critical = random.randint(1, self.strength) > random.randint(1, target.defense)
+                        critical = random.randint(1, self.strength) > target.defense
                         if critical:
                             damage *= 2
                 damage -= target.defense
@@ -263,7 +263,7 @@ init python:
                     if ability.element in target.weaknesses:
                         damage *= 2
                     elif ability.element == "PHYSICAL":
-                        critical = random.randint(1, self.strength) > random.randint(1, target.defense)
+                        critical = random.randint(1, self.strength) >= target.defense
                         if critical:
                             damage *= 2
                 damage -= target.defense
@@ -625,6 +625,10 @@ init python:
             enemy.health = enemy.max_health
             enemy.magic = enemy.max_magic
             enemy.current_effects.clear()
+    
+    def update_active_enemies() -> None:
+        global active_enemies
+        active_enemies = [enemy for enemy in active_enemies if enemy.health > 0]
 
 transform scroll_left(t):
     subpixel True
@@ -642,8 +646,7 @@ transform scroll_right(t):
     linear t xpos 0.0
     repeat
 
-
-default name_of_battle = ""
+default name_of_battle = "" # this was originally used for a scrapped ranking system to save for each battle, now it's just an identifier so you can find battles easily
 default can_follow_up = [] # fill this with available party members who can follow up when conditions are fulfilled
 default followed_up = [] # this will be filled with party members who have already followed up, this will be cleared at the start of each turn, if this matches the party during any turn, then the band together attack will happen
 default turn_order = []
@@ -662,7 +665,6 @@ default party_inventory = [] # fill this with any items that are obtained along 
 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
-# If battle is called twice in the same sequence (i.e. something you'd do for boss phase transitions or something), DO NOT CHANGE THE NAME FOR THE BATTLE
 label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, transition=True, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True):
     if last_checkpoint is None:
         $ active_party = party
@@ -765,8 +767,10 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
                         $ ability_results = current_actor.magic_attack_multi(selected_ability, selected_target)
                     else:
                         $ ability_results = current_actor.magic_attack_single(selected_ability, selected_target)
-                play sound selected_ability._sound
-                show expression selected_ability._image at selected_ability._transform
+                if selected_ability._sound is not None:
+                    play sound selected_ability._sound
+                if selected_ability._image is not None:
+                    show expression selected_ability._image at selected_ability._transform
                 show screen attack_results_display(selected_ability.cast_time)
                 "[current_actor.name] casts [selected_ability.name]!"
             elif selected_ability == "Normal Attack":
@@ -787,6 +791,8 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
                 "[current_actor.name] can't act for unknown reasons!"
         else:
             "[current_actor.name] is dead!"
+
+        $ update_active_enemies()
 
         # follow ups
         if "CONFUSE" not in current_actor.current_effects and (("WEAKNESS" in ability_results or "CRITICAL" in ability_results) if isinstance(ability_results, str) else any(("WEAKNESS" in result or "CRITICAL" in result) for result in ability_results)):
@@ -904,7 +910,7 @@ screen enemies_display:
             hover_background "#5558"
             add enemy._image xalign 0.5 yalign 0.5
             text enemy.name xalign 0.5 size 13 font battle_font text_align 0.5
-            action If(selected_target is None and (isinstance(selected_ability, (MagicAbility, str)) or isinstance(follow_up_actor, PartyMember)), [If(isinstance(selected_ability, MagicAbility) and selected_ability.multi, SetVariable("selected_target", active_enemies), SetVariable("selected_target", enemy)), Return()], If(current_actor == test_monika or current_actor == monika, NullAction()))
+            action If(selected_target is None and (isinstance(selected_ability, (MagicAbility, str)) or follow_up_actor is not None), [If(isinstance(selected_ability, MagicAbility) and selected_ability.multi, SetVariable("selected_target", active_enemies), SetVariable("selected_target", enemy)), Return()], If(current_actor == test_monika or current_actor == monika, NullAction()))
             hovered If(current_actor == test_monika or current_actor == monika, SetVariable("scanned_action", "NEXT ACTION: [enemy.next_action[0] if isinstance(enemy.next_action[0], str) else enemy.next_action[0].name]\nTARGET: [enemy.next_action[1].name]"))
             unhovered SetVariable("scanned_action", "")          
 
@@ -1058,6 +1064,8 @@ transform fade_top(t=0.5, d=0.0):
 
 label follow_up_loop:
     $ follow_up_actor = None
+    $ selected_target = None
+    $ ability_results = None
     if can_follow_up == []:
         "No one is available to follow up!"
         return
@@ -1081,13 +1089,47 @@ label follow_up_loop:
     
     $ followed_up.append(follow_up_actor)
     $ ability_results = follow_up_actor.perform_follow_up(selected_target)
-    show expression follow_up_actor.follow_up._image at follow_up_actor.follow_up._transform
+    if follow_up_actor.follow_up._sound is not None:
+        play sound follow_up_actor.follow_up._sound
+    if follow_up_actor.follow_up._image is not None:
+        show expression follow_up_actor.follow_up._image at follow_up_actor.follow_up._transform
+    show screen attack_results_display(follow_up_actor.follow_up.cast_time)
     "[follow_up_actor.name] follows up!"
+
+    $ update_active_enemies()
 
     if (("WEAKNESS" in ability_results or "CRITICAL" in ability_results) if isinstance(ability_results, str) else any(("WEAKNESS" in result or "CRITICAL" in result) for result in ability_results)):
         jump follow_up_loop
 
     return
+
+screen follow_up_choice:
+    if follow_up_actor is None:
+        for member in party:
+            button at right_bounce:
+                xysize (1280 // len(party), 50)
+                xpos (1280 // len(party)) * party.index(member)
+                ypos 150
+                background "#0008" 
+                hover_background "#5558"
+                insensitive_foreground "#0008"
+                text "FOLLOW UP" size 25 font battle_font align (0.5, 0.5) text_align 0.5
+                action If(member in can_follow_up, [SetVariable("follow_up_actor", member), SetVariable("selected_ability", "Follow Up")])
+    else:
+        button at right_bounce:
+            xysize (1280, 50)
+            ypos 150
+            background "#0008" 
+            hover_background "#5558"
+            text "BACK" size 25 font battle_font align (0.5, 0.5) text_align 0.5
+            action [SetVariable("follow_up_actor", None), SetVariable("selected_ability", None)]
+
+transform right_bounce:
+    on show:
+        xoffset 1280
+        easein_bounce 1.0 xoffset 0
+    on hide:
+        easeout 1.0 xoffset 1280
 
 label battle_victory:
     call screen victory_screen
@@ -1110,17 +1152,28 @@ screen game_over:
 define audio.default_battle_music = "<loop 34.259 to 119.484>mod_assets/music/PLACEHOLDER BATTLE (Delete later).mp3"
 define medieval_font = "mod_assets/fonts/PowerdarkBold-O9RP.ttf"
 define battle_font = "mod_assets/fonts/NotoSerifJP-Regular.otf"
-
-# battle_member_template = BattleMember(_("Name"), "Kanji", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
+    # Available magic elements:
+    #     FIRE
+    #     WATER
+    #     EARTH
+    #     WIND
+    #     ELECTRIC
+    #     ICE
+    #     LIGHT
+    #     DARK
+    #     PHYSICAL
+    #     ALMIGHTY
+# battle_member_template = BattleMember(_("Name"), "Kanji", max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 # TODO: fully define these
-default test_monika = PartyMember(_("Monika"), "モニカ", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
-default test_sayori = PartyMember(_("Sayori"), "さより", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
-default test_yuri = PartyMember(_("Yuri"), "百合", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
-default test_natsuki = PartyMember(_("Natsuki"), "無月", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
-default monika = PartyMember(_("Monika"), "モニカ", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
+default test_monika = PartyMember(_("Monika"), "モニカ", 300, 30, 30, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "ALMIGHTY", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
+default test_sayori = PartyMember(_("Sayori"), "さより", 200, 40, 20, 100, 400, 75, 50, ["WIND", "ELECTRIC", "FIRE"], [], MagicAbility("Follow Up", "", 100, 0, "LIGHT", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
+default test_yuri = PartyMember(_("Yuri"), "百合",       400, 20, 50, 200, 100, 50, 20, ["LIGHT", "ICE", "ALMIGHTY"], [], MagicAbility("Follow Up", "", 100, 0, "DARK", 1.0, multi=True), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
+default test_natsuki = PartyMember(_("Natsuki"), "無月", 200, 60, 10, 100, 350, 85, 40, ["WATER", "EARTH", "DARK"], [], MagicAbility("Follow Up", "", 100, 0, "PHYSICAL", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
 
-default test_enemy_1 = Enemy(_("Enemy 1"), "敵1", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
-default test_enemy_2 = Enemy(_("Enemy 2"), "敵2", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
+default monika = PartyMember(_("Monika"), "モニカ",      300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
+
+default test_enemy_1 = Enemy(_("Enemy 1"), "敵1", 300, 60, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
+default test_enemy_2 = Enemy(_("Enemy 2"), "敵2", 300, 60, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
 #default test_boss = Boss(_("Boss"), "ボス", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 
 image battle_start:
