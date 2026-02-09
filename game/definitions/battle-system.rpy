@@ -170,8 +170,8 @@ init python:
             target.magic += magic_recovery
             if target.health > target.max_health:
                 target.health = target.max_health
-                return f"FULL\nHEAL\n{f"{heal}\n" if heal > 0 else ""}{f"{magic_recovery}\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
-            return f"HEAL\n{f"{heal}\n" if heal > 0 else ""}{f"{magic_recovery}\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
+                return f"FULL\nHEAL\n{f'{heal}\n' if heal > 0 else ''}{f'{magic_recovery}\n' if magic_recovery > 0 else ''}{affected[0:-2]}"
+            return f"HEAL\n{f'{heal}\n' if heal > 0 else ''}{f'{magic_recovery}\n' if magic_recovery > 0 else ''}{affected[0:-2]}"
 
         def multiple(self, targets) -> list[str]:
             if not self.multi:
@@ -305,8 +305,8 @@ init python:
             target.health += heal
             if target.health > target.max_health:
                 target.health = target.max_health
-                return f"FULL\nHEAL\n{f"{heal}\n" if heal > 0 else ""}{affected[0:-2]}"
-            return f"HEAL\n{f"{heal}\n" if heal > 0 else ""}{affected[0:-2]}"
+                return f"FULL\nHEAL\n{f'{heal}\n' if heal > 0 else ''}{affected[0:-2]}"
+            return f"HEAL\n{f'{heal}\n' if heal > 0 else ''}{affected[0:-2]}"
         
         def heal_multi(self, ability: HealingAbility, targets: list) -> list[str]:
             if not ability.multi:
