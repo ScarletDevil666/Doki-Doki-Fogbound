@@ -170,8 +170,8 @@ init python:
             target.magic += magic_recovery
             if target.health > target.max_health:
                 target.health = target.max_health
-                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
-            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{magic_recovery + "\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
+                return f"FULL\nHEAL\n{f"{heal}\n" if heal > 0 else ""}{f"{magic_recovery}\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
+            return f"HEAL\n{f"{heal}\n" if heal > 0 else ""}{f"{magic_recovery}\n" if magic_recovery > 0 else ""}{affected[0:-2]}"
 
         def multiple(self, targets) -> list[str]:
             if not self.multi:
@@ -250,7 +250,7 @@ init python:
             return f"MISS"
 
         def magic_attack_single(self, ability: MagicAbility, target) -> str:
-            damage = random.randint(ability.damage // 2, ability.damage)+self.max_magic
+            damage = random.randint(ability.damage // 2, ability.damage)+(self.max_magic//10)
             hit = random.randint(1, self.accuracy - (100 if "BLIND" in self.current_effects else 0)) > random.randint(1, target.evasion) or ability.name == "Follow Up" or ability.name == "Band Together" or target.is_guarding
             affected = ""
             critical = False
@@ -305,8 +305,8 @@ init python:
             target.health += heal
             if target.health > target.max_health:
                 target.health = target.max_health
-                return f"FULL\nHEAL\n{heal + "\n" if heal > 0 else ""}{affected[0:-2]}"
-            return f"HEAL\n{heal + "\n" if heal > 0 else ""}{affected[0:-2]}"
+                return f"FULL\nHEAL\n{f"{heal}\n" if heal > 0 else ""}{affected[0:-2]}"
+            return f"HEAL\n{f"{heal}\n" if heal > 0 else ""}{affected[0:-2]}"
         
         def heal_multi(self, ability: HealingAbility, targets: list) -> list[str]:
             if not ability.multi:
@@ -759,9 +759,9 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
             elif isinstance(selected_ability, (MagicAbility, HealingAbility)):
                 if isinstance(selected_ability, HealingAbility):
                     if selected_ability.multi:
-                        $ ability_results = current_actor.heal_single(selected_ability, selected_target)
-                    else:
                         $ ability_results = current_actor.heal_multi(selected_ability, selected_target)
+                    else:
+                        $ ability_results = current_actor.heal_single(selected_ability, selected_target)
                 else:
                     if selected_ability.multi:
                         $ ability_results = current_actor.magic_attack_multi(selected_ability, selected_target)
@@ -830,32 +830,39 @@ transform results_transform(d, c):
 
 default ability_description = ""
 screen ability_selection(member):
-    frame:
-        xysize (300, 700)
-        frame: # frame for the viewport
-            viewport: # viewport for the ability buttons
-                has vbox
-                for ability in member.magic_abilities:
-                    button: # button for the ability
-                        hovered SetVariable("ability_description", ability.description)
-                        unhovered SetVariable("ability_description", "")
-                        action If(member.magic >= ability.cost, [SetVariable("selected_ability", ability), Hide("ability_selection")])
-                        hbox:
-                            xalign 0.5
-                            add "[ability.element].png" # will change this if the image happens to be in a different folder
-                            frame:
-                                xysize (250, 20)
-                                text ability.name
-                            frame:
-                                xysize (20, 20)
-                                text "[ability.cost:>2:0]" text_align 1.0
-        frame: # frame for the ability description
-            text ability_description
+    frame at from_top(1.0): # frame for the viewport
+        xysize (600, 400)
+        xalign 0.5
+        viewport: # viewport for the ability buttons
+            has vbox
+            spacing 10
+            for ability in member.magic_abilities:
+                button: # button for the ability
+                    hovered SetVariable("ability_description", ability.description)
+                    unhovered SetVariable("ability_description", "")
+                    action If(member.magic >= ability.cost, [SetVariable("selected_ability", ability), Hide("ability_selection")])
+                    hbox:
+                        xalign 0.5
+                        frame:
+                            xysize (75, 75)
+                            text ability.element[0:3] font battle_font text_align 0.5 # just a thing, this will be replaced with icons later
+                            #add "[ability.element].png" # will change this if the image happens to be in a different folder
+                        frame:
+                            xysize (400, 75)
+                            text ability.name font battle_font text_align 0.5
+                        frame:
+                            xysize (75, 75)
+                            text "[ability.cost]" font battle_font text_align 1.0
+    frame at from_bottom(1.0): # frame for the ability description
+        yalign 1.0
+        xalign 0.5
+        xysize (600, 300)
+        text ability_description
 
 default item_description = ""
 screen item_selection:
-    frame:
-        xysize (300, 700)
+    frame at from_top(1.0):
+        xysize (300, 600)
         frame: # frame for the viewport
             viewport: # viewport for the item buttons
                 has vbox
@@ -871,6 +878,8 @@ screen item_selection:
                                 xysize (250, 20)
                                 text item.name
         frame: # frame for the item description
+            yalign 1.0
+            xysize (300, 600)
             text item_description
 
 screen party_stats(party):
@@ -891,7 +900,7 @@ screen party_stats(party):
                 text member.name size 15 font battle_font
                 text "HEALTH: [member.health]/[member.max_health]" font battle_font
                 text "MAGIC: [member.magic]/[member.max_magic]" font battle_font
-            action If(selected_target is None and isinstance(selected_ability, HealingAbility), [If(isinstance(selected_ability, HealingAbility) and selected_ability.multi, SetVariable("selected_target", active_party), SetVariable("selected_target", member)), Return()])
+            action If(selected_target is None and isinstance(selected_ability, HealingAbility), [If(isinstance(selected_ability, HealingAbility) and selected_ability.multi, SetVariable("selected_target", party), SetVariable("selected_target", member)), Return()])
 
 default scanned_action = ""
 screen enemies_display:
@@ -1066,29 +1075,31 @@ label follow_up_loop:
     $ follow_up_actor = None
     $ selected_target = None
     $ ability_results = None
-    if can_follow_up == []:
+    if can_follow_up == [] and not (len(followed_up) == (len(active_party)-1) or len(followed_up) == (len(active_enemies)-1)):
+        $ print(followed_up, (len(active_party)-1), (len(active_enemies)-1))
         "No one is available to follow up!"
         return
 
     if isinstance(current_actor, PartyMember) != ("CHARM" in current_actor.current_effects):
-        if len(followed_up) == len(active_party)-1:
+        if len(followed_up) == (len(active_party)-1):
             $ band_together_attack(party, enemies)
-            show expression follow_up_actor.band_together_attack._image at follow_up_actor.band_together_attack._transform
+            #show expression follow_up_actor.band_together_attack._image at follow_up_actor.band_together_attack._transform
             "The whole party bands together!"
             return
         else:
             call screen follow_up_choice
     else:
-        if len(followed_up) == len(active_enemies)-1:
+        if len(followed_up) == (len(active_enemies)-1):
             $ band_together_attack(party, enemies)
-            show expression follow_up_actor.band_together_attack._image at follow_up_actor.band_together_attack._transform
+            #show expression follow_up_actor.band_together_attack._image at follow_up_actor.band_together_attack._transform
             "All the enemies band together!"
             return
         $ follow_up_actor = random.choice(can_follow_up)
         $ selected_target = random.choice([member for member in party if member.health > 0])
     
-    $ followed_up.append(follow_up_actor)
-    $ ability_results = follow_up_actor.perform_follow_up(selected_target)
+    $ ability_results = follow_up_actor.perform_follow_up(selected_target, enemies if isinstance(follow_up_actor, PartyMember) else party)
+    if follow_up_actor.follow_up.multi:
+        $ selected_target = enemies if isinstance(follow_up_actor, PartyMember) else party
     if follow_up_actor.follow_up._sound is not None:
         play sound follow_up_actor.follow_up._sound
     if follow_up_actor.follow_up._image is not None:
@@ -1165,26 +1176,44 @@ define battle_font = "mod_assets/fonts/NotoSerifJP-Regular.otf"
     #     ALMIGHTY
 # battle_member_template = BattleMember(_("Name"), "Kanji", max_health: int, strength: int, defense: int, max_magic: int, speed: int, accuracy: int, evasion: int, weaknesses: list[str], magic_abilities:list[MagicAbility | HealingAbility], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 # TODO: fully define these
-default test_monika = PartyMember(_("Monika"), "モニカ", 300, 30, 30, 100, 250, 35, 30, [], [
-
-], MagicAbility("Follow Up", "", 100, 0, "ALMIGHTY", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
-default test_sayori = PartyMember(_("Sayori"), "さより", 200, 40, 20, 100, 400, 75, 50, ["WIND", "ELECTRIC", "FIRE"], [
-
-], MagicAbility("Follow Up", "", 100, 0, "LIGHT", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
-default test_yuri = PartyMember(_("Yuri"), "百合",       400, 20, 50, 200, 100, 50, 20, ["LIGHT", "ICE", "ALMIGHTY"], [
-    MagicAbility(_("Stab"), "Stab a single enemy straight in the heart", 250, 15, "DARK", 1.0),
-    MagicAbility(_("Knife Storm"), "A flurry of knives that swirl around, hitting all enemies", 200, 20, "DARK", 1.0, multi=True),
-    MagicAbility(_("Poison Syringe"), "Inject a single enemy with poison through the veins", 100, 10, "DARK", 1.0, "POISON", 75.0)
-], MagicAbility("Follow Up", "", 500, 0, "DARK", 1.0, multi=True), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
-default test_natsuki = PartyMember(_("Natsuki"), "無月", 200, 60, 10, 100, 350, 85, 40, ["WATER", "EARTH", "DARK"], [
-    MagicAbility(_("Beat Up"), "PUNCHPUNCHPUNCHPUNCHPUNCHPUNCHPUNCH\non a single enemy", 250, 15, "PHYSICAL", 1.0),
-    MagicAbility(_("Whirlwind"), "Spin around a single enemy in a whirlwind of hand attacks, chance of inflicting confuse", 200, 20, "WIND", 1.0, "CONFUSE", 25.0)
-], MagicAbility("Follow Up", "", 350, 0, "PHYSICAL", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999)
+default test_monika = PartyMember(_("Monika"), "モニカ", 900, 30, 30, 100, 250, 35, 30, [], [
+    MagicAbility(_("Take Control"), _("Charm an enemy"), 0, 20, "ALMIGHTY", 1.0, "CHARM", 100.0),
+    HealingAbility(_("Vaccine"), _("Cure any and all negative effects on a party member"), 0, 25, 1.0, [*available_negative_effects], 100.0),
+    HealingAbility(_("Delete All"), _("Delete any and all negative effects from the whole party"), 0, 50, 1.0, [*available_negative_effects], 100.0, multi=True)
+], MagicAbility("Follow Up", "", 200, 0, "ELECTRIC", 1.0), MagicAbility("Band Together", "", 300, 0, "ALMIGHTY", 1.0, multi=True), starting_exp = 999999) 
+default test_sayori = PartyMember(_("Sayori"), "さより", 800, 40, 20, 100, 400, 75, 50, ["WIND", "ELECTRIC", "FIRE"], [ # abilities relating to rope hangings or happiness (main healer)
+    MagicAbility(_("Lasso"), _("Noose on the neck, pull till it breaks (single enemy)"), 250, 15, "LIGHT", 1.0),
+    HealingAbility(_("Cure"), _("Heal a single party member a moderate amount"), 200, 15, 1.0),
+    HealingAbility(_("Mega Cure"), _("Heal the whole party a moderate amount"), 200, 30, 1.0, multi=True)
+], MagicAbility("Follow Up", "", 100, 0, "LIGHT", 1.0), MagicAbility("Band Together", "", 200, 0, "ALMIGHTY", 1.0, multi=True), starting_exp = 999999)
+default test_yuri = PartyMember(_("Yuri"), "百合",       1000, 20, 50, 200, 100, 50, 20, ["LIGHT", "ICE", "ALMIGHTY"], [
+    MagicAbility(_("Stab"), _("Stab a single enemy straight in the heart"), 250, 15, "DARK", 1.0),
+    MagicAbility(_("Knife Storm"), _("A flurry of knives that swirl around, hitting all enemies"), 200, 20, "DARK", 1.0, multi=True),
+    MagicAbility(_("Poison Syringe"), _("Inject a single enemy with poison through the veins"), 100, 10, "DARK", 1.0, "POISON", 75.0)
+], MagicAbility("Follow Up", "", 500, 0, "ALMIGHTY", 1.0, multi=True), MagicAbility("Band Together", "", 550, 0, "DARK", 1.0, multi=True), starting_exp = 999999)
+default test_natsuki = PartyMember(_("Natsuki"), "無月", 800, 60, 10, 100, 350, 85, 40, ["WATER", "EARTH", "DARK"], [
+    MagicAbility(_("Beat Up"), _("PUNCHPUNCHPUNCHPUNCHPUNCHPUNCHPUNCH\non a single enemy"), 250, 15, "PHYSICAL", 1.0),
+    MagicAbility(_("Whirlwind"), _("Spin around a single enemy in a whirlwind of hand attacks, chance of inflicting confuse"), 200, 20, "WIND", 1.0, "CONFUSE", 25.0),
+    MagicAbility(_("Campfire"), _("Cook all enemies over an open fire, chance of inflicting burn"), 225, 25, "FIRE", 1.0, "BURN", 25.0, multi=True)
+], MagicAbility("Follow Up", "", 350, 0, "PHYSICAL", 1.0), MagicAbility("Band Together", "", 400, 0, "FIRE", 1.0, multi=True), starting_exp = 999999)
 
 default monika = PartyMember(_("Monika"), "モニカ",      300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), starting_exp = 99999) 
 
-default test_enemy_1 = Enemy(_("Enemy 1"), "敵1", 300, 60, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
-default test_enemy_2 = Enemy(_("Enemy 2"), "敵2", 300, 60, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 100, 0, "", 1.0), _image=None, exp=10)
+default test_enemy_1 = Enemy(_("Satan"), "サタン", 10000, 60, 100, 900, 250, 70, 50, ["LIGHT"], [
+    MagicAbility(_("Burn Baby Burn"), "", 250, 10, "FIRE", 1.0, "BURN", 80.0, multi=True),
+    MagicAbility(_("Skewer"), "", 200, 10, "DARK", 1.0),
+    MagicAbility(_("Devour"), "", 250, 10, "PHYSICAL", 1.0)
+], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 300, 0, "", 1.0, multi=True), _image=None, exp=10)
+default test_enemy_2 = Enemy(_("Markov"), "マーコーヴ", 5000, 60, 40, 900, 250, 70, 50, ["ELECTRIC", "FIRE"], [
+    MagicAbility(_("Eye Almighty"), "", 300, 10, "ALMIGHTY", 1.0),
+    MagicAbility(_("Stare"), "", 150, 10, "DARK", 1.0, "BLIND", 50.0),
+    MagicAbility(_("Death Scream"), "", 250, 10, "EARTH", 1.0)
+], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 300, 0, "", 1.0, multi=True), _image=None, exp=10)
+default test_enemy_3 = Enemy(_("Death"), "死", 5000, 100, 60, 900, 250, 70, 50, ["ALMIGHTY", "PHYSICAL", "DARK"], [
+    MagicAbility(_("Black Scythe"), "", 400, 10, "PHYSICAL", 1.0, "PARALYZE", 50.0),
+    MagicAbility(_("Decide your fate"), "", 350, 10, "ALMIGHTY", 1.0, multi=True),
+    MagicAbility(_("Riverman Snap"), "", 300, 10, "DARK", 1.0)
+], MagicAbility("Follow Up", "", 100, 0, "", 1.0), MagicAbility("Band Together", "", 300, 0, "", 1.0, multi=True), _image=None, exp=10)
 #default test_boss = Boss(_("Boss"), "ボス", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 
 image battle_start:
@@ -1200,6 +1229,6 @@ label test_battle:
     "BEGINNING TEST"
     $ start_of_battle = "test_battle"
     $ last_checkpoint = None
-    call battle("TEST BATTLE", [test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
+    call battle("TEST BATTLE", [test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_3, test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
     "TEST COMPLETE"
     return
