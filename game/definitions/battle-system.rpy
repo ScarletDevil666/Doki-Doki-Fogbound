@@ -1022,11 +1022,13 @@ screen turn_order_display:
                         text member.name size 13 yalign 0.5 font battle_font
 
 transform single_target_lock:
+    subpixel True
     on show:
         xcenter get_target_center(selected_target)[0]
         ycenter get_target_center(selected_target)[1]
 
 transform turn_order_transform:
+    subpixel True
     on show:
         xalign 0.5
         yalign 0.5
@@ -1040,6 +1042,7 @@ transform turn_order_transform:
         easeout_quart 1.0 xoffset -300
 
 transform xzoom_open(t=0.5, d=0.0, xstart=0.0):
+    subpixel True
     on show:
         xzoom xstart
         d
@@ -1048,6 +1051,7 @@ transform xzoom_open(t=0.5, d=0.0, xstart=0.0):
         easeout_quart t xzoom 0.0
 
 transform from_top(t=0.5, d=0.0):
+    subpixel True
     on show:
         yoffset -720
         d
@@ -1056,6 +1060,7 @@ transform from_top(t=0.5, d=0.0):
         easeout_quart t*0.5 yoffset -720
 
 transform from_bottom(t=0.5, d=0.0):
+    subpixel True
     on show:
         yoffset 720
         d
@@ -1064,6 +1069,7 @@ transform from_bottom(t=0.5, d=0.0):
         easeout_quart t*0.5 yoffset 720
 
 transform fade_top(t=0.5, d=0.0):
+    subpixel True
     on show:
         yoffset -10 alpha 0.0
         d
@@ -1075,6 +1081,7 @@ label follow_up_loop:
     $ follow_up_actor = None
     $ selected_target = None
     $ ability_results = None
+    $ selected_ability = None
     if can_follow_up == [] and not (len(followed_up) == (len(active_party)-1) or len(followed_up) == (len(active_enemies)-1)):
         $ print(followed_up, (len(active_party)-1), (len(active_enemies)-1))
         "No one is available to follow up!"
@@ -1136,6 +1143,7 @@ screen follow_up_choice:
             action [SetVariable("follow_up_actor", None), SetVariable("selected_ability", None)]
 
 transform right_bounce:
+    subpixel True
     on show:
         xoffset 1280
         easein_bounce 1.0 xoffset 0
