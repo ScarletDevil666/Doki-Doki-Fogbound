@@ -238,6 +238,9 @@ init python:
                 if damage < 0:
                     damage = 0
                 target.health -= damage
+                self.magic += damage // 10
+                if self.magic > self.max_magic:
+                    self.magic = self.max_magic
                 if target.health <= 0:
                     affected += f"KILLED\n"
                 if target.is_guarding:
