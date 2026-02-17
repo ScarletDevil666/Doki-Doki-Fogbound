@@ -14,6 +14,12 @@ init python:
         PHYSICAL
     """
 
+    DAMAGE_CAP = None # The maximum amount of damage you want to allow, None for no limit
+    renpy.const("DAMAGE_CAP")
+
+    DAMAGE_MAXOUT = 2**31-1 # This is set to the max for a 32-bit integer to ensure maximum damage, should be used in line with DAMAGE_CAP
+    renpy.const("DAMAGE_MAXOUT")
+
     class BattleException(Exception):
         pass
 
@@ -115,6 +121,8 @@ init python:
                     f"APPLIED {self.effect}\n"
                 if damage < 0:
                     damage = 0
+                if DAMAGE_CAP is not None:
+                    damage = min(damage, DAMAGE_CAP)
                 target.health -= damage
                 if target.health <= 0:
                     affected += f"KILLED\n"
@@ -237,6 +245,8 @@ init python:
                 damage -= target.defense
                 if damage < 0:
                     damage = 0
+                if DAMAGE_CAP is not None:
+                    damage = min(damage, DAMAGE_CAP)
                 target.health -= damage
                 self.magic += damage // 10
                 if self.magic > self.max_magic:
@@ -275,6 +285,8 @@ init python:
                     f"APPLIED {ability.effect}\n"
                 if damage < 0:
                     damage = 0
+                if DAMAGE_CAP is not None:
+                    damage = min(damage, DAMAGE_CAP)
                 target.health -= damage
                 if target.health <= 0:
                     affected += f"KILLED\n"
