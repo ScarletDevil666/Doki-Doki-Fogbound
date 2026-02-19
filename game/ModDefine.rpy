@@ -101,3 +101,6 @@ define audio.war_sounds = "mod_assets/ambience/War Sounds.ogg"
 define audio.wind_fog = "mod_assets/ambience/Wind (Fog).ogg"
 define audio.wind = "mod_assets/ambience/wind.ogg"
 
+# Movies
+image movie = Movie(size=(1280, 720))
+image moviefg = Movie(size=(1280, 720), channel="moviefg", side_mask=True)
