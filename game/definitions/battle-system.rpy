@@ -644,6 +644,23 @@ init python:
     def update_active_enemies() -> None:
         global active_enemies
         active_enemies = [enemy for enemy in active_enemies if enemy.health > 0]
+    
+    class BattleBranch:
+        def __init__(self, branch: str, _condition: str, *args, **kwargs):
+            self.branch = branch
+            self._condition = renpy.python.py_compile(condition or "False", mode="eval")
+            self.args = args
+            self.kwargs = kwargs
+        
+        @property
+        def condition(self):
+            return renpy.python.py_eval_bytecode(self._condition)
+    
+    def check_branches(branches: list[BattleBranch]):
+        for i, branch in enumerate(branches):
+            if branch.condition:
+                renpy.call(branch.branch, *branch.args, **branch.kwargs)
+                del branches[i]
 
 transform scroll_left(t):
     subpixel True
@@ -680,7 +697,8 @@ default party_inventory = [] # fill this with any items that are obtained along 
 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
-label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, transition=True, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True):
+# Define every branch entry using this: BattleBranch(branch_name (label to call), condition)
+label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, transition=True, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True, branches = []):
     if last_checkpoint is None:
         $ active_party = party
         $ active_enemies = enemies
@@ -719,6 +737,8 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
         $ current_actor = turn_order[current_turn]
         $ current_actor.stop_guarding()
         $ followed_up.clear()
+
+        $ check_branches(branches)
 
         if all(e.health <= 0 for e in enemies):
             $ quick_menu = True
