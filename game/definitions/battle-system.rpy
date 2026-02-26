@@ -643,7 +643,10 @@ init python:
     
     def update_active_enemies() -> None:
         global active_enemies
+        global active_party
+        global turn_order
         active_enemies = [enemy for enemy in active_enemies if enemy.health > 0]
+        turn_order = [member for member in turn_order if member in active_party or member.health in active_enemies]
     
     class BattleBranch:
         def __init__(self, branch: str, _condition: str, *args, **kwargs):
@@ -685,6 +688,7 @@ default turn_order = []
 default active_party = []
 default active_enemies = [] # remember to remove each enemy that is defeated from this list
 default current_turn = 0
+default current_round = 0
 default selected_ability = None
 default selected_target = None
 default current_actor = None
@@ -713,6 +717,7 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
     $ can_follow_up = []
     $ followed_up = []
     $ selected_ability = None
+    $ current_round = 0
     if restore_party:
         $ party_restoration(party)
     if restore_enemies:
@@ -738,6 +743,8 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
         $ current_actor = turn_order[current_turn]
         $ current_actor.stop_guarding()
         $ followed_up.clear()
+        if current_turn == 0:
+            $ current_round += 1
 
         $ check_branches(branches)
 
@@ -827,6 +834,8 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
                 "[current_actor.name] can't act for unknown reasons!"
         else:
             "[current_actor.name] is dead!"
+        
+        $ check_branches(branches)
 
         $ update_active_enemies()
 
@@ -1149,6 +1158,8 @@ label follow_up_loop:
         show expression follow_up_actor.follow_up._image at follow_up_actor.follow_up._transform
     show screen attack_results_display(follow_up_actor.follow_up.cast_time)
     "[follow_up_actor.name] follows up!"
+
+    $ check_branches(branches)
 
     $ update_active_enemies()
 
