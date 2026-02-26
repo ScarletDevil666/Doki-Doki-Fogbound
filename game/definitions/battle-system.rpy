@@ -646,7 +646,7 @@ init python:
         global active_party
         global turn_order
         active_enemies = [enemy for enemy in active_enemies if enemy.health > 0]
-        turn_order = [member for member in turn_order if member in active_party or member.health in active_enemies]
+        turn_order = [member for member in turn_order if member in active_party or member in active_enemies]
     
     class BattleBranch:
         def __init__(self, branch: str, _condition: str, *args, **kwargs):
