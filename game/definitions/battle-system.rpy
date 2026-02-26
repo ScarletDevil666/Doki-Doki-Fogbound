@@ -626,7 +626,7 @@ init python:
             x = left + center
             y = 435
         else:
-            BattleException("Target isn't actively in this battle")
+            raise BattleException("Target isn't actively in this battle")
         return (x, y)
     
     def party_restoration(party: list[PartyMember]) -> None:
@@ -653,10 +653,10 @@ init python:
             self.kwargs = kwargs
         
         @property
-        def condition(self):
+        def condition(self) -> bool:
             return renpy.python.py_eval_bytecode(self._condition)
     
-    def check_branches(branches: list[BattleBranch]):
+    def check_branches(branches: list[BattleBranch]) -> None:
         for i, branch in enumerate(branches):
             if branch.condition:
                 renpy.call(branch.branch, *branch.args, **branch.kwargs)
@@ -702,7 +702,8 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
     if last_checkpoint is None:
         $ active_party = party
         $ active_enemies = enemies
-        $ decide_turn_order(party, enemies)
+        if not all(member in party or member in enemies for member in turn_order):
+            $ decide_turn_order(party, enemies)
     
     if _music is not None:
         $ renpy.music.play(_music)
