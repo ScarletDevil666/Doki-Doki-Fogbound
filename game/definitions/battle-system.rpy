@@ -490,6 +490,8 @@ init python:
 
     def decide_turn_order(party: list[PartyMember], enemies: list[Enemy | Boss]) -> None:
         global turn_order
+        if all(member in turn_order for member in [*party, *enemies]):
+            return
         turn_numbers = {}
         for member in [*party, *enemies]:
             turn_numbers[member] = member.decide_turn()
@@ -702,12 +704,11 @@ default party_inventory = [] # fill this with any items that are obtained along 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
 # I'm using they/them pronouns to address every member since there's no real way to identify gender here
 # Define every branch entry using this: BattleBranch(branch_name (label to call), condition)
-label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, *, transition=True, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True, branches = []):
+label battle(name, party, enemies, transition_background, battle_background, _music = audio.default_battle_music, music_buildup=6.3, *, transition=True, override_victory = "battle_victory", override_defeat = "battle_defeat", victory_args = tuple(), defeat_args = tuple(), victory_kwargs = {}, defeat_kwargs = {}, restore_party = True, restore_enemies = True, branches = []):
     if last_checkpoint is None:
         $ active_party = party
         $ active_enemies = enemies
-        if not all(member in party or member in enemies for member in turn_order):
-            $ decide_turn_order(party, enemies)
+    $ decide_turn_order(party, enemies)
     
     if _music is not None:
         $ renpy.music.play(_music)
@@ -724,9 +725,10 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
         $ enemies_restoration(enemies)
     if transition:
         scene expression transition_background at scroll_right(0.175)
-        show battle_start at truecenter
+        $ zoom_time = min(1.0, music_buildup/3.0)
+        show battle_start at battle_transition(zoom_time)
         with Fade(0.1, 0.0, 0.1, color="#fff")
-        pause 4.3
+        pause (music_buildup - 2*zoom_time)
         hide battle_start with None
     scene expression battle_background
     show screen enemies_display
@@ -1216,6 +1218,7 @@ screen game_over:
     textbutton _("QUIT GAME") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 90 action Quit() at fade_top(1.0, 3.0)
 
 define audio.default_battle_music = "<loop 34.259 to 119.484>mod_assets/music/PLACEHOLDER BATTLE (Delete later).mp3"
+define audio.default_boss_music = "<loop 29.6454375 to 108.00260416666667>mod_assets/music/PLACEHOLDER BOSS (Delete later).mp3"
 define medieval_font = "mod_assets/fonts/PowerdarkBold-O9RP.ttf"
 define battle_font = "mod_assets/fonts/NotoSerifJP-Regular.otf"
     # Available magic elements:
@@ -1272,18 +1275,23 @@ default test_enemy_3 = Enemy(_("Death"), "死", 5000, 100, 60, 900, 250, 70, 50,
 #default test_boss = Boss(_("Boss"), "ボス", 300, 30, 20, 100, 250, 35, 30, [], [], MagicAbility("Follow Up", "", 100, 0, ""), MagicAbility("Band Together", "", 100, 0, ""))
 
 image battle_start:
+    subpixel True
     "mod_assets/visuals/battle_start.png"
+
+transform battle_transition(t=1.0):
+    subpixel True
+    truecenter
     on show:
         zoom 3.0
-        linear 1.0 zoom 1.0
+        linear t zoom 1.0
     on hide:
-        linear 1.0 zoom 3.0
+        linear t zoom 3.0
         alpha 0.0
 
 label test_battle:
     "BEGINNING TEST"
     $ start_of_battle = "test_battle"
     $ last_checkpoint = None
-    call battle("TEST BATTLE", [test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_3, test_enemy_1, test_enemy_2], "bg bedroom", "bg closet")
+    call battle("TEST BATTLE", [test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_3, test_enemy_1, test_enemy_2], "bg bedroom", "bg closet", audio.default_boss_music, 2.7)
     "TEST COMPLETE"
     return
