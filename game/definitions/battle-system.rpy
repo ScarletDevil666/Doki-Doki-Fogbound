@@ -519,11 +519,19 @@ init python:
                 can_follow_up.remove(member)
     
     def band_together_attack(party: list[PartyMember], enemies: list[Enemy | Boss]) -> list[str]:
+        import re
         global turn_order
         global current_turn
         who_started = turn_order[current_turn]
         attacks = [member.band_together_ability(enemies if isinstance(who_started, PartyMember) else party) for member in (party if isinstance(who_started, PartyMember) else enemies)]
-        return attacks
+        result = []
+        for attack in attacks:
+            match = re.match(r"(.*?)(\d+)$", attack[0])
+            if match:
+                prefix = match.group(1)
+                total = sum(int(re.search(r"(\d+)$", s).group(1)) for s in attack)
+                result.append(f"{prefix}{total}")
+        return result
     
     def next_turn() -> None:
         global current_turn
