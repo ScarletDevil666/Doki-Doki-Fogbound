@@ -674,6 +674,11 @@ init python:
             if branch.condition:
                 renpy.call(branch.branch, *branch.args, **branch.kwargs)
                 del branches[i]
+    
+    class BattleCheckpoint:
+        def __init__(self, name: str, jump_to: str):
+            self.name = name
+            self.jump_to = jump_to
 
 transform scroll_left(t):
     subpixel True
@@ -705,8 +710,8 @@ default current_actor = None
 default follow_up_actor = None
 default ability_results = None
 default checkpoint_to_jump = "battle_loop"
-default start_of_battle = "battle_loop" # set this to the starting label of each battle
-default last_checkpoint = None # set this to the checkpoint label of each battle phase (None if it is the very start of the battle)
+default checkpoints = []
+default last_checkpoint = None
 default party_inventory = [] # fill this with any items that are obtained along the way, they will be used in battles mostly
 
 # It is highly recommended to call a label that calls this one for this to work, because if you call this from the current main story label, the only real option to jump to is the start of that loop if the battle is failed, and it will cause the player to completely restart that story instead of just the battle
@@ -716,6 +721,7 @@ label battle(name, party, enemies, transition_background, battle_background, _mu
     if last_checkpoint is None:
         $ active_party = party
         $ active_enemies = enemies
+        $ last_checkpoint = checkpoints[-1]
     $ decide_turn_order(party, enemies)
     
     if _music is not None:
@@ -1219,11 +1225,13 @@ label battle_defeat:
 screen game_over:
     add Solid("#000")
     add "noise" alpha 0.05
-    text _("Death has fallen upon you") size 100 font medieval_font align (0.5, 0.5) text_align 0.5 at fade_top(5.0, 1.0)
-    textbutton _("LAST CHECKPOINT") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 0 text_insensitive_color "#fff8" action If(last_checkpoint is not None, [SetVariable("checkpoint_to_jump", last_checkpoint), Return()]) at fade_top(1.0, 1.5)
-    textbutton _("RESTART BATTLE") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 30 action [SetVariable("checkpoint_to_jump", start_of_battle), Return()] at fade_top(1.0, 2.0)
-    textbutton _("TITLE SCREEN") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 60 action MainMenu(True, False) at fade_top(1.0, 2.5)
-    textbutton _("QUIT GAME") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.8 yoffset 90 action Quit() at fade_top(1.0, 3.0)
+    text _("Death has fallen upon you") size 100 font medieval_font align (0.5, 0.25) text_align 0.5 at fade_top(5.0, 1.0)
+    if checkpoints:
+        text _("CHECKPOINTS") size 35 font medieval_font color "#fff" text_align 0.5 xalign 0.5 yalign 0.6 yoffset 0 at fade_top(1.0, 1.5)
+    for i, checkpoint in enumerate(checkpoints):
+        textbutton checkpoint.name text_size 20 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.6 yoffset 30 action [SetVariable("checkpoint_to_jump", checkpoint.jump_to), Return()] at fade_top(1.0, 2.0 + (i*0.5))
+    textbutton _("TITLE SCREEN") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.7 yoffset 60 action MainMenu(True, False) at fade_top(1.0, 2.0 + (len(checkpoints)*0.5))
+    textbutton _("QUIT GAME") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.7 yoffset 90 action Quit() at fade_top(1.0, 2.5 + (len(checkpoints)*0.5))
 
 define audio.default_battle_music = "<loop 34.259 to 119.484>mod_assets/music/PLACEHOLDER BATTLE (Delete later).mp3"
 define audio.default_boss_music = "<loop 29.6454375 to 108.00260416666667>mod_assets/music/PLACEHOLDER BOSS (Delete later).mp3"
@@ -1298,8 +1306,8 @@ transform battle_transition(t=1.0):
 
 label test_battle:
     "BEGINNING TEST"
-    $ start_of_battle = "test_battle"
-    $ last_checkpoint = None
+    $ checkpoints.clear()
+    $ checkpoints.append(BattleCheckpoint(_("START OF BATTLE"), "test_battle"))
     call battle("TEST BATTLE", [test_monika, test_sayori, test_yuri, test_natsuki], [test_enemy_3, test_enemy_1, test_enemy_2], "bg bedroom", "bg closet", audio.default_boss_music, 2.7)
     "TEST COMPLETE"
     return
