@@ -679,6 +679,12 @@ init python:
         def __init__(self, name: str, jump_to: str):
             self.name = name
             self.jump_to = jump_to
+            global active_party
+            global active_enemies
+            self.party = active_party
+            self.enemies = active_enemies
+            global inventory
+            self.inventory = inventory
 
 transform scroll_left(t):
     subpixel True
@@ -1229,7 +1235,7 @@ screen game_over:
     if checkpoints:
         text _("CHECKPOINTS") size 35 font medieval_font color "#fff" text_align 0.5 xalign 0.5 yalign 0.6 yoffset 0 at fade_top(1.0, 1.5)
     for i, checkpoint in enumerate(checkpoints):
-        textbutton checkpoint.name text_size 20 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.6 yoffset 30 action [SetVariable("checkpoint_to_jump", checkpoint.jump_to), Return()] at fade_top(1.0, 2.0 + (i*0.5))
+        textbutton checkpoint.name text_size 20 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.6 yoffset 30 action [SetVariable("checkpoint_to_jump", checkpoint.jump_to), SetVariable("inventory", checkpoint.inventory), SetVariable("active_party", checkpoint.party), SetVariable("active_enemies", checkpoint.enemies), Return()] at fade_top(1.0, 2.0 + (i*0.5))
     textbutton _("TITLE SCREEN") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.7 yoffset 60 action MainMenu(True, False) at fade_top(1.0, 2.0 + (len(checkpoints)*0.5))
     textbutton _("QUIT GAME") text_size 25 text_font medieval_font text_color "#fff" text_hover_color "#aaa" text_align 0.5 xalign 0.5 yalign 0.7 yoffset 90 action Quit() at fade_top(1.0, 2.5 + (len(checkpoints)*0.5))
 
